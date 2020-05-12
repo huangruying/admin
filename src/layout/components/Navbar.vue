@@ -65,8 +65,19 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      var res = await this.$store.dispatch('user/logout')
+      if(res.code == '200'){
+        this.$message({
+          message: '退出登录成功！',
+          type: 'success'
+        })
+        this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      }else{
+        this.$message({
+          message: '退出失败！',
+          type: 'error'
+        })
+      }
     }
   }
 }
@@ -130,7 +141,11 @@ export default {
       .avatar-wrapper {
         margin-top: 5px;
         position: relative;
-
+        display: flex;
+        align-items: center;
+        >span{
+          margin-left: 10px;
+        }
         .user-avatar {
           cursor: pointer;
           width: 40px;
@@ -142,7 +157,7 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 20px;
           font-size: 12px;
         }
       }

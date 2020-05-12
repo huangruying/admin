@@ -60,10 +60,12 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
+      var obj = localStorage.getItem('data')
+      var obj = JSON.parse(obj)
       var data = {
-        roles: ['carWash'],
-        name: '哈哈',
-        avatar: ''
+        roles: obj.roles,
+        name: obj.username,
+        avatar: obj.pic
       }
       const { roles, name, avatar } = data
       commit('SET_ROLES', roles)
@@ -101,11 +103,11 @@ const actions = {
       var obj = JSON.parse(obj)
       logout({
         username: obj.username
-      }).then(() => {
+      }).then((res) => {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
-        resolve()
+        resolve(res)
       }).catch(error => {
         reject(error)
       })

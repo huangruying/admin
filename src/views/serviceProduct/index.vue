@@ -4,36 +4,20 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.id"
-          placeholder="请输入账号ID"
+          v-model="queryList.productId"
+          placeholder="请输入产品id"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
-          v-model="queryList.dotName"
-          placeholder="请输入网点名称"
+          v-model="queryList.author"
+          placeholder="请输入创建人"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.phone"
-          placeholder="请输入手机号码"
+          <el-input
+          v-model="queryList.productName"
+          placeholder="请输入产品名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
-            <el-option
-              v-for="item in statusList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
-            ></el-option>
-          </el-select>
-          <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="类型">
-            <el-option
-              v-for="item in nodeTypesList"
-              :label="item.type"
-              :value="item.type"
-              :key="item.id"
-            ></el-option>
-          </el-select>
           <el-date-picker
             class="input fl"
             style="width:260px"
@@ -54,7 +38,6 @@
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
-            <el-button type="primary" @click="newly">新增</el-button>
          </div>
        </div>
     </div>
@@ -66,49 +49,75 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="账号ID" prop="id" fixed align="center">
+      <el-table-column label="订单编号" prop="orderNo" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="网点类型" prop="realname" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.realname }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="用户名" prop="username" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="手机号码" prop="phone" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" prop="status" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型" prop="type" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.type }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="网点名称" prop="dotName" align="center">
+      <el-table-column label="车行名称" prop="dotName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" prop="createTime" align="center" width="250">
+      <el-table-column label="车牌号" prop="licensePlate" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime }}</span>
+          <span>{{ scope.row.licensePlate }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="联系人" prop="shopowner" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.shopowner }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="手机号" prop="phone" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.phone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderStatusCopy }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单来源" prop="orderSource" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderSource }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="项目名称" prop="projectName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.projectName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="应收金额" prop="money" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.money }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="预约时间" prop="appointmentTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.appointmentTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="下单时间" prop="placeTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.placeTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否对账" prop="reconciliationCopy" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.reconciliationCopy }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" prop="remarks" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.remarks }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button>
+          <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -119,67 +128,73 @@
       :limit.sync="data.per_page"
       @pagination="getPageData"
     />
-    <!-- 弹窗编辑新增 -->
+    <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
-      width="40%"
+      width="50%"
       @close="close"
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
            <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="用户名:" prop="username" style="width:100%">
-              <el-input v-model="itemObj.username" style="width:210px"></el-input>
+           <el-form-item label="订单编号:" prop="orderNo" style="width:50%">
+              <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="手机号码:" prop="phone" style="width:100%">
-              <el-input v-model="itemObj.phone" style="width:210px"></el-input>
+           <el-form-item label="车行名称:" prop="dotName" style="width:50%">
+              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="用户密码:" prop="password" style="width:100%">
-              <el-input v-model="itemObj.password" style="width:210px" type="password"></el-input>
+           <el-form-item label="车行联系人:" prop="shopowner" style="width:50%">
+              <el-input v-model="itemObj.shopowner" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="状态:" prop="status" style="width:100%">
-             <el-switch
-              v-model="itemObj.status"
-              active-color="#13ce66">
-            </el-switch>
+           <el-form-item label="车行联系人电话:" prop="phone" style="width:50%">
+              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="类型:" prop="dotType" style="width:100%">
-              <el-select v-model="itemObj.dotType" @change="getData" tyle="width:210px" placeholder="类型" :disabled="inputDisabled">
-                <el-option
-                  v-for="item in nodeTypesList2"
-                  :label="item.type"
-                  :value="item.type"
-                  :key="item.id"
-                ></el-option>
-              </el-select>
+           <el-form-item label="车行地址:" prop="address" style="width:50%">
+              <el-input v-model="itemObj.address" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="网点名称:" prop="dotName" style="width:100%">
-              <el-input v-model="itemObj.dotName" style="width:210px" :disabled="inputDisabled"></el-input>
+           <!-- <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
+              <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
+           </el-form-item> -->
+           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
+              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 手机号:" prop="phone" style="width:50%">
+              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 订单状态:" prop="orderStatusCopy" style="width:50%">
+              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 订单来源:" prop="orderSource" style="width:50%">
+              <el-input v-model="itemObj.orderSource" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 项目名称:" prop="projectName" style="width:50%">
+              <el-input v-model="itemObj.projectName" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 应收金额:" prop="money" style="width:50%">
+              <el-input v-model="itemObj.money" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 预约时间:" prop="appointmentTime" style="width:50%">
+              <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
+              <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 是否对账:" prop="reconciliationCopy" style="width:50%">
+              <el-input v-model="itemObj.reconciliationCopy" style="width:80%" disabled></el-input>
            </el-form-item>
        </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" :loading="loadingBootm" @click="editDialogVisible">确 定</el-button>
+        <el-button type="primary" :loading="loadingBootm" @click="editDialog = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { findDotUserInfos , saveDotUser , findCarwashTypeInfos , updateDotUserById} from '@/api/account'
+import { findExternalProductAll } from '@/api/guest/serviceProduct'
 import Pagination from "@/components/Pagination"
-// import areaJson from '@/utils/city_data'
 export default {
-  // filters: {
-  //   statusFilter(status) {
-  //     const statusMap = {
-  //       published: 'success',
-  //       draft: 'gray',
-  //       deleted: 'danger'
-  //     }
-  //     return statusMap[status]
-  //   }
-  // },
   components: {
     Pagination
   },
@@ -208,10 +223,7 @@ export default {
       loading: false,
       passDialog: false,
       editDialog: false,
-      // areaJson:areaJson,
-      itemObj: {
-        openingBank: false
-      },
+      itemObj: {},
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' },
@@ -242,75 +254,66 @@ export default {
         link: ""
       },
       queryList: {
-        id: null,
-        status: null,
-        dotName: null,
-        phone: null,
-        nodeTypes: null,
+        productId: null,
+        author: null,
+        productName: null,
         time: ["", ""],
-      },
-      statusList: [
-        {
-          name: '启用',
-          value: 1
-        },
-        {
-          name: '禁用',
-          value: 0
-        },
-      ],
-      nodeTypesList: [
-        {
-          type: '车行',
-          id: 0
-        },
-        {
-          type: '代办机构',
-          id: 1
-        }
-      ],
-      nodeTypesList2: [
-        {
-          type: '车行',
-          id: 0
-        },
-        {
-          type: '代办机构',
-          id: 1
-        }
-      ]
+      }
     }
   },
   created() {
     this.getData()
-    // this.apiTypeInfos()
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
-    apiTypeInfos(){
-      findCarwashTypeInfos().then(res=>{
-        // console.log(res);
-        this.nodeTypesList = res.data
-      })
+    reconciliation(item){
+       this.open(item.orderNo)
+    },
+    open(orderNo) {
+        this.$confirm('确定对账?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateReconciliationByOrderNo({orderNo}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
     },
     getData(filter){
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.id) {
-        data.id = queryList.id
-      }
-      if (!queryList.status) {
-        data.status = queryList.status
-      }
-      if (queryList.dotName) {
-        data.dotName = queryList.dotName
+      if (queryList.licensePlate) {
+        data.licensePlate = queryList.licensePlate
       }
       if (queryList.phone) {
         data.phone = queryList.phone   
       }
-      if (queryList.nodeTypes) {
-        data.nodeTypes = queryList.nodeTypes
+      if (queryList.garageName) {
+        data.garageName = queryList.garageName   
+      }
+      if (queryList.orderStatus) {
+        data.orderStatus = queryList.orderStatus   
+      }
+      if (queryList.orderSource) {
+        data.orderSource = queryList.orderSource   
       }
       if (queryList.time[0] && queryList.time[1]) {
         data.startTime = queryList.time[0]
@@ -324,28 +327,41 @@ export default {
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      // console.log(data);
-      findDotUserInfos(data).then(res=>{
-        console.log(res);
-        this.data = res;
+      findExternalProductAll(data).then(res=>{
+        // this.data = res;
         this.loading = false;
-        if (res.data.length <= 0) {
+        if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
+          this.data.data = []
         }
-        if( res.data.length > 0){
+        if( res.data && res.data.length > 0){
+          console.log(res);
+          this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.status == 1){
-              v.statusCopy = "启用"
-            }else if(v.status == 0){
-              v.statusCopy = "禁用"
+            if(v.orderStatus == 0){
+              v.orderStatusCopy = '未支付'
+            }else{
+              v.orderStatusCopy = '已支付'
             }
-            
+            if(v.reconciliation == 0){
+              v.reconciliationCopy = '未对账'
+            }else if(v.reconciliation == 1){
+              v.reconciliationCopy = '已对账'
+            }
           })
         }
       })
+    },
+    compile(item){
+      this.dialogTitle = "查看"
+      this.itemObj = item
+      this.editDialog = true
+    },
+    close(){
+      this.itemObj = {}
     },
     handleFilter(){
       this.getData()
@@ -353,83 +369,13 @@ export default {
     getPageData(e) {
       this.getData("page");
     },
-    compile(item){
-      this.dotCode = item.dotCode
-      this.editDialog = true
-      this.dialogTitle = "编辑"
-      this.itemObj = item
-      this.inputDisabled = true
-    },
-    newly(){
-      this.editDialog = true
-      this.dialogTitle = "新增"
-      this.inputDisabled = false
-      this.urlBl = true
-    },
-    editDialogVisible(){
-      // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
-      // var data = this.itemObj
-      // var arr = Object.keys(data);
-      this.$refs['ruleForm'].validate((valid) => {
-          if (valid) {
-            this.loadingBootm = true
-            if(this.itemObj.status){
-              this.itemObj.status = 1
-            }else{
-              this.itemObj.status = 2
-            }
-            if(this.urlBl){
-              saveDotUser(this.itemObj).then(res=>{
-                this.loadingBootm = false
-                if(res.code == 200){
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success'
-                  })
-                  this.editDialog = false
-                }else{
-                  this.$message({
-                    message: res.msg,
-                    type: 'warning'
-                  })
-                }
-                console.log(res);
-              })
-            }else{
-              updateDotUserById(this.itemObj).then(res=>{
-                this.loadingBootm = false
-                if(res.code == 200){
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success'
-                  })
-                  this.editDialog = false
-                }else{
-                  this.$message({
-                    message: res.msg,
-                    type: 'warning'
-                  })
-                }
-              })
-            }
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-      });
-    },
-    close(){
-      this.itemObj = {}
-      this.getData()
-      this.urlBl = false
-    },
     reset(){
       this.queryList = {
-        id: null,
-        status: null,
-        dotName: null,
+        licensePlate: null,
         phone: null,
-        nodeTypes: null,
+        garageName: null,
+        orderStatus: null,
+        orderSource: null,
         time: ["", ""],
       }
     },

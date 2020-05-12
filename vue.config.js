@@ -36,7 +36,13 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    // headers: {
+    //   'Access-Control-Allow-Origin': '*'
+    // },
+    // hotOnly: false,
+    // disableHostCheck: true
+     before: require('./mock/mock-server.js')
+    // "dev": "vue-cli-service serve", // package.json 复制
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

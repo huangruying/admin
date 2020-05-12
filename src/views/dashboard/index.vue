@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">欢迎来到洗车后台 dad</div>
+    <div class="dashboard-text">欢迎来到愉悦超级管理后台</div>
   </div>
 </template>
 

@@ -75,7 +75,7 @@ export const asyncRoutes = [
     path: '/autoWash',
     component: Layout,
     // redirect: '/autoWash/indent',
-    meta: { title: '洗车服务管理', icon: 'example' , roles: ['carWash'] },
+    meta: { title: '洗车服务管理后台', icon: 'example' , roles: ['carWash'] },
     children: [
       {
         path: 'indent',
@@ -204,7 +204,90 @@ export const asyncRoutes = [
       },
     ]
   },
-
+  {
+    path: '/service',
+    component: Layout,
+    // redirect: '/autoWash/indent',
+    meta: { title: '贵宾厅服务管理后台', icon: 'example' , roles:  ['service'] },
+    children: [
+      {
+        path: 'service',
+        component: () => import('@/views/routerView/index'), // Parent router-view
+        meta: { title: '服务商', icon: 'example'},
+        children: [
+          {
+            path: 'serviceProduct',
+            name: 'serviceProduct',
+            component: () => import('@/views/serviceProduct/index'),
+            meta: { title: '服务商产品管理', icon: 'dashboard'}
+          },
+          {
+            path: 'serviceOrder',
+            name: 'serviceOrder',
+            component: () => import('@/views/serviceOrder/index'),
+            meta: { title: '服务单管理', icon: 'dashboard'}
+          }
+        ]
+      },
+      {
+        path: 'ditch',
+        component: () => import('@/views/routerView/index'), // Parent router-view
+        meta: { title: '渠道', icon: 'example'},
+        children: [
+          {
+            path: 'ditchProduct',
+            name: 'ditchProduct',
+            component: () => import('@/views/ditchProduct/index'),
+            meta: { title: '渠道产品管理', icon: 'dashboard' ,}
+          },
+          {
+            path: 'ditchOrder',
+            name: 'ditchOrder',
+            component: () => import('@/views/ditchOrder/index'),
+            meta: { title: ' 渠道订单管理', icon: 'dashboard' ,}
+          },
+        ]
+      },
+      // {
+      //   path: 'content',
+      //   component: () => import('@/views/routerView/index'), // Parent router-view
+      //   meta: { title: '渠道', icon: 'example'},
+      //   children: [
+      //     {
+      //       path: 'contentProduct',
+      //       name: 'contentProduct',
+      //       component: () => import('@/views/contentProduct/index'),
+      //       meta: { title: '产品管理', icon: 'dashboard' ,}
+      //     },
+      //     {
+      //       path: 'contentCircumscribed',
+      //       name: 'contentCircumscribed',
+      //       component: () => import('@/views/contentCircumscribed/index'),
+      //       meta: { title: ' 外接产品管理', icon: 'dashboard' ,}
+      //     },
+      //   ]
+      // },
+      // {
+      //   path: 'content',
+      //   component: () => import('@/views/routerView/index'), // Parent router-view
+      //   meta: { title: '用户', icon: 'example'},
+      //   children: [
+      //     {
+      //       path: 'contentProduct',
+      //       name: 'contentProduct',
+      //       component: () => import('@/views/contentProduct/index'),
+      //       meta: { title: '产品管理', icon: 'dashboard' ,}
+      //     },
+      //     {
+      //       path: 'contentCircumscribed',
+      //       name: 'contentCircumscribed',
+      //       component: () => import('@/views/contentCircumscribed/index'),
+      //       meta: { title: ' 外接产品管理', icon: 'dashboard' ,}
+      //     },
+      //   ]
+      // },
+    ]
+  },
 
 
 
