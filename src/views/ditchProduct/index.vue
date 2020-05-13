@@ -19,6 +19,7 @@
        </div> 
        <div class="btn_box">
          <div>
+          <el-button type="danger" @click="remove(2)">批量删除</el-button>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
@@ -33,8 +34,14 @@
       border
       stripe
       fit
+      @selection-change="handleSelectionChange"
       style="width: 100%;">
       <!-- fit highlight-current-row -->
+      <el-table-column
+        align="center"
+        type="selection"
+        width="50">
+     </el-table-column>
       <el-table-column label="用户id" prop="uid" fixed align="center" width="80PX">
         <template slot-scope="scope">
           <span>{{ scope.row.uid }}</span>
@@ -77,8 +84,8 @@
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
-
+          <el-button size="mini" type="primary" @click="item(scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,121 +96,173 @@
       :limit.sync="data.per_page"
       @pagination="getPageData"
     />
+
     <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
-      width="50%"
+      width="80%"
       @close="close"
       center>
-      <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-           <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="订单编号:" prop="orderNo" style="width:50%">
-              <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行名称:" prop="dotName" style="width:50%">
-              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行联系人:" prop="shopowner" style="width:50%">
-              <el-input v-model="itemObj.shopowner" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行联系人电话:" prop="phone" style="width:50%">
-              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行地址:" prop="address" style="width:50%">
-              <el-input v-model="itemObj.address" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <!-- <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
-              <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
-           </el-form-item> -->
-           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
-              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 手机号:" prop="phone" style="width:50%">
-              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 订单状态:" prop="orderStatusCopy" style="width:50%">
-              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 订单来源:" prop="orderSource" style="width:50%">
-              <el-input v-model="itemObj.orderSource" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 项目名称:" prop="projectName" style="width:50%">
-              <el-input v-model="itemObj.projectName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 应收金额:" prop="money" style="width:50%">
-              <el-input v-model="itemObj.money" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 预约时间:" prop="appointmentTime" style="width:50%">
-              <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
-              <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 是否对账:" prop="reconciliationCopy" style="width:50%">
-              <el-input v-model="itemObj.reconciliationCopy" style="width:80%" disabled></el-input>
-           </el-form-item>
-       </el-form>
+      <div class="btn_top">
+        <div class="btn" :class="btnss == 1? 'click' : ''" @click="btn(1)">基本内容</div>
+        <div class="btns" :class="btnss == 2? 'click' : ''" @click="btn(2)">权益介绍</div>
+      </div>
+      <div>
+        <!-- 基本内容 -->
+        <el-divider content-position="left" v-if="btnss == 1"><span class="title">基本内容</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;" v-if="btnss == 1">
+          <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="产品名称：" prop="name" style="width: 100%">
+                  <el-input v-model="itemObj.name" style="width:50%" placeholder="请输入产品名称"></el-input>
+              </el-form-item>
+              <el-form-item label="产品价格：" prop="price" style="width: 100%">
+                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入产品价格"></el-input>
+              </el-form-item>
+              <el-form-item label="产品简介：" prop="desc" style="width: 100%">
+                  <el-input v-model="itemObj.desc" style="width:50%" placeholder="请输入产品简介"></el-input>
+              </el-form-item>
+              <el-form-item label="所属渠道商：" prop="desc" style="width: 100%">
+                <el-select v-model="itemObj.channelid" filterable multiple placeholder="请选择所属渠道商" style="width: 50%">
+                  <el-option
+                    v-for="item in channelList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="对应产品：" prop="desc" style="width: 100%">
+                <el-cascader :options="infoList" :props="props" style="width: 50%" @change="changeInfo" placeholder="请选择对应产品及所属数量">
+                  <template slot-scope="{ node, data }">
+                    <div class="item_box">
+                      <span>{{ data.label }}</span>
+                      <div style="color: #8492a6; font-size: 13px;padding-left: 13px">
+                        <el-input-number v-model="data.num" :min="1" :max="100" label="描述文字" @change="numChange" step-strictly></el-input-number>
+                      </div>
+                    </div>
+                  </template>
+                </el-cascader>
+              </el-form-item>
+              <el-form-item label="是否需要支付：" style="width: 100%">
+                <el-radio-group v-model="itemObj.isPay">
+                  <el-radio label="0">是</el-radio>
+                  <el-radio label="1">否</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="产品图片：" style="width: 100%">
+                <el-upload
+                  action=""
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  list-type="picture-card"
+                  :on-change="handleChange"
+                  :on-remove="handleRemove">
+                  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+                <el-button size="mini" type="danger" @click="imageUrl = ''" style="margin-left: 45px;">删除</el-button>
+              </el-form-item>
+              <el-form-item label="产品介绍：">
+                <div class="editorBox">
+                    <!-- 调用富文本编辑器 -->
+                    <quill-editor ref="myText" v-model="itemObj.content" :config='editorOption' class="editor">
+                    </quill-editor>
+                      <!-- <quill-editor v-model="content"
+                        :options="editorOption"
+                        @blur="onEditorBlur($event)"
+                        @focus="onEditorFocus($event)"
+                        @ready="onEditorReady($event)">
+                      </quill-editor> -->
+                </div>
+              </el-form-item>
+          </el-form>
+        </div>
+        <!-- 权益介绍 -->
+        <el-divider content-position="left" v-if="btnss == 2"><span class="title">权益介绍</span></el-divider>
+         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;" v-if="btnss == 2">
+           <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+             <el-form-item label="权益简介：">
+                <div class="editorBox">
+                    <!-- 调用富文本编辑器 -->
+                    <quill-editor ref="myText2" v-model="itemObj.equityBrief" :config='editorOption' class="editor">
+                    </quill-editor>
+                </div>
+              </el-form-item>
+              <el-form-item label="权益内容：">
+                <div class="editorBox">
+                    <!-- 调用富文本编辑器 -->
+                    <quill-editor ref="myText3" v-model="itemObj.equity" :config='editorOption' class="editor">
+                    </quill-editor>
+                </div>
+              </el-form-item>
+           </el-form>
+         </div>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" :loading="loadingBootm" @click="editDialog = false">确 定</el-button>
+        <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { findYuyueProductInfo } from '@/api/guest/ditchProduct'
+import { findYuyueProductInfo , deleteYuyueProduct , getChannelName , findIproductInfos , updateYuyueProduct } from '@/api/guest/ditchProduct'
+import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
+// import VueQuillEditor from 'vue-quill-editor'
+// import ImageResize from 'quill-image-resize-module'
+// Quill.register('modules/imageResize', ImageResize)
+import { quillEditor } from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 export default {
   components: {
-    Pagination
+    Pagination,
+    quillEditor,
+    // VueQuillEditor
+  },
+  computed: {
+    // itemLabel(label,num){
+    //   if(label.indexOf("/") == -1){
+    //           label = label + "/" + num
+    //   }else{
+    //     var str = label.split('/') 
+    //     label = str[0] + "/" + num
+    //   }
+    //   return label
+    // }
   },
   data() {
-    var storePhone = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('不能为空！'));
-        } else {
-          let reg = /^1[0-9]{10}$/
-          if (!reg.test(value)) {
-            callback(new Error('请输入正确的手机号！'));
-          }else{
-            callback();
-          } 
-        }
-    };
     return {
-      dotCode: "",
+      // equityBrief: "",
+      // equity: "",
+      itemID: "",
+      imageUrl: "",
+      fileList:[],
+      number: "",
+      props: { multiple: true },
+      btnss: 1,
+      // content: "", // 编辑器的内容
+      editorOption: {
+        placeholder: '请输入...',
+        // 编辑器的配置
+        // something config
+        theme: "bubble"
+      },
       dialogTitle: "",
-      thishostName: '',
       loadingBootm: false,
-      urlBl: false,
-      alterDisabled: false,
-      inputDisabled: false,
-      passRadio: null,
       loading: false,
-      passDialog: false,
       editDialog: false,
       itemObj: {},
+      itemArr: [],
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          password: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
-          ],
-          dotType: [
-            { required: true, message: '请选择类型', trigger: 'change' }
-          ],
-          dotName: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          phone: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { validator: storePhone, trigger: 'blur' }
           ]
       },
       data: {
@@ -227,23 +286,169 @@ export default {
           name: '不需支付',
           value: 1
         }
-      ]
+      ],
+      channelList: [],
+      infoList: [],
+      infoArr: []
     }
   },
-  created() {
+  mounted() {
     this.getData()
+    this.apiGetChannelName()
+    this.apiFindIproductInfos()
   },
   methods: {
-    reconciliation(item){
-       this.open(item.orderNo)
+    handleRemove(){
+      this.fileList = []
     },
-    open(orderNo) {
-        this.$confirm('确定对账?', '提示', {
+    apiUploadImg(formData){
+      dotOssUpload(formData).then(res => {
+        if(res.code == 200){
+          this.imageUrl = res.data
+          this.$message({
+            type: 'success',
+            message: '上传成功！'
+          })
+        }else{
+          this.$message.error('上传失败！');
+        }
+      })
+    },
+    handleChange(file, fileList){
+      if(fileList.length>0){
+         this.fileList = [fileList[fileList.length - 1]] //展示最后一次选择文件
+        //  this.storeImagess = URL.createObjectURL(file.raw);
+      }
+      if (this.fileList) {
+            var formData = new FormData()
+          // formData.append('dotCode', this.dotCode)
+            formData.append('file', file.raw)
+           this.apiUploadImg(formData)
+          } else {
+          this.$message({ message: '请上传图片!' })
+      }
+    },
+     beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg' || 'image/png';
+        const isLt2M = file.size / 1024 / 1024 < 4;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 或 png 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 4MB!');
+        }
+        return isJPG && isLt2M;
+    },
+    changeInfo(item){
+      var arr = []
+      for(var i = 0; i<item.length; i++){
+        arr[i] = item[i][0]
+      }
+      this.infoArr = arr
+      this.infoList.forEach(v=>{
+        for(var l = 0; l< this.infoArr.length; l++){
+          if(v.value == this.infoArr[l]){
+            if(v.label.indexOf("/") == -1){
+              v.label = v.label + "/" + v.num
+            }else{
+              var str = v.label.split('/') 
+              v.label = str[0] + "/" + v.num
+            }
+          }
+        }
+      })
+    },
+    numChange(){
+        this.infoList.forEach(v=>{
+          for(var l = 0; l< this.infoArr.length; l++){
+            if(v.value == this.infoArr[l]){
+              if(v.label.indexOf("/") == -1){
+                v.label = v.label + "/" + v.num
+              }else{
+                var str = v.label.split('/') 
+                v.label = str[0] + "/" + v.num
+              }
+            }
+          }
+        })
+    },
+    apiGetChannelName(){
+      getChannelName().then(res=>{
+        this.channelList = res.data
+      })
+    },
+    apiFindIproductInfos(){
+      findIproductInfos().then(res=>{
+        res.data.map(v=>{
+          v.value = v.id
+          v.label = v.name
+          v.num = 1
+          delete v.id
+          delete v.name
+        })
+        this.infoList = res.data
+      })
+    },
+    btn(index){
+      this.btnss = index
+    },
+    itemEditDialog(){
+      var arr = []
+      this.infoList.forEach(v=>{
+          for(var l = 0; l< this.infoArr.length; l++){
+            if(v.value == this.infoArr[l]){
+              arr.push(v)
+            }
+          }
+        })
+      arr.forEach(v=>{
+        v.productid = v.value
+        delete v.label
+        delete v.v.value
+      })
+      this.itemObj.picfilepath = this.imageUrl
+      this.itemObj.productList = arr
+      this.itemObj.content = this.content
+      this.itemObj.id = this.itemID
+      // console.log(arr); // 对应产品数组
+      console.log(this.itemObj);
+      if(this.itemID){
+        updateYuyueProduct().then(res=>{
+          if(res.data.code == 200){
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          }else{
+            // this.$message(res.data)
+          }
+          console.log(res);
+        })
+      }else{
+
+      }
+      console.log(this.itemObj);
+    },
+    onEditorBlur(editor) {
+          // console.log('editor blur!', editor)
+        },
+    onEditorFocus(editor) {
+              // console.log('editor focus!', editor)
+            },
+    onEditorReady(editor) {
+          // console.log('editor ready!', editor)
+    },
+    handleSelectionChange(val) {
+        this.itemArr = val
+    },
+    open(text,id) {
+        this.$confirm(text, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          updateReconciliationByOrderNo({orderNo}).then(res=>{
+          deleteYuyueProduct({productId: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -277,7 +482,7 @@ export default {
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
-        this.data.current_page = 1;
+        this.data.current_page = 1
       }
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
@@ -290,33 +495,50 @@ export default {
           this.data.data = []
         }
         if( res.data && res.data.length > 0){
-          console.log(res);
+          // console.log(res);
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.orderStatus == 0){
-              v.orderStatusCopy = '未支付'
-            }else{
-              v.orderStatusCopy = '已支付'
-            }
-            if(v.reconciliation == 0){
-              v.reconciliationCopy = '未对账'
-            }else if(v.reconciliation == 1){
-              v.reconciliationCopy = '已对账'
-            }
+              v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+              v.updatetime = formatTime(v.updatetime*1000,'yyyy-mm-dd hh:mm:ss')
+              if( v.topdateline == 0 ){
+                v.topdateline = ''
+              }else{
+                v.topdateline = formatTime(v.topdateline*1000,'yyyy-mm-dd hh:mm:ss')
+              }
           })
         }
       })
     },
-    compile(item){
-      this.dialogTitle = "查看"
+    item(item){
       this.itemObj = item
       this.editDialog = true
+      this.dialogTitle = "编辑"
+      this.itemID = item.id
+    },
+    remove(item){
+      if(item === 2){
+        if(this.itemArr.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr.forEach(v=>{
+          arr.push(v.id)
+        })
+        this.open('确定批量删除？' , arr)
+      }else{
+        this.open('确定删除？' , [item.id])
+      }
     },
     close(){
       this.itemObj = {}
+      this.itemID = null
     },
     handleFilter(){
       this.getData()
@@ -339,6 +561,36 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "../../styles/cascader.css";
+.item_box{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  // /deep/.el-cascader-node{
+  //   margin-top: 10px !important;
+  // }
+}
+.btn_top{
+  display: flex;
+  margin-bottom: 30px;
+  .btn,.btns{
+    width: 100px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+    border-radius: 5px;
+    font-size: 17px;
+    cursor: pointer;
+    &.click{
+      background: #409eff;
+      color: #fff;
+    }
+  }
+}
 .title{
   font-size: 18px;
   font-weight: 600;
@@ -434,22 +686,10 @@ export default {
 .avatar-uploader .el-upload:hover {
    border-color: #409EFF;
  }
- .avatar-uploader-icon {
-   border: 1px dashed #DFDFDF;
-   border-radius: 6px;
-   cursor: pointer;
-   position: relative;
-   overflow: hidden;
-   font-size: 12px;
-   color: #8c939d;
-   width: 150px;
-   height: 100px;
-   line-height: 100px;
-   text-align: center;
- }
  .avatar {
-   width: 150px;
-   height: 100px;
-   display: block;
+   width: 148px;
+   height: 148px;
+   border-radius: 4px;
+   cursor: pointer;
  }
 </style>

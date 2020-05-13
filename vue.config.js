@@ -1,13 +1,15 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
-
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
-
 const name = defaultSettings.title || 'vue Admin Template' // page title
-
+// var ProvidePlugin = new webpack.ProvidePlugin({
+//   // 在这儿添加下面两行
+//     'window.Quill': 'quill/dist/quill.js',
+//     'Quill': 'quill/dist/quill.js'
+// })
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
@@ -57,7 +59,6 @@ module.exports = {
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
     config.plugins.delete('prefetch') // TODO: need test
-
     // set svg-sprite-loader
     config.module
       .rule('svg')
