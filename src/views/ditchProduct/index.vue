@@ -16,14 +16,23 @@
               :key="item.value"
             ></el-option>
           </el-select>
+          <el-select v-model="queryList.examine" @change="getData" class="input fl" placeholder="审核是否通过">
+            <el-option
+              v-for="item in auditList"
+              :label="item.name"
+              :value="item.value"
+              :key="item.value"
+            ></el-option>
+          </el-select>
        </div> 
        <div class="btn_box">
          <div>
-          <el-button type="danger" @click="remove(2)">批量删除</el-button>
+           <el-button type="danger" @click="remove(2)">批量删除</el-button>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
          <div>
+            <el-button type="primary" @click="newlyIncreased">新增</el-button>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
          </div>
        </div>
@@ -82,10 +91,16 @@
           <span>{{ scope.row.topdateline }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="审核是否通过" prop="examine" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.examine == 0 ? "未审核" : "审核已通过" }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="item(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
+          <div style="width: 100%;margin-bottom: 7px;" v-if="scope.row.examine == 0"><el-button size="mini" type="success" @click="audit(scope.row)">审核通过</el-button></div>
+          <div style="width: 100%;margin-bottom: 7px;"><el-button size="mini" type="primary" @click="item(scope.row)">编辑</el-button></div>
+          <div style="width: 100%;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -123,7 +138,7 @@
                   <el-input v-model="itemObj.desc" style="width:50%" placeholder="请输入产品简介"></el-input>
               </el-form-item>
               <el-form-item label="所属渠道商：" prop="desc" style="width: 100%">
-                <el-select v-model="itemObj.channelid" filterable multiple placeholder="请选择所属渠道商" style="width: 50%">
+                <el-select v-model="itemObj.channelids" filterable multiple placeholder="请选择所属渠道商" style="width: 50%">
                   <el-option
                     v-for="item in channelList"
                     :key="item.id"
@@ -133,7 +148,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="对应产品：" prop="desc" style="width: 100%">
-                <el-cascader :options="infoList" :props="props" style="width: 50%" @change="changeInfo" placeholder="请选择对应产品及所属数量">
+                <el-cascader v-model="valueList" :options="infoList" filterable :props="props" style="width: 50%" @change="changeInfo" placeholder="请选择对应产品及所属数量">
                   <template slot-scope="{ node, data }">
                     <div class="item_box">
                       <span>{{ data.label }}</span>
@@ -208,7 +223,7 @@
 </template>
 
 <script>
-import { findYuyueProductInfo , deleteYuyueProduct , getChannelName , findIproductInfos , updateYuyueProduct } from '@/api/guest/ditchProduct'
+import { findYuyueProductInfo , deleteYuyueProduct , getChannelName , findIproductInfos , updateYuyueProductInfo , saveYuyueProduct , getYyProductById , updateExamine } from '@/api/guest/ditchProduct'
 import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 import formatTime from "@/utils/formatTime"
@@ -240,6 +255,7 @@ export default {
     return {
       // equityBrief: "",
       // equity: "",
+      valueList: "",
       itemID: "",
       imageUrl: "",
       fileList:[],
@@ -275,7 +291,8 @@ export default {
       },
       queryList: {
         name: null,
-        isPay: null
+        isPay: null,
+        examine: null
       },
       statusList: [
         {
@@ -284,6 +301,16 @@ export default {
         },
         {
           name: '不需支付',
+          value: 1
+        }
+      ],
+      auditList: [
+        {
+          name: '已审核',
+          value: 0
+        },
+        {
+          name: '未审核',
           value: 1
         }
       ],
@@ -298,6 +325,41 @@ export default {
     this.apiFindIproductInfos()
   },
   methods: {
+    audit(item){
+      this.open2('确定审核通过？' , item.id)
+    },
+    open2(text,id) {
+        this.$confirm(text, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateExamine({id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    newlyIncreased(){
+      this.itemObj = {}
+      this.editDialog = true
+      this.dialogTitle = "新增"
+    },
     handleRemove(){
       this.fileList = []
     },
@@ -328,7 +390,7 @@ export default {
           this.$message({ message: '请上传图片!' })
       }
     },
-     beforeAvatarUpload(file) {
+    beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg' || 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 4;
 
@@ -394,41 +456,69 @@ export default {
       this.btnss = index
     },
     itemEditDialog(){
+      this.loadingBootm = true
       var arr = []
-      this.infoList.forEach(v=>{
+      if(this.infoList.length > 0){
+        this.infoList.forEach(v=>{
           for(var l = 0; l< this.infoArr.length; l++){
-            if(v.value == this.infoArr[l]){
+            if(this.infoArr[l] && v.value == this.infoArr[l]){
               arr.push(v)
             }
           }
         })
-      arr.forEach(v=>{
-        v.productid = v.value
-        delete v.label
-        delete v.v.value
-      })
+      }
+      if(arr.length>0){
+        arr.forEach(v=>{
+          v.productid = v.value
+          delete v.label
+          delete v.value
+        })
+      }
       this.itemObj.picfilepath = this.imageUrl
       this.itemObj.productList = arr
-      this.itemObj.content = this.content
-      this.itemObj.id = this.itemID
+      // this.itemObj.content = this.content
+      this.itemObj.pid = this.itemID
+      delete this.itemObj.dateline
+      delete this.itemObj.updatetime
+      delete this.itemObj.topdateline
+      delete this.itemObj.id
       // console.log(arr); // 对应产品数组
-      console.log(this.itemObj);
+      // console.log(this.itemObj);
       if(this.itemID){
-        updateYuyueProduct().then(res=>{
-          if(res.data.code == 200){
+        updateYuyueProductInfo(this.itemObj).then(res=>{
+          this.loadingBootm = false
+          if(res.code == 200){
             this.$message({
               type: 'success',
               message: '操作成功！'
             })
+            this.editDialog = false
+            this.getData()
           }else{
-            // this.$message(res.data)
+            this.$message({
+              type: 'error',
+              message: res.data
+            })
           }
-          console.log(res);
         })
-      }else{
-
+      }else{  
+        saveYuyueProduct(this.itemObj).then(res=>{
+          this.loadingBootm = false
+          if(res.code == 200){
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+            this.editDialog = false
+            this.getData()
+          }else{
+            this.$message({
+              type: 'error',
+              message: res.data
+            })
+          }
+        })
       }
-      console.log(this.itemObj);
     },
     onEditorBlur(editor) {
           // console.log('editor blur!', editor)
@@ -479,6 +569,9 @@ export default {
       if(!(queryList.isPay == null)){
         data.isPay = queryList.isPay
       }
+      if(!(queryList.examine == null)){
+        data.examine = queryList.examine
+      }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -501,22 +594,44 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-              v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
-              v.updatetime = formatTime(v.updatetime*1000,'yyyy-mm-dd hh:mm:ss')
-              if( v.topdateline == 0 ){
-                v.topdateline = ''
-              }else{
-                v.topdateline = formatTime(v.topdateline*1000,'yyyy-mm-dd hh:mm:ss')
-              }
+              // v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+              // v.updatetime = formatTime(v.updatetime*1000,'yyyy-mm-dd hh:mm:ss')
+              // if( v.topdateline == 0 ){
+              //   v.topdateline = ''
+              // }else{
+              //   v.topdateline = formatTime(v.topdateline*1000,'yyyy-mm-dd hh:mm:ss')
+              // }
           })
         }
       })
     },
     item(item){
+      // console.log(item);
       this.itemObj = item
       this.editDialog = true
       this.dialogTitle = "编辑"
       this.itemID = item.id
+      getYyProductById({id: item.id}).then(res=>{
+        var arr = []
+        this.itemObj.channelids = res.data.channelids
+        res.data.productList.forEach(v=>{
+          var arrNum = Number(v.productid)
+          arr.push([v.productid])
+          this.infoList.forEach(valueId=>{
+              if(valueId.value == v.productid){
+                if(valueId.label.indexOf("/") == -1){
+                  valueId.label = valueId.label + "/" + v.num
+                  valueId.num = v.num
+                }else{
+                  var str = valueId.label.split('/') 
+                  valueId.label = str[0] + "/" + v.num
+                }
+              }
+          })
+        })
+        this.valueList = arr 
+        this.infoArr = arr
+      })
     },
     remove(item){
       if(item === 2){
@@ -539,6 +654,9 @@ export default {
     close(){
       this.itemObj = {}
       this.itemID = null
+      this.imageUrl = ""
+      this.loadingBootm = false
+      this.apiFindIproductInfos()
     },
     handleFilter(){
       this.getData()
@@ -549,7 +667,8 @@ export default {
     reset(){
       this.queryList = {
         name: null,
-        isPay: null
+        isPay: null,
+        examine: null
       }
     },
     resetGetData(){

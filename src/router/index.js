@@ -226,7 +226,13 @@ export const asyncRoutes = [
             name: 'serviceOrder',
             component: () => import('@/views/serviceOrder/index'),
             meta: { title: '服务单管理', icon: 'dashboard'}
-          }
+          },
+          {
+            path: 'yuetuSite',
+            name: 'yuetuSite',
+            component: () => import('@/views/yuetuSite/index'),
+            meta: { title: '悦途站点管理', icon: 'dashboard'}
+          },
         ]
       },
       {

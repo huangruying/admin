@@ -32,9 +32,33 @@ export function findIproductInfos(data) {
   })
 }
 
-export function updateYuyueProduct(data) {
+export function updateYuyueProductInfo(data) {
   return request({
-    url: '/product/updateYuyueProduct',
+    url: '/product/updateYuyueProductInfo',
+    method: 'post',
+    data
+  })
+}
+
+export function saveYuyueProduct(data) {
+  return request({
+    url: '/product/saveYuyueProduct',
+    method: 'post',
+    data
+  })
+}
+
+export function getYyProductById(data) {
+  return request({
+    url: '/product/getYyProductById',
+    method: 'post',
+    data
+  })
+}
+
+export function updateExamine(data) {
+  return request({
+    url: '/product/updateExamine',
     method: 'post',
     data
   })

@@ -4,39 +4,48 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.productId"
-          placeholder="请输入产品id"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.author"
-          placeholder="请输入创建人"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.productName"
+          v-model="queryList.name"
           placeholder="请输入产品名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-date-picker
-            class="input fl"
-            style="width:260px"
-            v-model="queryList.time"
-            type="daterange"
-            format="yyyy 年 MM 月 dd 日"
-            value-format="yyyy-MM-dd"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            @change="getData"
-          ></el-date-picker>
+          <el-input
+          v-model="queryList.otherName"
+          placeholder="请输入商品别称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.usetypeid" @change="getData" class="input fl" placeholder="请选择用途">
+            <el-option
+              v-for="item in statusList"
+              :label="item.name"
+              :value="item.usetypeid"
+              :key="item.usetypeid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.typeid" @change="getData" class="input fl" placeholder="请选择次数">
+            <el-option
+              v-for="item in statusList2"
+              :label="item.name"
+              :value="item.typeid"
+              :key="item.typeid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.examine" @change="getData" class="input fl" placeholder="审核是否通过">
+            <el-option
+              v-for="item in auditList"
+              :label="item.name"
+              :value="item.value"
+              :key="item.value"
+            ></el-option>
+          </el-select>
        </div> 
        <div class="btn_box">
          <div>
+           <el-button type="danger" @click="remove(2)">批量删除</el-button>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
          <div>
+           <el-button type="primary" @click="newlyIncreased">新增</el-button>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
          </div>
        </div>
@@ -47,77 +56,69 @@
       border
       stripe
       fit
+      @selection-change="handleSelectionChange"
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="订单编号" prop="orderNo" fixed align="center">
+      <el-table-column
+        align="center"
+        type="selection"
+        width="50">
+     </el-table-column>
+      <el-table-column label="ID" prop="id" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderNo }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车行名称" prop="dotName" align="center">
+      <el-table-column label="产品名称" prop="name" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotName }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车牌号" prop="licensePlate" align="center">
+      <el-table-column label="副标题" prop="otherName" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.licensePlate }}</span>
+          <span>{{ scope.row.otherName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系人" prop="shopowner" align="center">
+      <el-table-column label="价格" prop="price" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.shopowner }}</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" prop="phone" align="center">
+      <el-table-column label="用途" prop="usetypeid" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.usetypeid == 1? "高铁" : "空铁" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
+      <el-table-column label="来源" prop="channelName" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderStatusCopy }}</span>
+          <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单来源" prop="orderSource" align="center">
+      <el-table-column label="次数" prop="typeid" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderSource }}</span>
+          <span>{{ scope.row.typeid == 1 ? "1次卡" : "2年卡"}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="项目名称" prop="projectName" align="center">
+      <!-- <el-table-column label="产品内容" prop="content" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.projectName }}</span>
+          <span>{{ scope.row.content }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="创建时间" prop="dateline" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dateline }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="应收金额" prop="money" align="center">
+      <el-table-column label="审核是否通过" prop="examine" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.money }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="预约时间" prop="appointmentTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.appointmentTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="下单时间" prop="placeTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.placeTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="是否对账" prop="reconciliationCopy" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.reconciliationCopy }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="备注" prop="remarks" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.remarks }}</span>
+          <span>{{ scope.row.examine == 0 ? "未审核" : "审核已通过" }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button>
-          <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
+          <div style="width: 100%;margin-bottom: 7px;" v-if="scope.row.examine == 0"><el-button size="mini" type="success" @click="audit(scope.row)">审核通过</el-button></div>
+          <div style="width: 100%;margin-bottom: 7px;"><el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button></div>
+          <div style="width: 100%;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -132,117 +133,102 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
-      width="50%"
+      width="80%"
       @close="close"
       center>
-      <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-           <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="订单编号:" prop="orderNo" style="width:50%">
-              <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行名称:" prop="dotName" style="width:50%">
-              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行联系人:" prop="shopowner" style="width:50%">
-              <el-input v-model="itemObj.shopowner" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行联系人电话:" prop="phone" style="width:50%">
-              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车行地址:" prop="address" style="width:50%">
-              <el-input v-model="itemObj.address" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <!-- <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
-              <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
-           </el-form-item> -->
-           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
-              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 手机号:" prop="phone" style="width:50%">
-              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 订单状态:" prop="orderStatusCopy" style="width:50%">
-              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 订单来源:" prop="orderSource" style="width:50%">
-              <el-input v-model="itemObj.orderSource" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 项目名称:" prop="projectName" style="width:50%">
-              <el-input v-model="itemObj.projectName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 应收金额:" prop="money" style="width:50%">
-              <el-input v-model="itemObj.money" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 预约时间:" prop="appointmentTime" style="width:50%">
-              <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
-              <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 是否对账:" prop="reconciliationCopy" style="width:50%">
-              <el-input v-model="itemObj.reconciliationCopy" style="width:80%" disabled></el-input>
-           </el-form-item>
-       </el-form>
+      <!-- 产品管理 -->
+        <el-divider content-position="left"><span class="title">产品管理</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="产品名称：" prop="name" style="width: 100%">
+                  <el-input v-model="itemObj.name" style="width:50%" placeholder="请输入产品名称"></el-input>
+              </el-form-item>
+              <el-form-item label="副标题：" prop="otherName" style="width: 100%">
+                  <el-input v-model="itemObj.otherName" style="width:50%" placeholder="请输入副标题"></el-input>
+              </el-form-item>
+              <el-form-item label="产品价格：" prop="price" style="width: 100%">
+                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入产品价格"></el-input>
+              </el-form-item>
+              <el-form-item label="悦途商品编号：" prop="commodityCode" style="width: 100%">
+                  <el-input v-model="itemObj.commodityCode" style="width:50%" placeholder="请输入悦途商品编号"></el-input>
+              </el-form-item>
+              <el-form-item label="简介：" prop="desc" style="width: 100%">
+                  <el-input type="textarea" v-model="itemObj.desc" style="width:50%" autosize maxlength="300" show-word-limit placeholder="请输入产品简介"></el-input>
+              </el-form-item>
+              <el-form-item label="用途：" style="width: 100%">
+                <el-radio-group v-model="itemObj.usetypeid">
+                  <el-radio label="1">高铁</el-radio>
+                  <el-radio label="2">空铁</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="会员卡类型：" style="width: 100%">
+                <el-radio-group v-model="itemObj.typeid">
+                  <el-radio label="1">次卡</el-radio>
+                  <el-radio label="2">年卡</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="产品图片：" style="width: 100%">
+                <el-upload
+                  action=""
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  list-type="picture-card"
+                  :on-change="handleChange">
+                  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+                <el-button size="mini" type="danger" @click="imageUrl = ''" style="margin-left: 45px;">删除</el-button>
+              </el-form-item>
+              <el-form-item label="产品内容：">
+                <div class="editorBox">
+                    <!-- 调用富文本编辑器 -->
+                    <quill-editor ref="myText" v-model="itemObj.content" :config='editorOption' class="editor">
+                    </quill-editor>
+                </div>
+              </el-form-item>
+          </el-form>
+        </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" :loading="loadingBootm" @click="editDialog = false">确 定</el-button>
+       <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { findExternalProductAll } from '@/api/guest/serviceProduct'
+import { findYuyueIproduct , deleteYuyueIproductById , updateYuyueIproduct , saveYuyueIproduct , getChannelName , updateExamine } from '@/api/guest/serviceProduct'
+import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
+import { quillEditor } from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 export default {
   components: {
-    Pagination
+    Pagination,
+    quillEditor
   },
   data() {
-    var storePhone = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('不能为空！'));
-        } else {
-          let reg = /^1[0-9]{10}$/
-          if (!reg.test(value)) {
-            callback(new Error('请输入正确的手机号！'));
-          }else{
-            callback();
-          } 
-        }
-    };
     return {
-      dotCode: "",
+      editorOption: {
+        placeholder: '请输入...',
+        // 编辑器的配置
+        // something config
+        theme: "bubble"
+      },
+      imageUrl: "",
       dialogTitle: "",
       thishostName: '',
       loadingBootm: false,
-      urlBl: false,
-      alterDisabled: false,
-      inputDisabled: false,
-      passRadio: null,
       loading: false,
-      passDialog: false,
       editDialog: false,
+      itemID: null,
       itemObj: {},
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          password: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
-          ],
-          dotType: [
-            { required: true, message: '请选择类型', trigger: 'change' }
-          ],
-          dotName: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          phone: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { validator: storePhone, trigger: 'blur' }
           ]
       },
       data: {
@@ -254,28 +240,178 @@ export default {
         link: ""
       },
       queryList: {
-        productId: null,
-        author: null,
-        productName: null,
-        time: ["", ""],
-      }
+        name: null,
+        otherName: null,
+        usetypeid: null,
+        typeid: null,
+        examine: null
+      },
+      itemArr: [],
+      statusList: [
+        {
+          name: "高铁",
+          usetypeid: 1
+        },
+        {
+          name: "空铁",
+          usetypeid: 2
+        }
+      ],
+      statusList2: [
+        {
+          name: "次卡",
+          typeid: 1
+        },
+        {
+          name: "年卡",
+          typeid: 2
+        }
+      ],
+      auditList: [
+        {
+          name: '待审核',
+          value: 1
+        },
+        {
+          name: '未审核',
+          value: 0
+        }
+      ],
+      nameList: []
     }
   },
   created() {
     this.getData()
-    this.thishostName = `${location.protocol}//${location.hostname}`
+    this.apiGetChannelName()
   },
   methods: {
-    reconciliation(item){
-       this.open(item.orderNo)
+    audit(item){
+      this.open2('确定审核通过？' , item.id)
     },
-    open(orderNo) {
-        this.$confirm('确定对账?', '提示', {
+    open2(text,id) {
+        this.$confirm(text, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          updateReconciliationByOrderNo({orderNo}).then(res=>{
+          updateExamine({id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    apiGetChannelName(){
+      getChannelName().then(res=>{
+        console.log(res);
+      })
+    },
+    itemEditDialog(){
+      this.loadingBootm = true
+      this.itemObj.picfilepath = this.imageUrl
+      this.itemObj.id = this.itemID
+      // delete this.itemObj.dateline
+      if(this.itemID){
+        updateYuyueIproduct(this.itemObj).then(res=>{
+          this.loadingBootm = false
+          if(res.code == 200){
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+            this.editDialog = false
+            this.getData()
+          }else{
+            this.$message({
+              type: 'error',
+              message: res.data
+            })
+          }
+        })
+      }else{  
+        saveYuyueIproduct(this.itemObj).then(res=>{
+          this.loadingBootm = false
+          if(res.code == 200){
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+            this.editDialog = false
+            this.getData()
+          }else{
+            this.$message({
+              type: 'error',
+              message: res.data
+            })
+          }
+        })
+      }
+    },
+    apiUploadImg(formData){
+      dotOssUpload(formData).then(res => {
+        if(res.code == 200){
+          this.imageUrl = res.data
+          this.$message({
+            type: 'success',
+            message: '上传成功！'
+          })
+        }else{
+          this.$message.error('上传失败！');
+        }
+      })
+    },
+    handleChange(file, fileList){
+      if (fileList) {
+            var formData = new FormData()
+          // formData.append('dotCode', this.dotCode)
+            formData.append('file', file.raw)
+           this.apiUploadImg(formData)
+          } else {
+          this.$message({ message: '请上传图片!' })
+      }
+    },
+    handleSelectionChange(val) {
+        this.itemArr = val
+    },
+    remove(item){
+      if(item === 2){
+        if(this.itemArr.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr.forEach(v=>{
+          arr.push(v.id)
+        })
+        this.open('确定批量删除？' , arr)
+      }else{
+        this.open('确定删除？' , [item.id])
+      }
+    },
+    open(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteYuyueIproductById({ids: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -300,24 +436,20 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.licensePlate) {
-        data.licensePlate = queryList.licensePlate
+      if (queryList.name) {
+        data.name = queryList.name
       }
-      if (queryList.phone) {
-        data.phone = queryList.phone   
+      if(!(queryList.otherName == null)){
+        data.otherName = queryList.otherName
       }
-      if (queryList.garageName) {
-        data.garageName = queryList.garageName   
+      if(!(queryList.usetypeid == null)){
+        data.usetypeid = queryList.usetypeid
       }
-      if (queryList.orderStatus) {
-        data.orderStatus = queryList.orderStatus   
+      if(!(queryList.typeid == null)){
+        data.typeid = queryList.typeid
       }
-      if (queryList.orderSource) {
-        data.orderSource = queryList.orderSource   
-      }
-      if (queryList.time[0] && queryList.time[1]) {
-        data.startTime = queryList.time[0]
-        data.endTime = queryList.time[1]
+      if(!(queryList.examine == null)){
+        data.examine = queryList.examine
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -327,7 +459,7 @@ export default {
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findExternalProductAll(data).then(res=>{
+      findYuyueIproduct(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
@@ -335,33 +467,32 @@ export default {
           this.data.data = []
         }
         if( res.data && res.data.length > 0){
-          console.log(res);
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.orderStatus == 0){
-              v.orderStatusCopy = '未支付'
-            }else{
-              v.orderStatusCopy = '已支付'
-            }
-            if(v.reconciliation == 0){
-              v.reconciliationCopy = '未对账'
-            }else if(v.reconciliation == 1){
-              v.reconciliationCopy = '已对账'
-            }
+            
           })
         }
       })
     },
     compile(item){
-      this.dialogTitle = "查看"
       this.itemObj = item
       this.editDialog = true
+      this.dialogTitle = "编辑"
+      this.itemID = item.id
+    },
+    newlyIncreased(){
+      this.itemObj = {}
+      this.editDialog = true
+      this.dialogTitle = "新增"
     },
     close(){
       this.itemObj = {}
+      this.itemID = null
+      this.imageUrl = ""
+      this.loadingBootm = false
     },
     handleFilter(){
       this.getData()
@@ -371,12 +502,9 @@ export default {
     },
     reset(){
       this.queryList = {
-        licensePlate: null,
-        phone: null,
-        garageName: null,
-        orderStatus: null,
-        orderSource: null,
-        time: ["", ""],
+        name: null,
+        otherName: null,
+        usetypeid: null,
       }
     },
     resetGetData(){
@@ -483,22 +611,10 @@ export default {
 .avatar-uploader .el-upload:hover {
    border-color: #409EFF;
  }
- .avatar-uploader-icon {
-   border: 1px dashed #DFDFDF;
-   border-radius: 6px;
+.avatar {
+   width: 148px;
+   height: 148px;
+   border-radius: 4px;
    cursor: pointer;
-   position: relative;
-   overflow: hidden;
-   font-size: 12px;
-   color: #8c939d;
-   width: 150px;
-   height: 100px;
-   line-height: 100px;
-   text-align: center;
- }
- .avatar {
-   width: 150px;
-   height: 100px;
-   display: block;
  }
 </style>
