@@ -4,28 +4,19 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.stationName"
-          placeholder="请输入车站名称"
+          v-model="queryList.title"
+          placeholder="请输入优惠券名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.province"
-          placeholder="请输入省份"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.city"
-          placeholder="请输入所在市"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.type" @change="getData" class="input fl" placeholder="请选择类型">
-            <el-option
-              v-for="item in statusList"
-              :label="item.name"
-              :value="item.type"
-              :key="item.type"
-            ></el-option>
-          </el-select>
+          <!-- <el-date-picker
+          class="picker fl"
+            v-model="queryList.time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker> -->
        </div> 
        <div class="btn_box">
          <div>
@@ -53,45 +44,41 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column label="车站ID" prop="stationId" fixed align="center" width="90px">
+      <el-table-column label="劵码ID" prop="couponsId" fixed align="center" width="90px">
         <template slot-scope="scope">
-          <span>{{ scope.row.stationId }}</span>
+          <span>{{ scope.row.couponsId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车站名称" prop="stationName" fixed align="center">
+      <el-table-column label="优惠券名称" prop="title" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.stationName }}</span>
+          <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="厅总数" prop="hallCount" fixed align="center">
+      <el-table-column label="优惠金额" prop="money" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.hallCount }}</span>
+          <span>{{ scope.row.money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在省" prop="province" fixed align="center">
+      <el-table-column label="领取人数" prop="number" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.province }}</span>
+          <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在市" prop="city" fixed align="center">
+      <el-table-column label="有效时间" prop="startdate" fixed align="center" width="340px">
         <template slot-scope="scope">
-          <span>{{ scope.row.city }}</span>
+          <span>{{ scope.row.startdate + "~" + scope.row.enddate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" fixed align="center">
+      <el-table-column label="劵码量" prop="couponsNum" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型" prop="type" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.typeCopy }}</span>
+          <span>{{ scope.row.couponsNum }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
+          <div style="width: 100%;margin-bottom: 7px;" v-if="scope.row.examine == 0"><el-button size="mini" type="success" @click="audit(scope.row)">审核通过</el-button></div>
+          <div style="width: 100%;margin-bottom: 7px;"><el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button></div>
+         <div style="width: 100%;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -107,31 +94,30 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
-      width="60%"
+      width="50%"
       @close="close"
       center>
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="车站名称：" prop="stationName" style="width: 100%">
-                  <el-input v-model="itemObj.stationName" style="width:50%" placeholder="请输入车站名称"></el-input>
+              <el-form-item label="优惠劵名称：" prop="couponName" style="width: 100%">
+                  <el-input v-model="itemObj.couponName" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
               </el-form-item>
-              <el-form-item label="省份：">
-                  <el-select v-model="itemObj.provinceId" placeholder="请选择省份" filterable @change="prCityList">
-                    <el-option v-for="value in provinceList" :key="value.id" :label="value.province" :value="value.provinceid"></el-option>
-                  </el-select>
+              <el-form-item label="优惠劵金额：" prop="couponMoney" style="width: 100%">
+                  <el-input v-model="itemObj.couponMoney" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
               </el-form-item>
-              <el-form-item label="城市：">
-                  <el-select v-model="itemObj.cityId" placeholder="请选择城市" filterable>
-                    <el-option v-for="value in cityList" :key="value.id" :label="value.city" :value="value.cityid"></el-option>
-                  </el-select>
+              <el-form-item label="有效期：" prop="couponMoney" style="width: 100%">
+                 <el-date-picker
+                    style="width:50%"
+                    v-model="itemObj.time"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="有效期开始"
+                    end-placeholder="有效期结束"
+                  ></el-date-picker>
               </el-form-item>
-              <el-form-item label="类型：" prop="type" style="width: 100%">
-                <el-radio-group v-model="itemObj.type">
-                  <el-radio label="1">高铁火车站</el-radio>
-                  <el-radio label="2">国内机场</el-radio>
-                  <el-radio label="3">国际/中国港澳台</el-radio>
-                </el-radio-group>
+              <el-form-item label="使用说明：" prop="instructions" style="width: 100%">
+                  <el-input type="textarea" v-model="itemObj.instructions" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
               </el-form-item>
           </el-form>
         </div>
@@ -144,7 +130,7 @@
 </template>
 
 <script>
-import { listStationsNameInfos , delStationsNameInfo , findYuyueProvinces , findYuyueCityByProvinceid , updateYuyueStationInfo , saveYuyueStationInfo } from '@/api/guest/yuetuSite'
+import { findYuyueCoupons , deleteYuyueCouponsById } from '@/api/guest/marketingList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -156,7 +142,6 @@ export default {
       loadingBootm: false,
       editDialog: false,
       loading: false,
-      newly: false,
       itemArr: [],
       itemObj: {},
       rules: {
@@ -172,65 +157,70 @@ export default {
         total: 0,
         link: ""
       },
-      queryList: {
-        stationName: null,
-        province: null,
-        city: null,
-        type: null
-      },
-      statusList: [
+      auditList: [
         {
-          name: "高铁火车站",
-          type: 1
+          name: '已审核',
+          value: 1
         },
         {
-          name: "国内机场",
-          type: 2
-        },
-        {
-          name: "国际/中国港澳台",
-          type: 3
+          name: '未审核',
+          value: 0
         }
       ],
-      provinceList: [],
-      cityList: []
+      queryList: {
+        title: null ,
+        // time: ["" , ""]
+      }
     }
   },
   created() {
     this.getData()
-    this.apiProvince()
   },
   methods: {
+    audit(item){
+      this.open2('确定审核通过？' , item.id)
+    },
+    open2(text,id) {
+        this.$confirm(text, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateExamine({id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
     compile(item){
       this.editDialog = true
       this.itemObj = item
-      this.apiCity(item.provinceId)
     },
     newlyIncreased(){
       this.editDialog = true
     },
-    async apiProvince(){
-      var res = await findYuyueProvinces()
-      this.provinceList = res.data
-    },
-    prCityList(data){
-      this.apiCity(data,1)
-    },
-    async apiCity(provinceid,change){
-      var res = await findYuyueCityByProvinceid({provinceid})
-      this.cityList = res.data
-      if(change){
-         this.itemObj.cityId = res.data[0].cityid
-      }
-    },
     itemEditDialog(){
-      if(this.itemObj.stationId){
-        delete this.itemObj.createTime
-        delete this.itemObj.hallCount
-        delete this.itemObj.typeCopy
-        this.itemObj.id = this.itemObj.stationId
-        delete this.itemObj.stationId
-        updateYuyueStationInfo(this.itemObj).then(res=>{
+        var data = {}
+      if(this.itemObj.id){
+        data.id = this.itemObj.id
+        data.name = this.itemObj.name
+        data.alias = this.itemObj.alias
+        updateYyChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -246,7 +236,9 @@ export default {
           }
         })
       }else{
-        saveYuyueStationInfo(this.itemObj).then(res=>{
+        data.name = this.itemObj.name
+        data.alias = this.itemObj.alias
+        saveYyChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -278,11 +270,11 @@ export default {
         }
         var arr = []
         this.itemArr.forEach(v=>{
-          arr.push(v.stationId)
+          arr.push(v.couponsId)
         })
         this.open('确定批量删除？' , arr)
       }else{
-        this.open('确定删除？' , [item.stationId])
+        this.open('确定删除？' , [item.couponsId])
       }
     },
     open(text,id) {
@@ -292,7 +284,7 @@ export default {
           type: 'warning'
         }).then(() => {
           this.loading = true
-          delStationsNameInfo({ids: id}).then(res=>{
+          deleteYuyueCouponsById({ids: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -317,18 +309,13 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.stationName) {
-        data.stationName = queryList.stationName
+      if (queryList.title) {
+        data.title = queryList.title
       }
-      if (queryList.province) {
-        data.province = queryList.province
-      }
-      if (queryList.city) {
-        data.city = queryList.city
-      }
-      if(!(queryList.type == null)){
-        data.type = queryList.type
-      }
+      // if (queryList.time[0] && queryList.time[1]) {
+      //   data.startTime = queryList.time[0]
+      //   data.endTime = queryList.time[1]
+      // }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -336,7 +323,7 @@ export default {
       }
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      listStationsNameInfos(data).then(res=>{
+      findYuyueCoupons(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
@@ -350,13 +337,7 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.type == 1){
-              v.typeCopy = "高铁火车站"
-            }else if(v.type == 2){
-              v.typeCopy = "国内机场"
-            }else if(v.type == 3){
-              v.typeCopy = "国际/中国港澳台"
-            }
+            
           })
         }
       })
@@ -372,10 +353,8 @@ export default {
     },
     reset(){
       this.queryList = {
-        stationName: null,
-        province: null,
-        city: null,
-        type: null
+        name: null,
+        time: ["" , ""]
       }
     },
     resetGetData(){

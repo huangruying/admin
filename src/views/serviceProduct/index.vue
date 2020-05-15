@@ -269,7 +269,7 @@ export default {
       ],
       auditList: [
         {
-          name: '待审核',
+          name: '已审核',
           value: 1
         },
         {

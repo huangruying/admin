@@ -307,11 +307,11 @@ export default {
       auditList: [
         {
           name: '已审核',
-          value: 0
+          value: 1
         },
         {
           name: '未审核',
-          value: 1
+          value: 0
         }
       ],
       channelList: [],

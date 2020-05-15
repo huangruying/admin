@@ -241,6 +241,12 @@ export const asyncRoutes = [
         meta: { title: '渠道', icon: 'example'},
         children: [
           {
+            path: 'ditchChannel',
+            name: 'ditchChannel',
+            component: () => import('@/views/ditchChannel/index'),
+            meta: { title: '渠道管理', icon: 'dashboard' ,}
+          },
+          {
             path: 'ditchProduct',
             name: 'ditchProduct',
             component: () => import('@/views/ditchProduct/index'),
@@ -254,25 +260,39 @@ export const asyncRoutes = [
           },
         ]
       },
-      // {
-      //   path: 'content',
-      //   component: () => import('@/views/routerView/index'), // Parent router-view
-      //   meta: { title: '渠道', icon: 'example'},
-      //   children: [
-      //     {
-      //       path: 'contentProduct',
-      //       name: 'contentProduct',
-      //       component: () => import('@/views/contentProduct/index'),
-      //       meta: { title: '产品管理', icon: 'dashboard' ,}
-      //     },
-      //     {
-      //       path: 'contentCircumscribed',
-      //       name: 'contentCircumscribed',
-      //       component: () => import('@/views/contentCircumscribed/index'),
-      //       meta: { title: ' 外接产品管理', icon: 'dashboard' ,}
-      //     },
-      //   ]
-      // },
+      {
+        path: 'marketing',
+        component: () => import('@/views/routerView/index'), // Parent router-view
+        meta: { title: '营销工具', icon: 'example'},
+        children: [
+          {
+            path: 'marketingCoupon',
+            name: 'marketingCoupon',
+            component: () => import('@/views/routerView/index'),
+            meta: { title: '优惠券管理', icon: 'dashboard'},
+            children: [
+              {
+                path: 'marketingList',
+                name: 'marketingList',
+                component: () => import('@/views/marketingList/index'),
+                meta: { title: '优惠券列表', icon: 'dashboard' ,}
+              },
+              {
+                path: 'marketingGet',
+                name: 'marketingGet',
+                component: () => import('@/views/marketingGet/index'),
+                meta: { title: '优惠券领取表', icon: 'dashboard' ,}
+              }
+            ]
+          },
+          {
+            path: 'marketingCertificate',
+            name: 'marketingCertificate',
+            component: () => import('@/views/marketingCertificate/index'),
+            meta: { title: '兑换券管理', icon: 'dashboard' ,}
+          },
+        ]
+      },
       // {
       //   path: 'content',
       //   component: () => import('@/views/routerView/index'), // Parent router-view
