@@ -1,5 +1,5 @@
 <template>
-  <div class="marketingGet">
+  <div class="WxBasic">
       <div class="xiaoGeGe">该功能小哥哥在努力开发中...</div>
   </div>
 </template>

@@ -21,6 +21,8 @@
             v-model="queryList.time"
             type="daterange"
             range-separator="至"
+            value-format="yyyy-MM-dd hh:mm:ss"
+            :default-time="['00:00:00', '23:59:59']"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             @change="getData"

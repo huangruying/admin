@@ -11,6 +11,8 @@
           <!-- <el-date-picker
           class="picker fl"
             v-model="queryList.time"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -44,41 +46,42 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column label="劵码ID" prop="couponsId" fixed align="center" width="90px">
+      <el-table-column label="劵码ID" prop="couponsId" align="center" width="90px">
         <template slot-scope="scope">
           <span>{{ scope.row.couponsId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠券名称" prop="title" fixed align="center">
+      <el-table-column label="优惠券名称" prop="title" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠金额" prop="money" fixed align="center">
+      <el-table-column label="优惠金额" prop="money" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取人数" prop="number" fixed align="center">
+      <el-table-column label="领取人数" prop="number" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="有效时间" prop="startdate" fixed align="center" width="340px">
+      <el-table-column label="有效时间" prop="startdate" align="center" width="340px">
         <template slot-scope="scope">
-          <span>{{ scope.row.startdate + "~" + scope.row.enddate }}</span>
+          <span>{{ scope.row.startdate }}</span> &nbsp;&nbsp; ~ &nbsp;&nbsp; <span>{{ scope.row.enddate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="劵码量" prop="couponsNum" fixed align="center">
+      <el-table-column label="劵码量" prop="couponsNum" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponsNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="操作" fixed="right" prop="audit_status" width="210px" align="center">
         <template slot-scope="scope">
-          <div style="width: 100%;margin-bottom: 7px;" v-if="scope.row.examine == 0"><el-button size="mini" type="success" @click="audit(scope.row)">审核通过</el-button></div>
-          <div style="width: 100%;margin-bottom: 7px;"><el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button></div>
-         <div style="width: 100%;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)">生成券码</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="info" @click="look(scope.row)">查看券码</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -100,24 +103,27 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="优惠劵名称：" prop="couponName" style="width: 100%">
-                  <el-input v-model="itemObj.couponName" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
+              <el-form-item label="优惠劵名称：" prop="title" style="width: 100%">
+                  <el-input v-model="itemObj.title" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
               </el-form-item>
-              <el-form-item label="优惠劵金额：" prop="couponMoney" style="width: 100%">
-                  <el-input v-model="itemObj.couponMoney" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
+              <el-form-item label="优惠劵金额：" prop="money" style="width: 100%">
+                  <el-input v-model="itemObj.money" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
               </el-form-item>
               <el-form-item label="有效期：" prop="couponMoney" style="width: 100%">
                  <el-date-picker
                     style="width:50%"
                     v-model="itemObj.time"
                     type="daterange"
+                    format="yyyy 年 MM 月 dd 日"
+                    value-format="yyyy-MM-dd hh:mm:ss"
+                    :default-time="['00:00:00', '23:59:59']"
                     range-separator="至"
                     start-placeholder="有效期开始"
                     end-placeholder="有效期结束"
                   ></el-date-picker>
               </el-form-item>
-              <el-form-item label="使用说明：" prop="instructions" style="width: 100%">
-                  <el-input type="textarea" v-model="itemObj.instructions" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
+              <el-form-item label="使用说明：" prop="content" style="width: 100%">
+                  <el-input type="textarea" v-model="itemObj.content" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
               </el-form-item>
           </el-form>
         </div>
@@ -126,11 +132,92 @@
        <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 查看 -->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="lookEditDialog"
+      width="70%"
+      @close="close2"
+      center>
+      <el-divider content-position="left"><span class="title">查询</span></el-divider>
+      <div class="query">
+       <div class="input_box">
+         <el-input
+          v-model="dialogList.barcode"
+          placeholder="请输入劵码号"
+          class="input fl"
+          @keyup.enter.native="look(item)"/>
+       </div>
+       <div class="btn_box">
+         <div>
+           <el-button type="danger" @click="dialogRemove(2)">批量删除</el-button>
+           <el-button type="primary" icon="el-icon-search" @click="look(item)">搜索</el-button>
+         </div>
+         <div>
+           <el-button type="primary" icon="el-icon-refresh" @click="resetGetData2(item)"></el-button>
+         </div>
+       </div>
+      </div>
+        <el-table
+          v-loading="loading2"
+          :data="dialog.data"
+          border
+          stripe
+          fit
+          @selection-change="handleSelectionChange2"
+          style="width: 100%;">
+          <el-table-column
+            align="center"
+            type="selection"
+            width="50">
+        </el-table-column>
+          <el-table-column label="优惠劵名称" prop="title" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.title }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="劵码号" prop="barcode" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.barcode }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" prop="dateline" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.dateline }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="使用时间" prop="usetime" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.usetime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" prop="status" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.status == 0? "未使用" : "已使用" }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed prop="" align="center">
+            <template slot-scope="scope">
+              <el-button size="mini" type="danger" @click="dialogRemove(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="dialog.total>0"
+          :total="dialog.total"
+          :page.sync="dialog.current_page"
+          :limit.sync="dialog.per_page"
+          @pagination="getPageData2"
+        />
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="lookEditDialog = false">返回列表</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { findYuyueCoupons , deleteYuyueCouponsById } from '@/api/guest/marketingList'
+import { findYuyueCoupons , deleteYuyueCouponsById , saveYuyueCoupons , updateYuyueCoupons , saveYuyueCouponscode , getYuyueCouponscodeByCid , deleteYuyueCouponscode } from '@/api/guest/marketingList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -141,9 +228,13 @@ export default {
       dialogTitle: "",
       loadingBootm: false,
       editDialog: false,
+      lookEditDialog: false,
       loading: false,
+      loading2: false,
       itemArr: [],
+      itemArr2: [],
       itemObj: {},
+      item: {},
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' }
@@ -157,19 +248,20 @@ export default {
         total: 0,
         link: ""
       },
-      auditList: [
-        {
-          name: '已审核',
-          value: 1
-        },
-        {
-          name: '未审核',
-          value: 0
-        }
-      ],
+      dialog: {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 10,
+        total: 0,
+        link: ""
+      },
       queryList: {
         title: null ,
         // time: ["" , ""]
+      },
+      dialogList: {
+        barcode: null
       }
     }
   },
@@ -177,16 +269,56 @@ export default {
     this.getData()
   },
   methods: {
+    look(item,filter){
+      this.loading2 = true
+      this.lookEditDialog = true
+      this.item = item
+      var data = {}
+      data.cid = item.couponsId
+      if (filter && this.dialog.current_page > 1) {
+        data.page = this.dialog.current_page;
+      } else {
+        this.data.current_page = 1;
+      }
+      if(this.dialogList.barcode){
+        data.barcode = this.dialogList.barcode
+      }
+      data.pageNum = this.dialog.current_page
+      data.pageSize = this.dialog.per_page
+      getYuyueCouponscodeByCid(data).then(res=>{
+         this.loading2 = false;
+        if (!res.data || res.data.length <= 0) {
+          this.$message("暂无数据~")
+          this.dialog.data = []
+        }
+        if( res.data && res.data.length > 0){
+          // console.log(res);
+          this.dialog = res;
+          this.dialog.current_page = res.pageNum
+          this.dialog.per_page = res.pageSize
+          this.dialog.total = res.total
+          this.dialog.data.forEach(v=>{
+            
+          })
+        }
+      })
+    },
+    aa(total){
+      return total.toString().replace(/\B(?=(\d{3})+$)/g,',');
+    },
     audit(item){
-      this.open2('确定审核通过？' , item.id)
+      this.open2('优惠卷名称 ：  ' + item.title , item.couponsId)
     },
     open2(text,id) {
-        this.$confirm(text, '提示', {
+        this.$prompt(text, '确定生成券码？', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
+          inputPlaceholder: '请输入生成券码数量',
+          inputPattern:  /^\d+$|^\d+[.]?\d+$/,
+          inputErrorMessage: '请输入正确的数量！',
           type: 'warning'
-        }).then(() => {
-          updateExamine({id}).then(res=>{
+        }).then(({ value }) => {
+          saveYuyueCouponscode({cid: id,num: value}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -210,17 +342,23 @@ export default {
     compile(item){
       this.editDialog = true
       this.itemObj = item
+      this.itemObj.time = [item.startdate , item.enddate]
     },
     newlyIncreased(){
       this.editDialog = true
     },
     itemEditDialog(){
         var data = {}
-      if(this.itemObj.id){
-        data.id = this.itemObj.id
-        data.name = this.itemObj.name
-        data.alias = this.itemObj.alias
-        updateYyChannel(data).then(res=>{
+        data.title = this.itemObj.title
+        data.money = this.itemObj.money
+        data.content = this.itemObj.content
+        if(this.itemObj.time[0] && this.itemObj.time[1]) {
+          data.startdate = this.itemObj.time[0]
+          data.enddate = this.itemObj.time[1]
+        }
+      if(this.itemObj.couponsId){
+        data.id = this.itemObj.couponsId
+        updateYuyueCoupons(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -236,9 +374,8 @@ export default {
           }
         })
       }else{
-        data.name = this.itemObj.name
-        data.alias = this.itemObj.alias
-        saveYyChannel(data).then(res=>{
+        data.uid = 1
+        saveYuyueCoupons(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -258,6 +395,55 @@ export default {
     },
     handleSelectionChange(val) {
         this.itemArr = val
+    },
+    handleSelectionChange2(val){
+       this.itemArr2 = val
+    },
+    dialogRemove(item){
+      if(item === 2){
+        if(this.itemArr2.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr2.forEach(v=>{
+          arr.push(v.id)
+        })
+        this.open3('确定批量删除？' , arr)
+      }else{
+        this.open3('确定删除？' , [item.id])
+      }
+    },
+    open3(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading2 = true
+          deleteYuyueCouponscode({ids: id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.look(this.item)
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
     },
     remove(item){
       if(item === 2){
@@ -345,11 +531,17 @@ export default {
     close(){
       this.itemObj = {}
     },
+    close2(){
+
+    },
     handleFilter(){
       this.getData()
     },
     getPageData(e) {
       this.getData("page");
+    },
+    getPageData2(e) {
+      this.look( this.item , "page" )
     },
     reset(){
       this.queryList = {
@@ -360,6 +552,10 @@ export default {
     resetGetData(){
       this.reset()
       this.getData()
+    },
+    resetGetData2(item){
+      this.look(item)
+      this.dialogList.barcode = null
     },
   }
 }

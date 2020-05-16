@@ -275,43 +275,75 @@ export const asyncRoutes = [
                 path: 'marketingList',
                 name: 'marketingList',
                 component: () => import('@/views/marketingList/index'),
-                meta: { title: '优惠券列表', icon: 'dashboard' ,}
+                meta: { title: '优惠券列表'}
               },
               {
                 path: 'marketingGet',
                 name: 'marketingGet',
                 component: () => import('@/views/marketingGet/index'),
-                meta: { title: '优惠券领取表', icon: 'dashboard' ,}
+                meta: { title: '优惠券领取表'}
               }
             ]
           },
           {
             path: 'marketingCertificate',
             name: 'marketingCertificate',
-            component: () => import('@/views/marketingCertificate/index'),
-            meta: { title: '兑换券管理', icon: 'dashboard' ,}
+            component: () => import('@/views/routerView/index'),
+            meta: { title: '兑换券管理', icon: 'dashboard'},
+            children: [
+              {
+                path: 'marketingOrder',
+                name: 'marketingOrder',
+                component: () => import('@/views/marketingOrder/index'),
+                meta: { title: '不记名卡订单管理'}
+              },
+              {
+                path: 'marketingConvert',
+                name: 'marketingConvert',
+                component: () => import('@/views/marketingConvert/index'),
+                meta: { title: '不记名卡兑换管理'}
+              }
+            ]
           },
         ]
       },
-      // {
-      //   path: 'content',
-      //   component: () => import('@/views/routerView/index'), // Parent router-view
-      //   meta: { title: '用户', icon: 'example'},
-      //   children: [
-      //     {
-      //       path: 'contentProduct',
-      //       name: 'contentProduct',
-      //       component: () => import('@/views/contentProduct/index'),
-      //       meta: { title: '产品管理', icon: 'dashboard' ,}
-      //     },
-      //     {
-      //       path: 'contentCircumscribed',
-      //       name: 'contentCircumscribed',
-      //       component: () => import('@/views/contentCircumscribed/index'),
-      //       meta: { title: ' 外接产品管理', icon: 'dashboard' ,}
-      //     },
-      //   ]
-      // },
+      {
+        path: 'WxDeploy',
+        component: () => import('@/views/routerView/index'), // Parent router-view
+        meta: { title: '微信配置', icon: 'example'},
+        children: [
+          {
+            path: 'WxBasic',
+            name: 'WxBasic',
+            component: () => import('@/views/WxBasic/index'),
+            meta: { title: '基本配置', icon: 'dashboard' ,}
+          },
+          {
+            path: 'WxMenu',
+            name: 'WxMenu',
+            component: () => import('@/views/WxMenu/index'),
+            meta: { title: '自定义菜单', icon: 'dashboard' ,}
+          },
+          {
+            path: 'WxNews',
+            name: 'WxNews',
+            component: () => import('@/views/WxNews/index'),
+            meta: { title: '收到消息回复', icon: 'dashboard' ,}
+          },
+          {
+            path: 'WxAntistop',
+            name: 'WxAntistop',
+            component: () => import('@/views/WxAntistop/index'),
+            meta: { title: '关键词回复', icon: 'dashboard' ,}
+          },
+          {
+            path: 'WxAttention',
+            name: 'WxAttention',
+            component: () => import('@/views/WxAttention/index'),
+            meta: { title: '被关注回复', icon: 'dashboard' ,}
+          }
+        ]
+      },
     ]
   },
 
