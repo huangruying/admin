@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findYuyueIproduct(data) {
   return request({
-    url: '/iproduct/findYuyueIproduct',
+    url: '/wash/iproduct/findYuyueIproduct',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findYuyueIproduct(data) {
 
 export function deleteYuyueIproductById(data) {
   return request({
-    url: '/iproduct/deleteYuyueIproductById',
+    url: '/wash/iproduct/deleteYuyueIproductById',
     method: 'post',
     data
   })
@@ -18,7 +18,7 @@ export function deleteYuyueIproductById(data) {
 
 export function updateYuyueIproduct(data) {
   return request({
-    url: '/iproduct/updateYuyueIproduct',
+    url: '/wash/iproduct/updateYuyueIproduct',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function updateYuyueIproduct(data) {
 
 export function saveYuyueIproduct(data) {
   return request({
-    url: '/iproduct/saveYuyueIproduct',
+    url: '/wash/iproduct/saveYuyueIproduct',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function saveYuyueIproduct(data) {
 
 export function getChannelName(data) {
   return request({
-    url: '/product/getChannelName',
+    url: '/wash/product/getChannelName',
     method: 'post',
     data
   })
@@ -42,7 +42,7 @@ export function getChannelName(data) {
 
 export function updateExamine(data) {
   return request({
-    url: '/iproduct/updateExamine',
+    url: '/wash/iproduct/updateExamine',
     method: 'post',
     data
   })

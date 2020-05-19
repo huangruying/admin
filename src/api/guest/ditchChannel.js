@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findYyChannelInfos(data) {
   return request({
-    url: '/channe/findYyChannelInfos',
+    url: '/wash/channe/findYyChannelInfos',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findYyChannelInfos(data) {
 
 export function delYyChannelById(data) {
     return request({
-      url: '/channe/delYyChannelById',
+      url: '/wash/channe/delYyChannelById',
       method: 'post',
       data
     })
@@ -18,7 +18,7 @@ export function delYyChannelById(data) {
 
 export function updateYyChannel(data) {
     return request({
-      url: '/channe/updateYyChannel',
+      url: '/wash/channe/updateYyChannel',
       method: 'post',
       data
     })
@@ -26,7 +26,7 @@ export function updateYyChannel(data) {
 
 export function saveYyChannel(data) {
     return request({
-      url: '/channe/saveYyChannel',
+      url: '/wash/channe/saveYyChannel',
       method: 'post',
       data
     })
@@ -34,7 +34,7 @@ export function saveYyChannel(data) {
 
 export function updateExamine(data) {
     return request({
-      url: '/channe/updateExamine',
+      url: '/wash/channe/updateExamine',
       method: 'post',
       data
     })

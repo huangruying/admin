@@ -92,6 +92,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
+          <el-button size="mini" type="success" class="btnCa" @click="look(scope.row)">查看大厅</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -140,28 +141,188 @@
        <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 大厅 -->
+    <!-- <lobby :text="text" :visibleLobby.sync="visibleLobby"></lobby> -->
+    <el-dialog
+      :title="text"
+      :visible.sync="visibleLobby"
+      width="80%"
+      @close="close2"
+      center>
+      <el-dialog
+        width="70%"
+        :title="textInner"
+        :visible.sync="innerVisible"
+         @close="close3"
+        append-to-body
+        center>
+        <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+            <el-form label-position="right" ref="lobby" :rules="rules2" label-width="150px" :model="lobbyObj" class="clearFix">
+                <el-form-item label="大厅名称：" prop="hallName" style="width: 100%">
+                    <el-input v-model="lobbyObj.hallName" style="width:50%" placeholder="请输入大厅名称"></el-input>
+                </el-form-item>
+                <el-form-item label="营业时间：" prop="businessHours" style="width: 100%">
+                    <el-time-picker
+                      @change="businessHours"
+                      is-range
+                      arrow-control
+                      v-model="lobbyObj.businessHours"
+                      format="HH:mm"
+                      value-format="HH:mm"
+                      range-separator="至"
+                      start-placeholder="开始时间"
+                      end-placeholder="结束时间"
+                      placeholder="选择时间范围">
+                    </el-time-picker>
+                </el-form-item>
+                <el-form-item label="客服电话：" prop="servicePhone" style="width: 100%">
+                    <el-input v-model="lobbyObj.servicePhone" style="width:50%" placeholder="请输入大厅名称"></el-input>
+                </el-form-item>
+                <el-form-item label="大厅地址：" prop="hallLocation" style="width: 100%">
+                    <el-input v-model="lobbyObj.hallLocation" style="width:50%" placeholder="请输入大厅名称"></el-input>
+                </el-form-item>
+                <el-form-item label="产品图片：" style="width: 100%">
+                  <el-upload
+                    action=""
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    list-type="picture-card"
+                    :on-change="handleChange">
+                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
+                  <el-button size="mini" type="danger" @click="imageUrl = ''" style="margin-left: 45px;">删除</el-button>
+              </el-form-item>
+            </el-form>
+        </div>
+        <el-divider content-position="left"><span class="title">服务项</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <div class="img_list">
+              <el-checkbox-group v-model="checkList">
+                <el-checkbox :label="item.serviceId" v-for="(item,index) in imgList" :key="index"><div class="imgbox"><img class="img" :src="item.serviceIcon" alt=""><span class="span">{{item.serviceName}}</span></div></el-checkbox>
+              </el-checkbox-group>
+          </div>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="innerVisible = false">取 消</el-button>
+          <el-button type="primary" :loading="loadingBtn" @click="lobbyDialog">确 定</el-button>
+        </span>
+      </el-dialog>
+        <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-table
+            v-loading="dialogLoading"
+            :data="lobbyData.data"
+            border
+            stripe
+            fit
+            class="itemTable">
+            <el-table-column label="大厅图片" prop="hallPic" align="center">
+              <template slot-scope="scope">
+                <img :src="scope.row.hallPic" alt="">
+              </template>
+            </el-table-column>
+            <el-table-column label="大厅名称" prop="hallName" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.hallName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="营业时间" prop="businessHours" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.businessHours }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="客服电话" prop="servicePhone" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.servicePhone }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="大厅地址" prop="hallLocation" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.hallLocation }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="修改时间" prop="updateTime" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.updateTime }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" @click="lobbyCompile(scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="lobbyRemove(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <pagination
+            v-show="lobbyData.total>0"
+            :total="lobbyData.total"
+            :page.sync="lobbyData.current_page"
+            :limit.sync="lobbyData.per_page"
+            @pagination="getPageData2"
+          />
+        </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visibleLobby = false">取 消</el-button>
+        <el-button type="primary" :loading="loadingBootm" @click="visibleLobby = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listStationsNameInfos , delStationsNameInfo , findYuyueProvinces , findYuyueCityByProvinceid , updateYuyueStationInfo , saveYuyueStationInfo } from '@/api/guest/yuetuSite'
+import { listStationsNameInfos , delStationsNameInfo , findYuyueProvinces , findYuyueCityByProvinceid , updateYuyueStationInfo , saveYuyueStationInfo , findStationsByIds , delYuyueStations , findHallService , updateYuyueStations } from '@/api/guest/yuetuSite'
+import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
+import lobby from "@/components/yuetuLobby"
 export default {
   components: {
-    Pagination
+    Pagination,
+    lobby
+  },
+  watch:{
+    // 监听数据的变化输出 newV 改变的值，oldV 改变之前的值
+    // visibleLobby(newV,oldV){
+    //   // console.log(newV,oldV);
+    // },
   },
   data() {
     return {
+      loadingBtn: false,
+      imageUrl: "",
+      lobbyObj: {},
+      textInner: "",
+      innerVisible: false,
+      stationId: null,
+      dialogLoading: false,
+      lobbyData:{
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 10,
+        total: 0,
+        link: ""
+      },
+      visibleLobby: false,
+      text: "",
       dialogTitle: "",
       loadingBootm: false,
       editDialog: false,
       loading: false,
       newly: false,
+      checkList: [],
+      imgList: [],
       itemArr: [],
       itemObj: {},
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' }
+          ]
+      },
+      rules2: {
+          businessHours: [
+            { required: true, message: '请选择营业时间', trigger: 'blur'}
           ]
       },
       data: {
@@ -201,6 +362,150 @@ export default {
     this.apiProvince()
   },
   methods: {
+    businessHours(date){
+    },
+    close2(){
+      this.getData()
+    },
+    close3(){
+      this.getList()
+      this.lobbyObj = {}
+      this.checkList = []
+      this.textInner = ""
+    },
+    lobbyDialog(){
+      var obj = this.lobbyObj
+      obj.hallPic = this.imageUrl
+      obj.serviceIds = this.checkList
+      obj.businessHours = obj.businessHours[0] + "-" +  obj.businessHours[1]
+      updateYuyueStations(obj).then(res=>{
+        if(res.code == 200){
+            this.$message({
+                type: 'success',
+                message: '操作成功!'
+            })
+            this.getList()
+            this.innerVisible = false
+          }else{
+            this.$message({
+                type: 'info',
+                message: res.msg
+            })
+          }
+      })
+    },
+    apiUploadImg(formData){
+      dotOssUpload(formData).then(res => {
+        if(res.code == 200){
+          this.imageUrl = res.data
+          this.$message({
+            type: 'success',
+            message: '上传成功！'
+          })
+        }else{
+          this.$message.error('上传失败！');
+        }
+      })
+    },
+    handleChange(file, fileList){
+      if(fileList.length>0){
+         this.fileList = [fileList[fileList.length - 1]] //展示最后一次选择文件
+        //  this.storeImagess = URL.createObjectURL(file.raw);
+      }
+      if (this.fileList) {
+            var formData = new FormData()
+          // formData.append('dotCode', this.dotCode)
+            formData.append('file', file.raw)
+           this.apiUploadImg(formData)
+          } else {
+          this.$message({ message: '请上传图片!' })
+      }
+    },
+    lobbyCompile(item){
+      this.innerVisible = true
+      this.textInner = item.hallName
+      if(item.businessHours.indexOf("-") == -1){
+
+      }else{
+         var a = item.businessHours.split("-")
+         item.businessHours = a
+      }
+      this.lobbyObj = item
+      var arr = []
+      item.services.forEach(v=>{
+        arr.push(v.serviceId)
+      })
+      this.checkList = arr 
+      findHallService().then(res=>{
+        this.imgList = res.data
+      })
+    },
+    lobbyRemove(item){
+      this.lobbyOpen("确定删除该大厅？" , item.hallId)
+    },
+    lobbyOpen(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.dialogLoading = true
+          delYuyueStations({hallId: id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getList()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    look(item){
+      this.stationId = item.stationId
+      this.text = item.stationName + "大厅信息"
+      this.visibleLobby = true
+      this.getList()
+    },
+    getList(filter){
+      this.dialogLoading = true
+      var data = {}
+      if (filter && this.lobbyData.current_page > 1) {
+        data.page = this.lobbyData.current_page;
+      } else {
+        this.lobbyData.current_page = 1;
+      }
+      data.pageNum = this.lobbyData.current_page
+      data.pageSize = this.lobbyData.per_page
+      data.stationId = this.stationId
+      findStationsByIds(data).then(res=>{
+         this.dialogLoading = false;
+        if (!res.data || res.data.length <= 0) {
+          this.$message("暂无数据~")
+          this.lobbyData.data = []
+        }
+        if( res.data && res.data.length > 0){
+          // console.log(res);
+          this.lobbyData = res;
+          this.lobbyData.current_page = res.pageNum
+          this.lobbyData.per_page = res.pageSize
+          this.lobbyData.total = res.total
+          this.lobbyData.data.forEach(v=>{
+            
+          })
+        }
+      })
+    },
     compile(item){
       this.editDialog = true
       this.itemObj = item
@@ -370,6 +675,9 @@ export default {
     getPageData(e) {
       this.getData("page");
     },
+    getPageData2(e) {
+      this.getList("page");
+    },
     reset(){
       this.queryList = {
         stationName: null,
@@ -387,6 +695,39 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.img_list{
+  padding: 10px;
+  /deep/.el-checkbox__input{
+    position: absolute;
+    bottom: 0;
+    left: 5px;
+  }
+  .imgbox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+    margin-top: 15px;
+    .span{
+      margin-left: 10px;
+    }
+    .img{
+      width: 90px;
+      height: 90px;
+      border-radius: 4px;
+    }
+  }
+}
+.itemTable{
+  width: 100%;
+  // /deep/.el-table{
+  //   width: 100%;
+  // }
+}
+.btnCa{
+  width: 80%;
+  margin-top: 8px;
+}
 .title{
   font-size: 18px;
   font-weight: 600;

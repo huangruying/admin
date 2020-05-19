@@ -292,17 +292,23 @@ export const asyncRoutes = [
             meta: { title: '兑换券管理', icon: 'dashboard'},
             children: [
               {
-                path: 'marketingOrder',
-                name: 'marketingOrder',
-                component: () => import('@/views/marketingOrder/index'),
-                meta: { title: '不记名卡订单管理'}
-              },
-              {
                 path: 'marketingConvert',
                 name: 'marketingConvert',
                 component: () => import('@/views/marketingConvert/index'),
-                meta: { title: '不记名卡兑换管理'}
-              }
+                meta: { title: '券码管理'}
+              },
+              {
+                path: 'marketingOrder',
+                name: 'marketingOrder',
+                component: () => import('@/views/marketingOrder/index'),
+                meta: { title: '订单管理'}
+              },
+              // {
+              //   path: 'marketingConvert',
+              //   name: 'marketingConvert',
+              //   component: () => import('@/views/marketingConvert/index'),
+              //   meta: { title: '兑换管理'}
+              // }
             ]
           },
         ]
@@ -310,47 +316,43 @@ export const asyncRoutes = [
       {
         path: 'WxDeploy',
         component: () => import('@/views/routerView/index'), // Parent router-view
+        alwaysShow: true,
         meta: { title: '微信配置', icon: 'example'},
         children: [
-          {
-            path: 'WxBasic',
-            name: 'WxBasic',
-            component: () => import('@/views/WxBasic/index'),
-            meta: { title: '基本配置', icon: 'dashboard' ,}
-          },
+          // {
+          //   path: 'WxBasic',
+          //   name: 'WxBasic',
+          //   component: () => import('@/views/WxBasic/index'),
+          //   meta: { title: '基本配置', icon: 'dashboard' ,}
+          // },
           {
             path: 'WxMenu',
             name: 'WxMenu',
             component: () => import('@/views/WxMenu/index'),
             meta: { title: '自定义菜单', icon: 'dashboard' ,}
           },
-          {
-            path: 'WxNews',
-            name: 'WxNews',
-            component: () => import('@/views/WxNews/index'),
-            meta: { title: '收到消息回复', icon: 'dashboard' ,}
-          },
-          {
-            path: 'WxAntistop',
-            name: 'WxAntistop',
-            component: () => import('@/views/WxAntistop/index'),
-            meta: { title: '关键词回复', icon: 'dashboard' ,}
-          },
-          {
-            path: 'WxAttention',
-            name: 'WxAttention',
-            component: () => import('@/views/WxAttention/index'),
-            meta: { title: '被关注回复', icon: 'dashboard' ,}
-          }
+          // {
+          //   path: 'WxNews',
+          //   name: 'WxNews',
+          //   component: () => import('@/views/WxNews/index'),
+          //   meta: { title: '收到消息回复', icon: 'dashboard' ,}
+          // },
+          // {
+          //   path: 'WxAntistop',
+          //   name: 'WxAntistop',
+          //   component: () => import('@/views/WxAntistop/index'),
+          //   meta: { title: '关键词回复', icon: 'dashboard' ,}
+          // },
+          // {
+          //   path: 'WxAttention',
+          //   name: 'WxAttention',
+          //   component: () => import('@/views/WxAttention/index'),
+          //   meta: { title: '被关注回复', icon: 'dashboard' ,}
+          // }
         ]
       },
     ]
   },
-
-
-
-
-
   // 4级菜单测试用
   // {
   //   path: '/nested',
@@ -359,7 +361,8 @@ export const asyncRoutes = [
   //   name: 'Nested',
   //   meta: {
   //     title: 'Nested',
-  //     icon: 'nested'
+  //     icon: 'nested',
+  //     roles:  ['user']
   //   },
   //   children: [
   //     {
@@ -416,6 +419,21 @@ export const asyncRoutes = [
   //   ]
   // },
   // 404 page must be placed at the end !!!
+  {
+    path: '/userRight',
+    component: Layout,
+    alwaysShow: true,
+   // component: () => import('@/views/routerView/index'), // Parent router-view
+    meta: { title: '用户权限管理', icon: 'example' },
+    children: [
+      {
+        path: '/userList',
+        name: 'userList',
+        component: () => import('@/views/userList/index'),
+        meta: { title: '用户列表'}
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

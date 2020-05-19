@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findYuyueOrders(data) {
   return request({
-    url: '/order/findYuyueOrders',
+    url: '/wash/order/findYuyueOrders',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findYuyueOrders(data) {
 
 export function delYuyueOrdersByOrderNo(data) {
     return request({
-      url: '/order/delYuyueOrdersByOrderNo',
+      url: '/wash/order/delYuyueOrdersByOrderNo',
       method: 'post',
       data
     })

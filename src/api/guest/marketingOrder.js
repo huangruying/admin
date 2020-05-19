@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findYyBearercardorderInfos(data) {
   return request({
-    url: '/bearercard/findYyBearercardorderInfos',
+    url: '/wash/bearercard/findYyBearercardorderInfos',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findYyBearercardorderInfos(data) {
 
 export function delYyBearercardorderById(data) {
     return request({
-      url: '/bearercard/delYyBearercardorderById',
+      url: '/wash/bearercard/delYyBearercardorderById',
       method: 'post',
       data
     })

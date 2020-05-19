@@ -32,8 +32,11 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-    port: port,
+    // port: port,
+    port: 8080, // 端口号
     open: true,
+    // host: '0.0.0.0', // 端口
+    host: '192.168.0.140', // 端口,可不写
     overlay: {
       warnings: false,
       errors: true

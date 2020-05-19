@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findYuyueCoupons(data) {
   return request({
-    url: '/coupon/findYuyueCoupons',
+    url: '/wash/coupon/findYuyueCoupons',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findYuyueCoupons(data) {
 
 export function deleteYuyueCouponsById(data) {
     return request({
-      url: '/coupon/deleteYuyueCouponsById',
+      url: '/wash/coupon/deleteYuyueCouponsById',
       method: 'post',
       data
     })
@@ -18,7 +18,7 @@ export function deleteYuyueCouponsById(data) {
 
 export function saveYuyueCoupons(data) {
   return request({
-    url: '/coupon/saveYuyueCoupons',
+    url: '/wash/coupon/saveYuyueCoupons',
     method: 'post',
     data
   })
@@ -26,7 +26,7 @@ export function saveYuyueCoupons(data) {
 
 export function updateYuyueCoupons(data) {
   return request({
-    url: '/coupon/updateYuyueCoupons',
+    url: '/wash/coupon/updateYuyueCoupons',
     method: 'post',
     data
   })
@@ -34,7 +34,7 @@ export function updateYuyueCoupons(data) {
 
 export function saveYuyueCouponscode(data) {
   return request({
-    url: '/coupon/saveYuyueCouponscode',
+    url: '/wash/coupon/saveYuyueCouponscode',
     method: 'post',
     data
   })
@@ -42,7 +42,7 @@ export function saveYuyueCouponscode(data) {
 
 export function getYuyueCouponscodeByCid(data) {
   return request({
-    url: '/coupon/getYuyueCouponscodeByCid',
+    url: '/wash/coupon/getYuyueCouponscodeByCid',
     method: 'post',
     data
   })
@@ -50,7 +50,7 @@ export function getYuyueCouponscodeByCid(data) {
 
 export function deleteYuyueCouponscode(data) {
   return request({
-    url: '/coupon/deleteYuyueCouponscode',
+    url: '/wash/coupon/deleteYuyueCouponscode',
     method: 'post',
     data
   })

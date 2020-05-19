@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listStationsNameInfos(data) {
   return request({
-    url: '/station/listStationsNameInfos',
+    url: '/wash/station/listStationsNameInfos',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function listStationsNameInfos(data) {
 
 export function delStationsNameInfo(data) {
     return request({
-      url: '/station/delStationsNameInfo',
+      url: '/wash/station/delStationsNameInfo',
       method: 'post',
       data
     })
@@ -34,7 +34,7 @@ export function findYuyueCityByProvinceid(data) {
 
 export function updateYuyueStationInfo(data) {
     return request({
-      url: '/station/updateYuyueStationInfo',
+      url: '/wash/station/updateYuyueStationInfo',
       method: 'post',
       data: data
     })
@@ -42,8 +42,40 @@ export function updateYuyueStationInfo(data) {
 
 export function saveYuyueStationInfo(data) {
     return request({
-      url: '/station/saveYuyueStationInfo',
+      url: '/wash/station/saveYuyueStationInfo',
       method: 'post',
       data: data
     })
+}
+
+export function findStationsByIds(data) {
+  return request({
+    url: '/wash/station/findStationsByIds',
+    method: 'post',
+    data: data
+  })
+}
+
+export function delYuyueStations(data) {
+  return request({
+    url: '/wash/station/delYuyueStations',
+    method: 'post',
+    data: data
+  })
+}
+
+export function findHallService(data) {
+  return request({
+    url: '/wash/station/findHallService',
+    method: 'post',
+    data: data
+  })
+}
+
+export function updateYuyueStations(data) {
+  return request({
+    url: '/wash/station/updateYuyueStations',
+    method: 'post',
+    data: data
+  })
 }
