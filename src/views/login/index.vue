@@ -97,7 +97,7 @@ export default {
         code: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         code: [{ required: true, trigger: 'blur', validator: validateUserCode }]
       },

@@ -303,12 +303,13 @@ export const asyncRoutes = [
                 component: () => import('@/views/marketingOrder/index'),
                 meta: { title: '订单管理'}
               },
-              // {
-              //   path: 'marketingConvert',
-              //   name: 'marketingConvert',
-              //   component: () => import('@/views/marketingConvert/index'),
-              //   meta: { title: '兑换管理'}
-              // }
+              {
+                path: 'marketingOrderCharge',
+                name: 'marketingOrderCharge',
+                hidden: true, // 不在侧边栏线上
+                component: () => import('@/views/marketingOrderCharge/index'),
+                meta: { title: '收费订单管理', activeMenu: '/service/marketing/marketingCertificate/marketingOrder', }
+              }
             ]
           },
         ]
@@ -424,7 +425,7 @@ export const asyncRoutes = [
     component: Layout,
     alwaysShow: true,
    // component: () => import('@/views/routerView/index'), // Parent router-view
-    meta: { title: '用户权限管理', icon: 'example' },
+    meta: { title: '用户权限管理', icon: 'example' , roles:  ['userList'] },
     children: [
       {
         path: '/userList',

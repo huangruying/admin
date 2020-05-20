@@ -79,3 +79,11 @@ export function updateYuyueStations(data) {
     data: data
   })
 }
+
+export function saveYuyueStations(data) {
+  return request({
+    url: '/wash/station/saveYuyueStations',
+    method: 'post',
+    data: data
+  })
+}

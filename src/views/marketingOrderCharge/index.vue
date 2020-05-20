@@ -4,8 +4,23 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.name"
+          v-model="queryList.channelName"
           placeholder="请输入渠道名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.customerId"
+          placeholder="请输入客户ID"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.belongOrg"
+          placeholder="请输入发放机构ID"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.bindMemName"
+          placeholder="请输入姓名"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -13,19 +28,6 @@
           placeholder="请输入手机号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.goodsname"
-          placeholder="请输入商品名称"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
-            <el-option
-              v-for="item in statusList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
-            ></el-option>
-          </el-select>
        </div> 
        <div class="btn_box">
          <div>
@@ -61,29 +63,24 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="商品名称" prop="goodsname" align="center">
+      <el-table-column label="客户ID" prop="customerId" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.goodsname }}</span>
+          <span>{{ scope.row.customerId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="平台订单号" prop="orderno" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.orderno }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="第三方平台订单号" prop="orderId" align="center">
+      <el-table-column label="订单ID" prop="orderId" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.orderId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="券码" prop="code" align="center">
+      <el-table-column label="渠道商" prop="channelName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.code }}</span>
+          <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单价格" prop="orderprice" align="center">
+      <el-table-column label="商品名称" prop="goodsname" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderprice }}</span>
+          <span>{{ scope.row.goodsname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="发放机构ID" prop="belongOrg" align="center">
@@ -96,34 +93,19 @@
           <span>{{ scope.row.belongSys }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="生效时间" prop="cardEffTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cardEffTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="失效时间" prop="cardInvTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cardInvTime }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="真实姓名" prop="bindMemName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.bindMemName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号码" prop="bindMemPhone" align="center">
+      <el-table-column label="电话号码" prop="bindMemPhone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.bindMemPhone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="下单时间" prop="dateline" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dateline }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="订单状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status == 1? "待支付": "已支付" }}</span>
+          <span>{{ scope.row.status }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
@@ -150,26 +132,23 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="平台订单号：" prop="orderno" style="width: 100%">
-                  <el-input v-model="itemObj.orderno" style="width:50%" disabled></el-input>
+              <el-form-item label="客户ID：" prop="customerId" style="width: 100%">
+                  <el-input v-model="itemObj.customerId" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="第三方平台订单号：" prop="orderId" style="width: 100%">
+              <el-form-item label="订单ID：" prop="orderId" style="width: 100%">
                   <el-input v-model="itemObj.orderId" style="width:50%" disabled></el-input>
               </el-form-item>
               <el-form-item label="发放机构ID：" prop="belongOrg" style="width: 100%">
                   <el-input v-model="itemObj.belongOrg" style="width:50%" disabled></el-input>
               </el-form-item>
+              <el-form-item label="渠道商：" prop="channelName" style="width: 100%">
+                  <el-input v-model="itemObj.channelName" style="width:50%" disabled></el-input>
+              </el-form-item>
               <el-form-item label="真实姓名：" prop="bindMemName" style="width: 100%">
                   <el-input v-model="itemObj.bindMemName" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="下单时间：" prop="dateline" style="width: 100%">
-                  <el-input v-model="itemObj.dateline" style="width:50%" disabled></el-input>
-              </el-form-item>
-              <el-form-item label="生效时间：" prop="cardEffTime" style="width: 100%">
-                  <el-input v-model="itemObj.cardEffTime" style="width:50%" disabled></el-input>
-              </el-form-item>
-              <el-form-item label="失效时间：" prop="cardInvTime" style="width: 100%">
-                  <el-input v-model="itemObj.cardInvTime" style="width:50%" disabled></el-input>
+              <el-form-item label="发放系统：" prop="belongSys" style="width: 100%">
+                  <el-input v-model="itemObj.belongSys" style="width:50%" disabled></el-input>
               </el-form-item>
           </el-form>
         </div>
@@ -187,9 +166,9 @@
                   <span>{{ scope.row.goodsname }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="券码" prop="code" align="center">
+              <el-table-column label="电话号码" prop="bindMemPhone" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.code }}</span>
+                  <span>{{ scope.row.bindMemPhone }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="发放系统" prop="belongSys" align="center">
@@ -197,14 +176,9 @@
                   <span>{{ scope.row.belongSys }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="订单价格" prop="orderprice" align="center" width="120">
-                <template slot-scope="scope">
-                  <span>{{ scope.row.orderprice }}</span>
-                </template>
-              </el-table-column>
               <el-table-column label="订单状态" prop="status" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.status == 1? "待支付": "已支付" }}</span>
+                  <span>{{ scope.row.status }}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -217,7 +191,7 @@
 </template>
 
 <script>
-import { findYyBearercardorderInfos , delYyBearercardorderById } from '@/api/guest/marketingOrder'
+import { findYyExchangelogInfos , delYyExchangelog } from '@/api/guest/marketingOrderCharge'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -228,7 +202,7 @@ export default {
       editDialog: false,
       dialogTitle: "查看",
       loading: false,
-      btnss: 1,
+      btnss: 2,
       itemArr: [],
       itemObj: {},
       data: {
@@ -240,10 +214,11 @@ export default {
         link: ""
       },
       queryList: {
-        goodsname: null,
-        name: null,
-        status: null,
-        bindMemPhone: null,
+        channelName: null,
+        customerId: null,
+        belongOrg: null,
+        bindMemName: null,
+        bindMemPhone: null
       },
       statusList: [
         {
@@ -305,7 +280,7 @@ export default {
           type: 'warning'
         }).then(() => {
           this.loading = true
-          delYyBearercardorderById({ids: id}).then(res=>{
+          delYyExchangelog({ids: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -330,17 +305,20 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.goodsname) {
-        data.goodsname = queryList.goodsname
+      if (queryList.channelName) {
+        data.channelName = queryList.channelName
       }
-      if (queryList.name) {
-        data.name = queryList.name
+      if (queryList.customerId) {
+        data.customerId = queryList.customerId
+      }
+      if (queryList.belongOrg) {
+        data.belongOrg = queryList.belongOrg
+      }
+      if (queryList.bindMemName) {
+        data.bindMemName = queryList.bindMemName
       }
       if (queryList.bindMemPhone) {
         data.bindMemPhone = queryList.bindMemPhone
-      }
-      if(!(queryList.status == null)){
-        data.status = queryList.status
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -349,7 +327,7 @@ export default {
       }
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findYyBearercardorderInfos(data).then(res=>{
+      findYyExchangelogInfos(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
@@ -362,7 +340,11 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if(v.status == 1){
+                v.status = "待使用"
+            }else if(v.status == 2){
+                v.status = "已使用"
+            }
           })
         }
       })
@@ -382,10 +364,11 @@ export default {
     },
     reset(){
       this.queryList = {
-        goodsname: null,
-        name: null,
-        status: null,
-        bindMemPhone: null,
+        channelName: null,
+        customerId: null,
+        belongOrg: null,
+        bindMemName: null,
+        bindMemPhone: null
       }
     },
     resetGetData(){

@@ -209,6 +209,10 @@
           <el-button type="primary" :loading="loadingBtn" @click="lobbyDialog">确 定</el-button>
         </span>
       </el-dialog>
+       <div class="btn_box" style="margin-bottom:10px;">
+           <div></div>
+           <el-button type="primary" @click="newlyDivider">新增</el-button>
+       </div>
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-table
@@ -220,7 +224,7 @@
             class="itemTable">
             <el-table-column label="大厅图片" prop="hallPic" align="center">
               <template slot-scope="scope">
-                <img :src="scope.row.hallPic" alt="">
+                <img :src="scope.row.hallPic" alt="" style="height:75px;">
               </template>
             </el-table-column>
             <el-table-column label="大厅名称" prop="hallName" align="center">
@@ -272,7 +276,7 @@
 </template>
 
 <script>
-import { listStationsNameInfos , delStationsNameInfo , findYuyueProvinces , findYuyueCityByProvinceid , updateYuyueStationInfo , saveYuyueStationInfo , findStationsByIds , delYuyueStations , findHallService , updateYuyueStations } from '@/api/guest/yuetuSite'
+import { listStationsNameInfos , delStationsNameInfo , findYuyueProvinces , findYuyueCityByProvinceid , updateYuyueStationInfo , saveYuyueStationInfo , findStationsByIds , delYuyueStations , findHallService , updateYuyueStations , saveYuyueStations } from '@/api/guest/yuetuSite'
 import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 import lobby from "@/components/yuetuLobby"
@@ -354,7 +358,8 @@ export default {
         }
       ],
       provinceList: [],
-      cityList: []
+      cityList: [],
+      newlyData: false
     }
   },
   created() {
@@ -362,6 +367,17 @@ export default {
     this.apiProvince()
   },
   methods: {
+    newlyDivider(){
+      this.innerVisible = true
+      this.lobbyObj = {}
+      this.checkList = []
+      this.textInner = "新增大厅"
+      this.imageUrl = ""
+      findHallService().then(res=>{
+        this.imgList = res.data
+      })
+      this.newlyData = true
+    },
     businessHours(date){
     },
     close2(){
@@ -371,28 +387,49 @@ export default {
       this.getList()
       this.lobbyObj = {}
       this.checkList = []
-      this.textInner = ""
+      this.newlyData = false
     },
     lobbyDialog(){
-      var obj = this.lobbyObj
-      obj.hallPic = this.imageUrl
-      obj.serviceIds = this.checkList
-      obj.businessHours = obj.businessHours[0] + "-" +  obj.businessHours[1]
-      updateYuyueStations(obj).then(res=>{
-        if(res.code == 200){
-            this.$message({
-                type: 'success',
-                message: '操作成功!'
-            })
-            this.getList()
-            this.innerVisible = false
-          }else{
-            this.$message({
-                type: 'info',
-                message: res.msg
-            })
-          }
-      })
+        var obj = this.lobbyObj
+        obj.hallPic = this.imageUrl
+        obj.serviceIds = this.checkList
+        if(obj.businessHours && obj.businessHours[0] && obj.businessHours[1]){
+          obj.businessHours = obj.businessHours[0] + "-" +  obj.businessHours[1]
+        }
+      if(this.newlyData){
+        obj.stationId = this.stationId
+        saveYuyueStations(obj).then(res=>{
+          if(res.code == 200){
+              this.$message({
+                  type: 'success',
+                  message: '操作成功!'
+              })
+              this.getList()
+              this.innerVisible = false
+            }else{
+              this.$message({
+                  type: 'info',
+                  message: res.msg
+              })
+            }
+        })
+      }else{
+        updateYuyueStations(obj).then(res=>{
+          if(res.code == 200){
+              this.$message({
+                  type: 'success',
+                  message: '操作成功!'
+              })
+              this.getList()
+              this.innerVisible = false
+            }else{
+              this.$message({
+                  type: 'info',
+                  message: res.msg
+              })
+            }
+        })
+      }
     },
     apiUploadImg(formData){
       dotOssUpload(formData).then(res => {
