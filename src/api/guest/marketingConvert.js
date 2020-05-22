@@ -31,3 +31,19 @@ export function updateYyBearercardByState(data) {
     data
   })
 }
+
+export function importYyBearercardByCode(data) {
+  return request({
+    url: '/wash/bearercard/importYyBearercardByCode',
+    method: 'post',
+    data
+  })
+}
+
+export function importYyBearercardByState(data) {
+  return request({
+    url: '/wash/bearercard/importYyBearercardByState',
+    method: 'post',
+    data
+  })
+}

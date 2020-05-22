@@ -86,9 +86,50 @@
       width="90%"
       @close="close2"
       center>
-        <div class="btn_box" style="margin-bottom:15px;">
-            <el-button type="danger" @click="remove(2)">批量删除</el-button>
-            <div></div>
+      <!--上传文件的弹窗-->
+      <el-dialog center width="50%" @close="close3" :visible.sync="uploaddialogVisible" append-to-body title="导入数据">
+        <!-- <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
+              <el-option
+                v-for="item in statusInfoList"
+                :label="item.name"
+                :value="item.id"
+                :key="item.value"
+              ></el-option>
+        </el-select> -->
+        <div style="margin: 0 auto;">
+          <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
+            :limit="1" action="" drag class="upload-demo">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div slot="tip" class="el-upload__tip">只能上传excel文件</div>
+          </el-upload>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="uploaddialogVisible = false">返 回</el-button>
+          <el-button type="primary" :loading="loadingUpload" @click="submitImportExcel">确 定</el-button>
+        </span>
+      </el-dialog>
+      <el-divider content-position="left"><span class="title">查询</span></el-divider>
+        <div class="query">
+          <div class="input_box">
+              <el-select v-model="dialogList.state" @change="apiCodeState()" class="input fl" placeholder="请选择核销状态">
+                <el-option
+                  v-for="item in dialogStateList"
+                  :label="item.name"
+                  :value="item.usetypeid"
+                  :key="item.usetypeid"
+                ></el-option>
+              </el-select>
+          </div> 
+          <div class="btn_box">
+            <div>
+              <el-button type="danger" @click="remove(2)">批量删除</el-button>
+            </div>
+            <div>
+              <el-button type="primary" @click="uploadDV(1)">导入不记名卡</el-button>
+              <el-button type="primary" @click="uploadDV(2)">导入兑换编号核销不记名卡</el-button>
+            </div>
+          </div>
         </div>
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
@@ -174,7 +215,7 @@
 </template>
 
 <script>
-import { findYyProductBearercardor , findYyBearercardByPid , delYyBearercardById , updateYyBearercardByState } from '@/api/guest/marketingConvert'
+import { findYyProductBearercardor , findYyBearercardByPid , delYyBearercardById , updateYyBearercardByState , importYyBearercardByCode , importYyBearercardByState } from '@/api/guest/marketingConvert'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -182,6 +223,8 @@ export default {
   },
   data() {
     return {
+      loadingUpload: false,
+      uploaddialogVisible: false,
       loadingBootm: false,
       codeLoading: false,
       text: "",
@@ -205,9 +248,30 @@ export default {
         total: 0,
         link: ""
       },
+      dialogList:{
+        state: null,
+      },
       queryList: {
         cardno: null,
       },
+      dialogStateList:[
+        {
+          name: "未核销",
+          usetypeid: 1
+        },
+        {
+          name: "已核销",
+          usetypeid: 0
+        },
+        {
+          name: "已注销",
+          usetypeid: 2
+        },
+        {
+          name: "已过期",
+          usetypeid: 3
+        }
+      ],
       statusList: [
         {
           name: "高铁",
@@ -218,12 +282,84 @@ export default {
           usetypeid: 2
         }
       ],
+      fileList: "",
+      number: null
     }
   },
   created() {
     this.getData()
   },
   methods: {
+    uploadDV(num){
+      this.number = num
+      this.uploaddialogVisible = true
+    },
+    apiCodeState(){
+     this.apiCode(this.codeId)
+    },
+    submitImportExcel() {
+      if(this.number == 1){
+         this.loadingUpload = true
+        if (this.fileList) {
+          var formData = new FormData()
+          formData.append('file', this.fileList[0].raw)
+          // formData.append('id', this.facilitatorId)
+          importYyBearercardByCode(formData).then(res => {
+            this.loadingUpload = false
+            if(res.code == 200){
+              this.uploaddialogVisible = false
+              this.apiCode(this.codeId)
+              this.$message({
+                type: 'success',
+                message: `上传成功!`
+              })
+            }else{
+              this.$message({
+                type: "info",
+                message: res.msg
+              })
+            }
+          })
+        } else {
+          this.$message({
+            message: '请选择Excle文件!'
+          })
+        }
+      }else{
+         this.loadingUpload = true
+        if (this.fileList) {
+          var formData = new FormData()
+          formData.append('file', this.fileList[0].raw)
+          // formData.append('id', this.facilitatorId)
+          importYyBearercardByState(formData).then(res => {
+            this.loadingUpload = false
+            if(res.code == 200){
+              this.uploaddialogVisible = false
+              this.apiCode(this.codeId)
+              this.$message({
+                type: 'success',
+                message: `上传成功!`
+              })
+            }else{
+              this.$message({
+                type: "info",
+                message: res.msg
+              })
+            }
+          })
+        } else {
+          this.$message({
+            message: '请选择Excle文件!'
+          })
+        }
+      }
+    },
+    removeFile(file, fileList) {
+        this.fileList = null
+    },
+    handleChange(file, fileList) {
+        this.fileList = fileList
+    },
     codeCompile(item){
       this.codeOpen("确定核销该券码？", item.id)
     },
@@ -314,6 +450,9 @@ export default {
       this.codeLoading = true
       let data = {}
       data.pid = id
+      if(!(this.dialogList.state == null)){
+        data.state = this.dialogList.state
+      }
       if (filter && this.codeData.current_page > 1) {
         data.page = this.codeData.current_page;
       } else {
@@ -389,6 +528,10 @@ export default {
     close2(){
 
     },
+    close3(){
+      this.number = null
+      this.fileList = ""
+    },
     handleFilter(){
       this.getData()
     },
@@ -414,6 +557,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.upload-demo {
+    text-align: center;
+    padding: 0 100px;
+  }
 .title{
   font-size: 18px;
   font-weight: 600;
