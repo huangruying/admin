@@ -91,6 +91,11 @@
           <span>{{ scope.row.topdateline }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="渠道" prop="channelNames" align="center">
+        <template slot-scope="scope">
+          <div v-for="(ditch,idx) in scope.row.channelNames" :key="idx">{{ditch}}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="审核是否通过" prop="examine" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.examine == 0 ? "未审核" : "审核已通过" }}</span>

@@ -546,7 +546,9 @@ export default {
     compile(item){
       this.editDialog = true
       this.itemObj = item
-      this.apiCity(item.provinceId)
+      if(item.provinceId){
+        this.apiCity(item.provinceId)
+      }
     },
     newlyIncreased(){
       this.editDialog = true

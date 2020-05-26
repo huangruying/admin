@@ -193,7 +193,7 @@
           </el-table-column>
           <el-table-column label="状态" prop="status" fixed align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.status == 0? "未使用" : "已使用" }}</span>
+              <span>{{ scope.row.status }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" fixed prop="" align="center">
@@ -289,7 +289,14 @@ export default {
          this.loading2 = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
-          this.dialog.data = []
+          this.dialog = {
+                          current_page: 1,
+                          data: [],
+                          last_page: 1,
+                          per_page: 10,
+                          total: 0,
+                          link: ""
+                        }
         }
         if( res.data && res.data.length > 0){
           // console.log(res);
@@ -298,7 +305,15 @@ export default {
           this.dialog.per_page = res.pageSize
           this.dialog.total = res.total
           this.dialog.data.forEach(v=>{
-            
+              if(v.status == 0){
+                v.status = "未领取"
+              }else if(v.status == 1){
+                v.status = "未使用"
+              }else if(v.status == 2){
+                v.status = "已使用"
+              }else if(v.status == 3){
+                v.status = "已过期"
+              }
           })
         }
       })
@@ -532,7 +547,7 @@ export default {
       this.itemObj = {}
     },
     close2(){
-
+      
     },
     handleFilter(){
       this.getData()
