@@ -170,6 +170,18 @@
                   <el-radio label="1">否</el-radio>
                 </el-radio-group>
               </el-form-item>
+              <el-form-item label="服务项：" style="width: 100%">
+                <div class="img_list">
+                    <el-checkbox-group v-model="checkList">
+                      <el-checkbox :label="item.serviceId" v-for="(item,index) in imgList" :key="index">
+                        <div class="imgbox">
+                          <img class="img" :src="item.serviceIcon" alt="">
+                          <span class="span">{{item.serviceName}}</span>
+                        </div>
+                      </el-checkbox>
+                    </el-checkbox-group>
+                </div>
+              </el-form-item>
               <el-form-item label="产品图片：" style="width: 100%">
                 <el-upload
                   action=""
@@ -229,7 +241,7 @@
 
 <script>
 import { findYuyueProductInfo , deleteYuyueProduct , getChannelName , findIproductInfos , updateYuyueProductInfo , saveYuyueProduct , getYyProductById , updateExamine } from '@/api/guest/ditchProduct'
-import { dotOssUpload } from '@/api/nodeList'
+import { dotOssUpload , findHallServiceInfos } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 import formatTime from "@/utils/formatTime"
 // import VueQuillEditor from 'vue-quill-editor'
@@ -321,15 +333,90 @@ export default {
       ],
       channelList: [],
       infoList: [],
-      infoArr: []
+      infoArr: [],
+      checkList: [],
+      imgList: [
+        // {
+        //   iconImg: require('@/assets/iconImg/1.png'),
+        //   name: "高铁贵宾厅",
+        //   explain: "无限次",
+        //   id: 0
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/2.png'),
+        //   name: "快捷进站",
+        //   explain: "无限次",
+        //   id: 1
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/3.png'),
+        //   name: "携伴",
+        //   explain: "12次",
+        //   id: 2
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/4.png'),
+        //   name: "智能按摩",
+        //   explain: "无限次",
+        //   id: 3
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/5.png'),
+        //   name: "优先登车",
+        //   explain: "无限次",
+        //   id: 4
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/6.png'),
+        //   name: "协助取票",
+        //   explain: "无限次",
+        //   id: 5
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/7.png'),
+        //   name: "候车用餐12次",
+        //   explain: "无限次",
+        //   id: 6
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/8.png'),
+        //   name: "机场贵宾厅",
+        //   explain: "无限次",
+        //   id: 7
+        // },
+        // // {
+        // //   iconImg: require('@/assets/iconImg/9.png'),
+        // //   name: "高铁贵宾厅",
+        // //   explain: "无限次",
+        // //   id: 8
+        // // },
+        // {
+        //   iconImg: require('@/assets/iconImg/10.png'),
+        //   name: "五星要客",
+        //   explain: "1次",
+        //   id: 9
+        // },
+        // {
+        //   iconImg: require('@/assets/iconImg/11.png'),
+        //   name: "商务会议",
+        //   explain: "1次",
+        //   id: 10
+        // }
+      ]
     }
   },
   mounted() {
     this.getData()
     this.apiGetChannelName()
     this.apiFindIproductInfos()
+    this.smallIcon()
   },
   methods: {
+    async smallIcon(){
+      var res = await findHallServiceInfos()
+      this.imgList = res.data
+      console.log(res);
+    },
     audit(item){
       this.open2('确定审核通过？' , item.id)
     },
@@ -481,6 +568,7 @@ export default {
       }
       this.itemObj.picfilepath = this.imageUrl
       this.itemObj.productList = arr
+      this.itemObj.serviceids = this.checkList
       // this.itemObj.content = this.content
       this.itemObj.pid = this.itemID
       delete this.itemObj.dateline
@@ -611,14 +699,18 @@ export default {
       })
     },
     item(item){
-      // console.log(item);
+      console.log(item);
       this.itemObj = item
       this.editDialog = true
       this.dialogTitle = "编辑"
       this.itemID = item.id
+      var ListArr = []
+      item.services.forEach(v=>{
+        ListArr.push(v.serviceId)
+      })
+      this.checkList = ListArr
       getYyProductById({id: item.id}).then(res=>{
         var arr = []
-        this.itemObj.channelids = res.data.channelids
         res.data.productList.forEach(v=>{
           var arrNum = Number(v.productid)
           arr.push([v.productid])
@@ -634,6 +726,12 @@ export default {
               }
           })
         })
+        var channelsArr = []
+        res.data.channels.forEach(v=>{
+          var id = Number(v.channelId)
+          channelsArr.push(id)
+        })
+        this.itemObj.channelids = channelsArr
         this.valueList = arr 
         this.infoArr = arr
       })
@@ -662,6 +760,7 @@ export default {
       this.imageUrl = ""
       this.loadingBootm = false
       this.apiFindIproductInfos()
+      this.checkList = []
     },
     handleFilter(){
       this.getData()
@@ -686,6 +785,35 @@ export default {
 
 <style lang="less" scoped>
 @import "../../styles/cascader.css";
+.img_list{
+  padding: 10px;
+  /deep/.el-checkbox__input{
+    position: absolute;
+    bottom: 10px;
+    left: 5px;
+  }
+  .imgbox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+    margin-top: 15px;
+    .explain{
+      margin-left: 10px;
+      color: #777;
+      font-size: 12px;
+      font-family: Microsoft YaHei;
+    }
+    .span{
+      margin-left: 10px;
+    }
+    .img{
+      width: 90px;
+      height: 90px;
+      border-radius: 4px;
+    }
+  }
+}
 .item_box{
   width: 100%;
   display: flex;

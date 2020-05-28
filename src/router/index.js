@@ -75,7 +75,7 @@ export const asyncRoutes = [
     path: '/autoWash',
     component: Layout,
     // redirect: '/autoWash/indent',
-    meta: { title: '洗车服务管理后台', icon: 'example' , roles: ['carWash'] },
+    meta: { title: '车后服务管理后台', icon: 'example' , roles: ['carWash'] },
     children: [
       {
         path: 'indent',
@@ -431,8 +431,14 @@ export const asyncRoutes = [
         path: '/userList',
         name: 'userList',
         component: () => import('@/views/userList/index'),
-        meta: { title: '用户列表'}
-      }
+        meta: { title: '后台用户列表'}
+      },
+      {
+        path: '/userWxList',
+        name: 'userWxList',
+        component: () => import('@/views/userWxList/index'),
+        meta: { title: '微信用户列表'}
+      },
     ]
   },
   { path: '*', redirect: '/404', hidden: true }

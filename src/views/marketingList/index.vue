@@ -56,9 +56,9 @@
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠金额" prop="money" align="center">
+      <el-table-column label="优惠金额" prop="price" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.money }}</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="领取人数" prop="number" align="center">
@@ -106,8 +106,8 @@
               <el-form-item label="优惠劵名称：" prop="title" style="width: 100%">
                   <el-input v-model="itemObj.title" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
               </el-form-item>
-              <el-form-item label="优惠劵金额：" prop="money" style="width: 100%">
-                  <el-input v-model="itemObj.money" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
+              <el-form-item label="优惠劵金额：" prop="price" style="width: 100%">
+                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
               </el-form-item>
               <el-form-item label="有效期：" prop="couponMoney" style="width: 100%">
                  <el-date-picker
@@ -365,7 +365,7 @@ export default {
     itemEditDialog(){
         var data = {}
         data.title = this.itemObj.title
-        data.money = this.itemObj.money
+        data.price = this.itemObj.price
         data.content = this.itemObj.content
         if(this.itemObj.time[0] && this.itemObj.time[1]) {
           data.startdate = this.itemObj.time[0]

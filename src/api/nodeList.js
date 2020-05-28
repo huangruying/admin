@@ -102,3 +102,11 @@ export function findMechanismName(data) {
     data
   })
 }
+
+export function findHallServiceInfos(data) {
+  return request({
+    url: '/wash/product/findHallServiceInfos',
+    method: 'post',
+    data
+  })
+}
