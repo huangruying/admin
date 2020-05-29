@@ -208,7 +208,7 @@ export const asyncRoutes = [
     path: '/service',
     component: Layout,
     // redirect: '/autoWash/indent',
-    meta: { title: '贵宾厅服务管理后台', icon: 'example' , roles:  ['service'] },
+    meta: { title: '贵宾厅管理后台', icon: 'example' , roles:  ['service'] },
     children: [
       {
         path: 'service',

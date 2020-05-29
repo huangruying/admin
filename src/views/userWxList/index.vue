@@ -3,25 +3,25 @@
     <el-divider content-position="left"><span class="title">查询</span></el-divider>
     <div class="query">
        <div class="input_box">
-          <!-- <el-input
-          v-model="queryList.cardno"
-          placeholder="请输入卡号"
+          <el-input
+          v-model="queryList.nickname"
+          placeholder="请输入昵称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.usetypeid" @change="getData" class="input fl" placeholder="请选择用途">
+          <el-select v-model="queryList.sex" @change="getData" class="input fl" placeholder="请选择性别">
             <el-option
               v-for="item in statusList"
               :label="item.name"
-              :value="item.usetypeid"
-              :key="item.usetypeid"
+              :value="item.sex"
+              :key="item.sex"
             ></el-option>
-          </el-select> -->
+          </el-select>
        </div> 
        <div class="btn_box">
          <div>
-           <!-- <el-button type="danger" @click="remove(2)">批量删除</el-button>
+           <!-- <el-button type="danger" @click="remove(2)">批量删除</el-button> -->
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
-           <el-button type="primary" @click="reset">重置</el-button> -->
+           <el-button type="primary" @click="reset">重置</el-button>
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
@@ -47,37 +47,37 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="头像" prop="headimgurl" fixed align="center">
+      <el-table-column label="头像" prop="headimgurl"  align="center">
         <template slot-scope="scope">
-          <img :src="scope.row.headimgurl" alt="">
+          <img :src="scope.row.headimgurl" alt="" style="width: 45px;height: 45px;">
         </template>
       </el-table-column>
-      <el-table-column label="昵称" prop="nickname" fixed align="center">
+      <el-table-column label="昵称" prop="nickname"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性别" prop="sex" fixed align="center">
+      <el-table-column label="性别" prop="sex"  align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.sex == 1 ? "男" : "女"}}</span>
+          <span>{{ scope.row.sex}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在地" prop="country" fixed align="center">
+      <el-table-column label="所在地" prop="country"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.country }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在省" prop="province" fixed align="center">
+      <el-table-column label="所在省" prop="province"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.province }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在市" prop="city" fixed align="center">
+      <el-table-column label="所在市" prop="city"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.city }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" fixed align="center">
+      <el-table-column label="创建时间" prop="createTime"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -118,11 +118,21 @@ export default {
         link: ""
       },
       queryList: {
+        nickname: null,
+        sex: null
       },
       statusList: [
         {
-          name: "高铁",
-          usetypeid: 1
+          name: "男",
+          sex: 1
+        },
+        {
+          name: "女",
+          sex: 2
+        },
+        {
+          name: "未知",
+          sex: 0
         }
       ],
     }
@@ -184,12 +194,12 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-    //   if (queryList.cardno) {
-    //     data.cardno = queryList.cardno
-    //   }
-    //   if(!(queryList.usetypeid == null)){
-    //     data.usetypeid = queryList.usetypeid
-    //   }
+      if (queryList.nickname) {
+        data.nickname = queryList.nickname
+      }
+      if(!(queryList.sex == null)){
+        data.sex = queryList.sex
+      }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -211,7 +221,13 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+             if(v.sex == 0){
+               v.sex = "未知"
+             }else if(v.sex == 1){
+               v.sex = "男"
+             }else{
+               v.sex = "女"
+             }
           })
         }
       })
@@ -230,7 +246,8 @@ export default {
     },
     reset(){
       this.queryList = {
-        
+        nickname: null,
+        sex: null
       }
     },
     resetGetData(){

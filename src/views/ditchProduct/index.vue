@@ -51,9 +51,14 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column label="用户id" prop="uid" fixed align="center" width="80PX">
+      <!-- <el-table-column label="用户id" prop="uid" fixed align="center" width="80PX">
         <template slot-scope="scope">
           <span>{{ scope.row.uid }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="产品图片" prop="picfilepath" align="center" width="90PX">
+        <template slot-scope="scope">
+          <img :src="scope.row.picfilepath" alt="" style="height: 55px; width: 82px;">
         </template>
       </el-table-column>
       <el-table-column label="产品名称" prop="name" align="center">
@@ -86,14 +91,14 @@
           <span>{{ scope.row.updatetime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="置顶时间" prop="topdateline" align="center">
+      <!-- <el-table-column label="置顶时间" prop="topdateline" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.topdateline }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="渠道" prop="channelNames" align="center">
+      </el-table-column> -->
+      <el-table-column label="渠道" prop="channels" align="center">
         <template slot-scope="scope">
-          <div v-for="(ditch,idx) in scope.row.channelNames" :key="idx">{{ditch}}</div>
+          <div v-for="(ditch,idx) in scope.row.channels" :key="idx">{{ditch.channelName}}</div>
         </template>
       </el-table-column>
       <el-table-column label="审核是否通过" prop="examine" align="center">
@@ -699,7 +704,7 @@ export default {
       })
     },
     item(item){
-      console.log(item);
+      this.imageUrl = item.picfilepath
       this.itemObj = item
       this.editDialog = true
       this.dialogTitle = "编辑"

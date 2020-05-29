@@ -206,6 +206,7 @@
                 <!-- <van-icon color="#8f8f8f" name="clear" /> -->
               </span>
               <el-button type="primary" @click="keySearch()" style="margin: 0 30px;" icon="el-icon-search">捜索</el-button>
+              <el-button type="primary" @click="SearchBtn()" style="margin: 0 30px;">确定选取该位置</el-button>
             </div>
           </div>
           <div class="con-box con-map" v-if="!search_key">
@@ -347,7 +348,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="市:" prop="city" style="width:50%">
-              <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty" :disabled="alterDisabled">
+              <el-select v-model="itemObj.cityid" placeholder="请选择城市" @change="changeCounty(itemObj.cityid)" :disabled="alterDisabled">
                 <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
               </el-select>
             </el-form-item>
@@ -707,6 +708,14 @@ export default {
     }
   },
   methods: {
+    // 确定选取位置
+    SearchBtn(){
+      var arr = this.center
+      this.arrLngLat = arr
+      this.itemObj.longitude = arr[0] + "/" + arr[1]
+      this.itemObj.longitudes = arr[0] + "/" + arr[1]
+      this.lngLatDialog = false
+    },
     // 以下是地图需要的函数
     adMap() {
       this.loadingLialog = true;
@@ -735,6 +744,7 @@ export default {
         // 获取地图中心点
         currentCenter = map.getCenter();
         this.center = [currentCenter.lng, currentCenter.lat];
+        // console.log(this.center);
         this.marker.setPosition([currentCenter.lng, currentCenter.lat]); //更新标记的位置
         //根据地图中心点查附近地点
       };
@@ -1083,7 +1093,7 @@ export default {
         this.cityList = res.data
         this.itemObj.city = this.cityList[0].city
         this.itemObj.cityid = this.cityList[0].cityid
-        this.changeCounty()
+        this.changeCounty(this.itemObj.cityid)
       })
       // areaJson.forEach(val =>{
       //     if(this.itemObj.province === val.n){
@@ -1093,8 +1103,8 @@ export default {
       //     }
       // })
     },
-    changeCounty(){
-      findYuyueAreasByCityid({cityid:this.itemObj.cityid}).then(res=>{
+    changeCounty(cityid){
+      findYuyueAreasByCityid({cityid: cityid}).then(res=>{
         this.countyList = res.data
         this.itemObj.region = this.countyList[0].area
         this.itemObj.regionId = this.countyList[0].areaid

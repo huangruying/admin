@@ -52,19 +52,24 @@
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取用户" prop="name" fixed align="center">
+      <el-table-column label="领取用户" prop="username" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠金额" prop="money" fixed align="center">
+      <el-table-column label="手机号" prop="phone" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.money }}</span>
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取时间" prop="dateline" fixed align="center">
+      <el-table-column label="优惠金额" prop="price" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dateline }}</span>
+          <span>{{ scope.row.price }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="领取时间" prop="collectionTime" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.collectionTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" prop="status" fixed align="center">

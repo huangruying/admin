@@ -66,6 +66,16 @@
           <span>{{ scope.row.number }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="领取次数" prop="frequency" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.frequency }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="剩余数量" prop="frequency" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.couponsNum - scope.row.frequency }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="有效时间" prop="startdate" align="center" width="340px">
         <template slot-scope="scope">
           <span>{{ scope.row.startdate }}</span> &nbsp;&nbsp; ~ &nbsp;&nbsp; <span>{{ scope.row.enddate }}</span>
