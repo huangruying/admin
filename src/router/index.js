@@ -425,7 +425,7 @@ export const asyncRoutes = [
     component: Layout,
     alwaysShow: true,
    // component: () => import('@/views/routerView/index'), // Parent router-view
-    meta: { title: '用户权限管理', icon: 'example' , roles:  ['userList'] },
+    meta: { title: '用户管理', icon: 'example' , roles:  ['userList'] },
     children: [
       {
         path: '/userList',

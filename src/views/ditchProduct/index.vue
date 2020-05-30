@@ -56,7 +56,7 @@
           <span>{{ scope.row.uid }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="产品图片" prop="picfilepath" align="center" width="90PX">
+      <el-table-column label="产品图片" prop="picfilepath" align="center">
         <template slot-scope="scope">
           <img :src="scope.row.picfilepath" alt="" style="height: 55px; width: 82px;">
         </template>

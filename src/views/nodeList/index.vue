@@ -353,7 +353,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="区:" prop="region" style="width:50%">
-              <el-select v-model="itemObj.regionId" placeholder="请选择区/县" :disabled="alterDisabled">
+              <el-select v-model="itemObj.regionId" placeholder="请选择区/县" :disabled="alterDisabled"  @change="regionChange">
                 <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
               </el-select>
             </el-form-item>
@@ -846,6 +846,10 @@ export default {
       //初始化地图
       // this.$nextTick(()=>{
       // })
+    },
+    regionChange(){
+      // console.log(this.itemObj.regionId);
+      this.$forceUpdate()
     },
     lnglatlog(){
       this.adMap()

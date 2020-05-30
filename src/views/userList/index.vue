@@ -42,16 +42,16 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="邮箱" prop="email" align="center">
+      <!-- <el-table-column label="邮箱" prop="email" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="昵称" prop="nickname" align="center">
+      </el-table-column> -->
+      <!-- <el-table-column label="昵称" prop="nickname" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.nickname }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="手机号" prop="mobile" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.mobile }}</span>
@@ -67,10 +67,10 @@
           <span>{{ scope.row.lastloginTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="90" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="compile(scope.row)">编辑</el-button>
-          <!-- <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button> -->
+          <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { findYuyueUserAll , updateYuyueUserByuId , saveYuyueUser } from '@/api/guest/userList'
+import { findYuyueUserAll , updateYuyueUserByuId , saveYuyueUser , delYuyueByuId } from '@/api/guest/userList'
 import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 export default {
@@ -231,6 +231,9 @@ export default {
       }else{
         data.roles = this.rolesList
       }
+      if(this.imageUrl){
+         data.pic = this.imageUrl
+      }
       delete data.type
       if(this.lobbyObj.id){
         updateYuyueUserByuId(data).then(res=>{
@@ -264,6 +267,7 @@ export default {
     },
     newly(){
       this.innerVisible = true
+      this.loadingBtn = false
       this.lobbyObj.type = "2"
       var a = localStorage.getItem("data")
       var b = JSON.parse(a)
@@ -277,12 +281,15 @@ export default {
       }
     },
     compile(item){
+      this.loadingBtn = false
       this.innerVisible = true
       this.lobbyObj = item
+      this.imageUrl = item.pic
+      console.log(item);
       var admin =  item.roles.indexOf("admin")
       if(admin == -1){
         this.lobbyObj.type = "2"
-        this.disabled = true
+        this.rolesList = item.roles
         // this.disabled = false
       }else{
         this.lobbyObj.roles = ["admin"]
@@ -290,7 +297,7 @@ export default {
       }
     },
     remove(item){
-      // this.open('确定删除？' , [item.id])
+      this.open('确定删除该用户？' , item.id)
     },
     open(text,id) {
         this.$confirm( text , '提示', {
@@ -299,7 +306,7 @@ export default {
           type: 'warning'
         }).then(() => {
           this.loading = true
-          delYyOrderytdetailById({ids: id}).then(res=>{
+          delYuyueByuId({id: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',

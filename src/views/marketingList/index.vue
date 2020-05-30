@@ -339,8 +339,8 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputPlaceholder: '请输入生成券码数量',
-          inputPattern:  /^\d+$|^\d+[.]?\d+$/,
-          inputErrorMessage: '请输入正确的数量！',
+          inputPattern:  /^([1-9]\d{0,3}|10000)$/,
+          inputErrorMessage: '请输入1到10000之间的整数！',
           type: 'warning'
         }).then(({ value }) => {
           saveYuyueCouponscode({cid: id,num: value}).then(res=>{

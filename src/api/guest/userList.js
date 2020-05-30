@@ -23,3 +23,11 @@ export function saveYuyueUser(data) {
       data
     })
 }
+
+export function delYuyueByuId(data) {
+  return request({
+    url: '/wash/user/delYuyueByuId',
+    method: 'post',
+    data
+  })
+}
