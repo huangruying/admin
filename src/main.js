@@ -40,6 +40,7 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
+// Vue.config.productionTip = true
 
 new Vue({
   el: '#app',

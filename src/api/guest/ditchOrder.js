@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function findYuyueOrders(data) {
+export function findUserPurchaseProductOrder(data) {
   return request({
-    url: '/wash/order/findYuyueOrders',
+    url: '/wash/userPurchase/findUserPurchaseProductOrder',
     method: 'post',
     data
   })
 }
 
-export function delYuyueOrdersByOrderNo(data) {
+export function delProductOrderByOrderNo(data) {
     return request({
-      url: '/wash/order/delYuyueOrdersByOrderNo',
+      url: '/wash/userPurchase/delProductOrderByOrderNo',
       method: 'post',
       data
     })

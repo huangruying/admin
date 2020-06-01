@@ -19,6 +19,7 @@ const mutations = {
     state.data = {}
     state.name = ''
     state.avatar = ''
+    state.roles = []
     localStorage.removeItem('data')
     // Object.assign(state, getDefaultState())
   },

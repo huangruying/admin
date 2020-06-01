@@ -10,7 +10,7 @@
           @keyup.enter.native="handleFilter"/>
            <el-input
           v-model="queryList.couponCode"
-          placeholder="请输入卷码号"
+          placeholder="请输入券码号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -85,7 +85,7 @@
           <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卷码号" prop="couponCode" align="center">
+      <el-table-column label="券码号" prop="couponCode" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponCode }}</span>
         </template>

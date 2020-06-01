@@ -107,7 +107,7 @@ export default {
             { required: true, message: '菜单名称不能为空', trigger: 'blur' },
             { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
           ]
-      },
+        },
       }
     },
     mounted(){

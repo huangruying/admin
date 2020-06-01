@@ -332,7 +332,7 @@ export default {
       return total.toString().replace(/\B(?=(\d{3})+$)/g,',');
     },
     audit(item){
-      this.open2('优惠卷名称 ：  ' + item.title , item.couponsId)
+      this.open2('优惠券名称 ：  ' + item.title , item.couponsId)
     },
     open2(text,id) {
         this.$prompt(text, '确定生成券码？', {

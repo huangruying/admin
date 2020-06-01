@@ -47,15 +47,6 @@ service.interceptors.response.use(
     }
   },
   error => {
-    // 路由异常错误处理，尝试解析一个异步组件时发生错误，重新渲染目标页面 
-    const pattern = /Loading chunk (\d)+ failed/g;
-    const isChunkLoadFailed = error.message.match(pattern);
-    const targetPath = service.history.pending.fullPath;
-    if (isChunkLoadFailed) {
-      service.replace(targetPath);
-    }
-
-    
     console.log('err' + error) // for debug
     Message({
       // message: error.msg,
@@ -66,16 +57,6 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
-// 路由异常错误处理，尝试解析一个异步组件时发生错误，重新渲染目标页面 
-// router.onError((error) => {
-//     const pattern = /Loading chunk (\d)+ failed/g;
-//     const isChunkLoadFailed = error.message.match(pattern);
-//     const targetPath = router.history.pending.fullPath;
-//     if (isChunkLoadFailed) {
-//         router.replace(targetPath);
-//     }
-// });
 
 export default service
 

@@ -456,6 +456,7 @@ export default {
       this.itemObj = {}
       this.editDialog = true
       this.dialogTitle = "新增"
+      this.valueList = ""
     },
     handleRemove(){
       this.fileList = []

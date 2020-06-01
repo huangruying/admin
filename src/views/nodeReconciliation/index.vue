@@ -10,7 +10,7 @@
           @keyup.enter.native="handleFilter"/>
            <el-input
           v-model="queryList.couponCode"
-          placeholder="请输入卷码号"
+          placeholder="请输入券码号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input

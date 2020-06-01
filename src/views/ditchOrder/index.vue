@@ -4,16 +4,26 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.orderno"
+          v-model="queryList.orderNo"
           placeholder="请输入订单号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
-          v-model="queryList.bindMemPhone"
-          placeholder="请输入手机号"
+          v-model="queryList.phone"
+          placeholder="请输入用户手机号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
+          <el-input
+          v-model="queryList.username"
+          placeholder="请输入购买用户"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.name"
+          placeholder="请输入产品名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择支付状态">
             <el-option
               v-for="item in statusList"
               :label="item.name"
@@ -21,10 +31,21 @@
               :key="item.value"
             ></el-option>
           </el-select>
+          <el-date-picker
+          class="picker fl"
+            v-model="queryList.time"
+            type="daterange"
+            range-separator="至"
+            value-format="yyyy-MM-dd hh:mm:ss"
+            :default-time="['00:00:00', '23:59:59']"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker>
        </div> 
        <div class="btn_box">
          <div>
-           <el-button type="danger" @click="remove(2)">批量删除</el-button>
+           <!-- <el-button type="danger" @click="remove(2)">批量删除</el-button> -->
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
@@ -52,62 +73,61 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品名称" prop="ordername" fixed align="center">
+      <el-table-column label="产品名称" prop="name" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.ordername }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单号" prop="orderno" fixed align="center">
+      <el-table-column label="订单号" prop="orderNo" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderno }}</span>
+          <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="悦途订单号" prop="ytorderno" fixed align="center">
+      <el-table-column label="购买用户" prop="username" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.ytorderno }}</span>
+          <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="来源" prop="channelName" fixed align="center">
+      <el-table-column label="购买用户手机号" prop="phone" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.channelName }}</span>
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="金额" prop="money" fixed align="center">
+      <el-table-column label="购买时间" prop="purchaseTime" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.purchaseTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="产品价格" prop="price" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.price }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="实际支付金额" prop="payAmount" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.payAmount }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="优惠金额" prop="money" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.money }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="优惠券使用状态" prop="money" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type == 0? "未使用优惠劵": "已使用优惠劵"}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="订单状态" prop="status" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status == 1? "未完成": "已完成" }}</span>
+          <span>{{ scope.row.status == 0? "未支付": "已支付" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="购买用户" prop="bindMemName" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.bindMemName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="手机号" prop="bindMemPhone" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.bindMemPhone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="下单时间" prop="dateline" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dateline }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="渠道商" prop="channelName" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.channelName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
+      <!-- <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
            <el-button size="mini" type="primary" @click="lookOver(scope.row)">查看</el-button>
-          <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->  
     </el-table>
     <pagination
       v-show="data.total>0"
@@ -182,7 +202,7 @@
 </template>
 
 <script>
-import { findYuyueOrders , delYuyueOrdersByOrderNo } from '@/api/guest/ditchOrder'
+import { findUserPurchaseProductOrder , delProductOrderByOrderNo } from '@/api/guest/ditchOrder'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -204,18 +224,21 @@ export default {
         link: ""
       },
       queryList: {
-        orderno: null,
-        bindMemPhone: null,
-        status: null
+        time: ["" , ""],
+        status: null,
+        name: null,
+        username: null,
+        phone: null,
+        orderNo: null
       },
       statusList: [
         {
-          name: "未完成",
-          value: 1
+          name: "未支付",
+          value: 0
         },
         {
-          name: "已完成",
-          value: 2
+          name: "已支付",
+          value: 1
         }
       ]
     }
@@ -246,21 +269,21 @@ export default {
         }
         var arr = []
         this.itemArr.forEach(v=>{
-          arr.push(v.orderno)
+          arr.push(v.orderNo)
         })
         this.open('确定批量删除？' , arr)
       }else{
-        this.open('确定删除？' , [item.orderno])
+        this.open('确定删除？' , [item.orderNo])
       }
     },
-    open(text,orderno) {
+    open(text,orderNo) {
         this.$confirm( text , '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.loading = true
-          delYuyueOrdersByOrderNo({ordernos: orderno}).then(res=>{
+          delProductOrderByOrderNo({orderNos: orderNo}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -285,14 +308,24 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.orderno) {
-        data.orderno = queryList.orderno
+      if (queryList.orderNo) {
+        data.orderNo = queryList.orderNo
       }
-      if (queryList.bindMemPhone) {
-        data.bindMemPhone = queryList.bindMemPhone
+      if (queryList.phone) {
+        data.phone = queryList.phone
+      }
+      if (queryList.username) {
+        data.username = queryList.username
+      }
+      if (queryList.name) {
+        data.name = queryList.name
       }
       if(!(queryList.status == null)){
         data.status = queryList.status
+      }
+      if (queryList.time[0] && queryList.time[1]) {
+        data.startTime = queryList.time[0]
+        data.endTime = queryList.time[1]
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -301,7 +334,7 @@ export default {
       }
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findYuyueOrders(data).then(res=>{
+      findUserPurchaseProductOrder(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {

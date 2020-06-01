@@ -5,12 +5,12 @@
        <div class="input_box">
           <el-input
           v-model="queryList.couponName"
-          placeholder="请输入卷名称"
+          placeholder="请输入券名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
            <el-input
           v-model="queryList.couponCode"
-          placeholder="请输入卷码号"
+          placeholder="请输入券码号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -64,7 +64,7 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="卷名称" prop="couponName" fixed align="center">
+      <el-table-column label="券名称" prop="couponName" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponName }}</span>
         </template>
@@ -79,7 +79,7 @@
           <span>{{ scope.row.couponMoney }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卷码号" prop="couponCode" align="center">
+      <el-table-column label="券码号" prop="couponCode" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponCode }}</span>
         </template>
@@ -94,7 +94,7 @@
           <span>{{ scope.row.alias }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卷码类型" prop="dotType" align="center">
+      <el-table-column label="券码类型" prop="dotType" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotType }}</span>
         </template>

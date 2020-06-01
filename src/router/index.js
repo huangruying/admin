@@ -332,6 +332,12 @@ export const asyncRoutes = [
             component: () => import('@/views/WxMenu/index'),
             meta: { title: '自定义菜单', icon: 'dashboard' ,}
           },
+          {
+            path: 'WxProductList',
+            name: 'WxProductList',
+            component: () => import('@/views/WxProductList/index'),
+            meta: { title: '微信产品管理', icon: 'dashboard' ,}
+          },
           // {
           //   path: 'WxNews',
           //   name: 'WxNews',
@@ -457,5 +463,15 @@ export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }
+
+// 路由异常错误处理，尝试解析一个异步组件时发生错误，重新渲染目标页面 
+router.onError((error) => {
+    const pattern = /Loading chunk (\d)+ failed/g;
+    const isChunkLoadFailed = error.message.match(pattern);
+    const targetPath = router.history.pending.fullPath;
+    if (isChunkLoadFailed) {
+        router.replace(targetPath)
+    }
+})
 
 export default router
