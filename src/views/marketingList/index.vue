@@ -201,6 +201,11 @@
               <span>{{ scope.row.usetime }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="领取时间" prop="collectionTime" fixed align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.collectionTime }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="状态" prop="status" fixed align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.status }}</span>

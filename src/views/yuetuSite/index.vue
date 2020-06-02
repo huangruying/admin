@@ -166,7 +166,6 @@
                     <el-time-picker
                       @change="businessHours"
                       is-range
-                      arrow-control
                       v-model="lobbyObj.businessHours"
                       format="HH:mm"
                       value-format="HH:mm"
@@ -469,9 +468,11 @@ export default {
       }
       this.lobbyObj = item
       var arr = []
-      item.services.forEach(v=>{
-        arr.push(v.serviceId)
-      })
+      if(item.services){
+        item.services.forEach(v=>{
+          arr.push(v.serviceId)
+        })
+      }
       this.checkList = arr 
       findHallService().then(res=>{
         this.imgList = res.data

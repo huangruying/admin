@@ -50,7 +50,7 @@ export default {
     pageSizes: {
       type: Array,
       default() {
-        return [6, 10, 20, 40]
+        return [10, 20, 50]
       }
     },
   },

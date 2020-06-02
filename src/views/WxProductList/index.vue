@@ -217,7 +217,6 @@ export default {
                   type: 'success',
                   message: '操作成功!'
               })
-              this.getData()
               this.editDialog = false
             }else{
               this.$message({
@@ -237,6 +236,7 @@ export default {
       this.itemList = {}
       this.imageUrl = ""
       this.itemID = null
+      this.getData()
     },
     handleFilter(){
       this.getData()
