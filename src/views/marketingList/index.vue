@@ -130,6 +130,7 @@
                     range-separator="至"
                     start-placeholder="有效期开始"
                     end-placeholder="有效期结束"
+                    :picker-options="pickerOptions"
                   ></el-date-picker>
               </el-form-item>
               <el-form-item label="使用说明：" prop="content" style="width: 100%">
@@ -146,7 +147,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="lookEditDialog"
-      width="70%"
+      width="83%"
       @close="close2"
       center>
       <el-divider content-position="left"><span class="title">查询</span></el-divider>
@@ -157,10 +158,24 @@
           placeholder="请输入劵码号"
           class="input fl"
           @keyup.enter.native="look(item)"/>
+          <el-input
+          v-model="dialogList.username"
+          placeholder="请输入领劵人"
+          class="input fl"
+          @keyup.enter.native="look(item)"/>
+          <el-select v-model="dialogList.status" @change="look(item)" class="input fl" placeholder="请选择券码状态">
+            <el-option
+              v-for="item in statusList"
+              :label="item.name"
+              :value="item.id"
+              :key="item.id"
+            ></el-option>
+          </el-select>
        </div>
        <div class="btn_box">
          <div>
            <el-button type="danger" @click="dialogRemove(2)">批量删除</el-button>
+           <el-button type="primary" @click="exportData(item)">导出券码</el-button>
            <el-button type="primary" icon="el-icon-search" @click="look(item)">搜索</el-button>
          </div>
          <div>
@@ -181,37 +196,47 @@
             type="selection"
             width="50">
         </el-table-column>
-          <el-table-column label="优惠劵名称" prop="title" fixed align="center">
+          <el-table-column label="劵码ID" prop="id" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="优惠劵名称" prop="title" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.title }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="劵码号" prop="barcode" fixed align="center">
+          <el-table-column label="劵码号" prop="barcode" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.barcode }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" prop="dateline" fixed align="center">
+          <el-table-column label="创建时间" prop="dateline" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.dateline }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="使用时间" prop="usetime" fixed align="center">
+          <el-table-column label="使用时间" prop="usetime" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.usetime }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="领取时间" prop="collectionTime" fixed align="center">
+          <el-table-column label="领取时间" prop="collectionTime" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.collectionTime }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="状态" prop="status" fixed align="center">
+          <el-table-column label="领劵人" prop="username" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.username }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" prop="status" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.status }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" fixed prop="" align="center">
+          <el-table-column label="操作" fixed="right" prop="" align="center">
             <template slot-scope="scope">
               <el-button size="mini" type="danger" @click="dialogRemove(scope.row)">删除</el-button>
             </template>
@@ -240,6 +265,11 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        disabledDate(time) {
+            return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
       dialogTitle: "",
       loadingBootm: false,
       editDialog: false,
@@ -276,14 +306,46 @@ export default {
         // time: ["" , ""]
       },
       dialogList: {
-        barcode: null
-      }
+        barcode: null,
+        status: null,
+        username: null
+      },
+      statusList: [
+        {
+          name: "未领取",
+          id: 0
+        },
+        {
+          name: "未使用",
+          id: 1
+        },
+        {
+          name: "已使用",
+          id: 2
+        },
+        {
+          name: "已过期",
+          id: 3
+        },
+      ]
     }
   },
   created() {
     this.getData()
   },
   methods: {
+    exportData(item){
+      if(this.dialog.data.length <= 0){
+        this.$message({
+            message: '暂无数据可导出~',
+            type: 'warning'
+          })
+      }else{
+          var { barcode , status , username } = this.dialogList
+
+          window.location.href = `http://test2.yuyuetrip.com.cn/wash/coupon/exportYuyueCouponscode?cid=${item.couponsId}&barcode=${barcode}&username=${username}&status=${status}`
+      }
+    },
     look(item,filter){
       this.loading2 = true
       this.lookEditDialog = true
@@ -298,6 +360,12 @@ export default {
       if(this.dialogList.barcode){
         data.barcode = this.dialogList.barcode
       }
+      if(this.dialogList.username){
+        data.username = this.dialogList.username
+      }
+      if(!(this.dialogList.status == null)){
+        data.status = this.dialogList.status
+      }
       data.pageNum = this.dialog.current_page
       data.pageSize = this.dialog.per_page
       getYuyueCouponscodeByCid(data).then(res=>{
@@ -305,13 +373,13 @@ export default {
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
           this.dialog = {
-                          current_page: 1,
-                          data: [],
-                          last_page: 1,
-                          per_page: 10,
-                          total: 0,
-                          link: ""
-                        }
+              current_page: 1,
+              data: [],
+              last_page: 1,
+              per_page: 10,
+              total: 0,
+              link: ""
+         }
         }
         if( res.data && res.data.length > 0){
           // console.log(res);
@@ -584,8 +652,9 @@ export default {
       this.getData()
     },
     resetGetData2(item){
-      this.look(item)
       this.dialogList.barcode = null
+      this.dialogList.status = null
+      this.look(item)
     },
   }
 }

@@ -57,6 +57,11 @@
           <span>{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="真实姓名" prop="username"  align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.username }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="性别" prop="sex"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.sex}}</span>
@@ -84,6 +89,7 @@
       </el-table-column>
       <el-table-column label="操作" width="90" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
+           <el-button size="mini" type="primary" @click="examine(scope.row)">查 看</el-button>
           <!-- <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -95,6 +101,73 @@
       :limit.sync="data.per_page"
       @pagination="getPageData"
     />
+
+    <!-- 查看車后信息 -->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="editDialog"
+      width="60%"
+      @close="close"
+      center>
+        <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-form label-position="right" ref="ruleForm" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="ID：" prop="id" style="width: 100%">
+                  <el-input v-model="itemObj.id" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="昵称：" prop="nickname" style="width: 100%">
+                  <el-input v-model="itemObj.nickname" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="真实姓名：" prop="username" style="width: 100%">
+                  <el-input v-model="itemObj.username" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="性别：" prop="sex" style="width: 100%">
+                  <el-input v-model="itemObj.sex" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="所在地：" prop="country" style="width: 100%">
+                  <el-input v-model="itemObj.country" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="所在省：" prop="province" style="width: 100%">
+                  <el-input v-model="itemObj.province" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="所在市：" prop="city" style="width: 100%">
+                  <el-input v-model="itemObj.city" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="创建时间：" prop="createTime" style="width: 100%">
+                  <el-input v-model="itemObj.createTime" style="width:50%" disabled></el-input>
+              </el-form-item>
+          </el-form>
+        </div>
+        <el-divider content-position="left"><span class="title">车后信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+            <el-table
+              :data="itemObj.vehicleUserIds"
+              border
+              stripe
+              fit
+              :row-class-name="tableRowClassName"
+              style="width: 100%;">
+              <el-table-column label="车牌号" prop="licensePlate" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.licensePlate }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="发动机号" prop="engine" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.engine }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="车架号" prop="frame" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.frame }}</span>
+                </template>
+              </el-table-column>
+            </el-table>
+        </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="editDialog = false">返 回</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -107,7 +180,12 @@ export default {
   },
   data() {
     return {
+      dialogTitle: "查看",
+      editDialog: false,
       loading: false,
+      itemObj: {
+        vehicleUserIds: {}
+      },
       itemArr: [],
       data: {
         current_page: 1,
@@ -141,6 +219,14 @@ export default {
     this.getData()
   },
   methods: {
+    examine(item){
+      // console.log(item);
+      if(!(item.vehicleUserIds)){
+        item.vehicleUserIds = []
+      }
+      this.itemObj = item
+      this.editDialog = true
+    },
     handleSelectionChange(val) {
         this.itemArr = val
     },
@@ -233,10 +319,17 @@ export default {
       })
     },
     close(){
-      this.itemObj = {}
-      this.itemID = null
-      this.imageUrl = ""
-      this.loadingBootm = false
+      this.itemObj = {
+        vehicleUserIds: []
+      }
+    },
+    tableRowClassName({row, rowIndex}) {
+        if (rowIndex === 0) {
+          return 'warning-row';
+        } else if (rowIndex === 1) {
+          return 'success-row';
+        }
+        return '';
     },
     handleFilter(){
       this.getData()

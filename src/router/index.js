@@ -113,6 +113,7 @@ export const asyncRoutes = [
       },
       {
         path: '/account',
+        alwaysShow: true,
         component: () => import('@/views/routerView/index'), // Parent router-view
         meta: { title: '账号管理', icon: 'example' , roles: ['ad'] },
         children: [
@@ -128,12 +129,12 @@ export const asyncRoutes = [
             component: () => import('@/views/account/index'),
             meta: { title: '网点账号管理', icon: 'table' }
           },
-          {
-            path: 'carOwner',
-            name: 'carOwner',
-            component: () => import('@/views/carOwner/index'),
-            meta: { title: '车主账号管理', icon: 'table' }
-          }
+          // {
+          //   path: 'carOwner',
+          //   name: 'carOwner',
+          //   component: () => import('@/views/carOwner/index'),
+          //   meta: { title: '车主账号管理', icon: 'table' }
+          // }
         ]
       },
       {
