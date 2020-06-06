@@ -92,9 +92,9 @@
           <span>{{ scope.row.dotCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="网点类型" prop="mechanismName" align="center">
+      <el-table-column label="网点类型" prop="dotType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.mechanismName }}</span>
+          <span>{{ scope.row.dotType }}</span>
         </template>
       </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
@@ -264,8 +264,8 @@
             <el-form-item label="网点简称:" prop="dotAbbreviation" style="width:50%">
               <el-input v-model="itemObj.dotAbbreviation" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
-            <el-form-item label="网点类型:" prop="mechanismName" style="width:50%">
-              <el-select v-model="itemObj.mechanismName" style="width:210px" placeholder="网点类型">
+            <el-form-item label="网点类型:" prop="dotType" style="width:50%">
+              <el-select v-model="itemObj.dotType" style="width:210px" placeholder="网点类型">
                 <el-option
                   v-for="item in nodeTypesList"
                   :label="item.name"
@@ -275,7 +275,7 @@
               </el-select>
               <!-- <el-input v-model="itemObj.mechanismName" style="width:210px" :disabled="inputDisabled"></el-input> -->
             </el-form-item>
-            <el-form-item label="所属机构:" prop="" style="width:50%">
+            <el-form-item label="所属机构:" prop="mechanismId" style="width:50%">
               <el-select v-model="itemObj.mechanismId" style="width:210px" placeholder="所属机构">
                 <el-option
                   v-for="item in organizationList"
@@ -342,17 +342,17 @@
               placeholder="选择时间范围">
             </el-time-picker>
             </el-form-item>
-            <el-form-item label="省:" prop="province" style="width:50%">
-              <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity" :disabled="alterDisabled">
-                <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.province"></el-option>
+            <el-form-item label="省:" prop="provinceId" style="width:50%">
+              <el-select v-model="itemObj.provinceId" placeholder="请选择省份" @change="changeCity" :disabled="alterDisabled">
+                <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.provinceid"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="市:" prop="city" style="width:50%">
-              <el-select v-model="itemObj.cityid" placeholder="请选择城市" @change="changeCounty(itemObj.cityid)" :disabled="alterDisabled">
+            <el-form-item label="市:" prop="cityId" style="width:50%">
+              <el-select v-model="itemObj.cityId" placeholder="请选择城市" @change="changeCounty(itemObj.cityId)" :disabled="alterDisabled">
                 <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="区:" prop="region" style="width:50%">
+            <el-form-item label="区:" prop="regionId" style="width:50%">
               <el-select v-model="itemObj.regionId" placeholder="请选择区/县" :disabled="alterDisabled"  @change="regionChange">
                 <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
               </el-select>
@@ -591,16 +591,16 @@ export default {
             { required: true, message: '网点编号不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
-          region: [
+          provinceId: [
             { required: true, message: '请选择区域', trigger: 'change' }
           ],
-          city: [
+          cityId: [
             { required: true, message: '请选择区域', trigger: 'change' }
           ],
-          province: [
+          regionId: [
             { required: true, message: '请选择区域', trigger: 'change' }
           ],
-          mechanismName: [
+          dotType: [
             { required: true, message: '请选择网点类型', trigger: 'change' }
           ],
           dotName: [
@@ -632,6 +632,15 @@ export default {
           ],
           businessHours: [
             { required: true, message: '请选择营业时间', trigger: 'blur'}
+          ],
+          accountName: [
+            { required: true, message: '户名不能为空', trigger: 'blur'}
+          ],
+          account: [
+            { required: true, message: '账户不能为空', trigger: 'blur'}
+          ],
+          openingBank: [
+            { required: true, message: '开户行不能为空', trigger: 'blur'}
           ]
           // storePhone: [
           //   { required: true, message: '不能为空', trigger: 'blur' },
@@ -679,11 +688,11 @@ export default {
       nodeTypesList: [
         {
           name: '车行',
-          mechanismName: 1
+          mechanismName: 0
         },
         {
           name: '代办机构',
-          mechanismName: 2
+          mechanismName: 1
         },
       ],
       organizationList: []
@@ -938,12 +947,24 @@ export default {
     },
     apiFindMechanismName(){
       findMechanismName().then(res=>{
+        console.log(res);
         if(res.code == 200){
           this.organizationList = res.data         
         }
       })
     },
     edit(item){
+      findYuyueCityByProvinceid({provinceid: item.provinceId}).then(res=>{
+        this.cityList = res.data
+      })
+      findYuyueAreasByCityid({cityid: item.cityId}).then(res=>{
+        this.countyList = res.data
+      })
+      item.cityId = String(item.cityId)
+      item.provinceId = String(item.provinceId)
+      item.regionId = String(item.regionId)
+      item.mechanismId = Number(item.mechanismId)
+      item.dotType = Number(item.dotType)
       this.editDialog = true
       this.dialogTitle = "查看"
       this.itemObj = item
@@ -953,6 +974,17 @@ export default {
       this.compileBtn = false
     },
     compile(item){
+      findYuyueCityByProvinceid({provinceid: item.provinceId}).then(res=>{
+        this.cityList = res.data
+      })
+      findYuyueAreasByCityid({cityid: item.cityId}).then(res=>{
+        this.countyList = res.data
+      })
+      item.cityId = String(item.cityId)
+      item.provinceId = String(item.provinceId)
+      item.regionId = String(item.regionId)
+      item.mechanismId = Number(item.mechanismId)
+      item.dotType = Number(item.dotType)
       this.dotCode = item.dotCode
       this.editDialog = true
       this.dialogTitle = "编辑"
@@ -971,6 +1003,12 @@ export default {
       this.disabledBtn = false
       this.compileBtn = true
       this.urlBl = val
+      this.fileList_1 = []
+      this.fileList_2 = []
+      this.fileList_3 = []
+      this.fileList_4 = []
+      this.fileList_5 = []
+      this.fileList_6 = []
       this.apiFindMechanismName()
     },
     close2(){
@@ -1083,21 +1121,22 @@ export default {
     },
     ApiAreaJson(){
       findYuyueProvinces().then(res=>{
+        // console.log(res);
         this.areaJson = res.data
       })
     },
     changeCity(){
-      var id
-      this.areaJson.forEach(v=>{
-        if(v.province === this.itemObj.province){
-          id = v.provinceid
-        }
-      })
-      findYuyueCityByProvinceid({provinceid: id}).then(res=>{
+      // var id
+      // this.areaJson.forEach(v=>{
+      //   if(v.province === this.itemObj.province){
+      //     id = v.provinceid
+      //   }
+      // })
+      findYuyueCityByProvinceid({provinceid: this.itemObj.provinceId}).then(res=>{
         this.cityList = res.data
-        this.itemObj.city = this.cityList[0].city
-        this.itemObj.cityid = this.cityList[0].cityid
-        this.changeCounty(this.itemObj.cityid)
+        // this.itemObj.city = this.cityList[0].city
+        this.itemObj.cityId = this.cityList[0].cityid
+        this.changeCounty()
       })
       // areaJson.forEach(val =>{
       //     if(this.itemObj.province === val.n){
@@ -1107,10 +1146,10 @@ export default {
       //     }
       // })
     },
-    changeCounty(cityid){
-      findYuyueAreasByCityid({cityid: cityid}).then(res=>{
+    changeCounty(){
+      findYuyueAreasByCityid({cityid: this.itemObj.cityId}).then(res=>{
         this.countyList = res.data
-        this.itemObj.region = this.countyList[0].area
+        // this.itemObj.region = this.countyList[0].area
         this.itemObj.regionId = this.countyList[0].areaid
       })
       //  this.cityList.forEach(item=>{
