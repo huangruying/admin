@@ -94,7 +94,7 @@
       </el-table-column>
       <el-table-column label="网点类型" prop="dotType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotType }}</span>
+          <span>{{ scope.row.dotType == 0? "车行" : "代办机构" }}</span>
         </template>
       </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
@@ -334,8 +334,8 @@
               arrow-control
               :disabled="alterDisabled"
               v-model="itemObj.businessHours"
-              format="HH : mm"
-              value-format="HH : mm"
+              format="HH:mm"
+              value-format="HH:mm"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
@@ -360,6 +360,31 @@
             <el-form-item label="网点详细地址:" prop="address" style="width:100%">
               <el-input v-model="itemObj.address" style="width:80%;" :disabled="inputDisabled"></el-input>
             </el-form-item>      
+         </div>
+         <el-divider content-position="left"><span class="title">服务项信息</span></el-divider>
+         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+            <!-- <el-checkbox-group v-model="itemVcheckList"> -->
+              <div class="fuwu_xan">
+                <div class="xian_type" v-for="(itemV,indexV) in serviceItemList" :key="indexV">
+                  <el-button type="primary" style="margin-bottom: 10px;">{{ itemV.dotType }}</el-button>
+                  <!-- <el-checkbox :label="itemV.id" style="width: 100px;margin-bottom:20px;" border>{{ itemV.dotType }}</el-checkbox> -->
+                  <div class="input_checkbox">
+                    <el-checkbox-group v-model="valueVcheckList">
+                      <div style="width:100%;" class="clearFix">
+                        <div style="width:50%; float: left;" v-for="(valueV,indexV) in itemV.carwashsTypes" :key="indexV">
+                            <el-checkbox :label="valueV.dotsType" @change="Vchange()">
+                              <el-input placeholder="请输入价格" type='number' min="0" onkeyup="this.value = this.value.replace(/[^\d.]/g,'');"  v-model="valueV.price" style="margin-bottom: 10px;">
+                                <template slot="prepend">{{ valueV.dotsType }}</template>
+                                <template slot="append">元</template>
+                              </el-input>
+                            </el-checkbox>
+                        </div>
+                      </div>
+                    </el-checkbox-group>
+                  </div>
+                </div>
+              </div>
+            <!-- </el-checkbox-group> -->
          </div>
          <el-divider content-position="left"><span class="title">银行账户信息</span></el-divider>
          <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
@@ -395,23 +420,6 @@
              </div>
            </div>
            <div class="boxUpload clearfix">
-            <!-- <div class="textUp">
-              <el-upload
-                :disabled="disabledBtn"
-                class="avatar-uploader"
-                action=""
-                :auto-upload="false"
-                :show-file-list="false"
-                :on-change="handleChange1"
-                :file-list="fileList_1"
-                :before-upload="beforeAvatarUpload">
-                <img v-if="storeImagess" :src="storeImagess" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon">上传店面形象照片</i>
-                <div class="text">上传店面形象照片</div>
-                <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
-              </el-upload>
-              <a :href="storeImagess" target="_blank" class="uploadTransparency" v-if="!(storeImagess=='')"></a>
-            </div> -->
             <div class="textUp">
               <el-upload
                 :disabled="disabledBtn"
@@ -510,21 +518,11 @@
 </template>
 
 <script>
-import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid , findMechanismName} from '@/api/nodeList'
+import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid , findMechanismName , findCarwashTypesInfos } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 // import areaJson from '@/utils/city_data'
 import axios from 'axios'
 export default {
-  // filters: {
-  //   statusFilter(status) {
-  //     const statusMap = {
-  //       published: 'success',
-  //       draft: 'gray',
-  //       deleted: 'danger'
-  //     }
-  //     return statusMap[status]
-  //   }
-  // },
   name: 'nodeList',
   components: {
     Pagination
@@ -543,6 +541,9 @@ export default {
         }
     };
     return {
+      serviceItemList: [],
+      itemVcheckList: [],
+      valueVcheckList: [],
       center: [116.42792, 39.902896], //经度+纬度
       search_key: "", //搜索值
       lanbtn: true,
@@ -572,7 +573,7 @@ export default {
       areaJson: [],
       itemObj: {},
       storeImage: [],
-      storeImagess: "",
+      storeImages: "",
       receptionImage: "",
       honorImage: "",
       constructionImage: "",
@@ -645,10 +646,6 @@ export default {
           // storePhone: [
           //   { required: true, message: '不能为空', trigger: 'blur' },
           //   { validator: storePhone, trigger: 'blur' }
-          // ],
-          // chargePhone: [
-          //   { required: true, message: '不能为空', trigger: 'blur' },
-          //   { validator: storePhone, trigger: 'blur' }
           // ]
       },
       data: {
@@ -704,6 +701,8 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
     // 省市区
     this.ApiAreaJson()
+    // 服务项
+    this.serviceItem()
   },
   watch: {
     search_key(newv, oldv) {
@@ -731,7 +730,7 @@ export default {
       //初始化地图
       var map = new AMap.Map("container", {
         zoom: 14, //缩放级别
-        center: this.center //设置地图中心点
+        // center: this.center //设置地图中心点
         //resizeEnable: true,  //地图初始化加载定位到当前城市
       });
       //获取初始中心点并赋值
@@ -842,13 +841,19 @@ export default {
       }, 1000);
     },
     // 以上是地图需要的函数
-
-    // apiTypeInfos(){
-    //   findCarwashTypeInfos().then(res=>{
-    //     this.nodeTypesList = res.data
-    //     console.log(res);
-    //   })
-    // },
+    Vchange(Vid){
+      console.log(this.valueVcheckList)
+    },
+    serviceItem(){
+      findCarwashTypesInfos().then(res=>{
+        this.serviceItemList = res.data
+        // this.serviceItemList.map(v=>{
+        //   var obj = JSON.stringify(v)
+        //   v.arr = []
+        //   v.obj = obj
+        // })
+      })
+    },
     lngLatDia(){
       this.lngLatDialog = true
       // this.inputBtn = false
@@ -947,7 +952,6 @@ export default {
     },
     apiFindMechanismName(){
       findMechanismName().then(res=>{
-        console.log(res);
         if(res.code == 200){
           this.organizationList = res.data         
         }
@@ -968,6 +972,40 @@ export default {
       this.editDialog = true
       this.dialogTitle = "查看"
       this.itemObj = item
+      this.itemObj.longitude = item.latitude + "/" + item.longitude
+      this.itemObj.businessHours = [item.businessHours,item.businessHours2]
+      if(item.trafficImage){
+        var trafficImage = JSON.parse(item.trafficImage)
+        this.trafficImage = trafficImage[0]
+      }
+      if(item.receptionImage){
+        var receptionImage = JSON.parse(item.receptionImage)
+        this.receptionImage = receptionImage[0]
+      }
+      if(item.honorImage){
+         var honorImage = JSON.parse(item.honorImage)
+         this.honorImage = honorImage[0]
+      }
+     if(item.constructionImage){
+       var constructionImage = JSON.parse(item.constructionImage)
+       this.constructionImage = constructionImage[0]
+     }
+     if(item.businessImage){
+       var businessImage = JSON.parse(item.businessImage)
+       this.businessImage = businessImage[0]
+     }
+     if(item.storeImages){
+       this.storeImage = item.storeImages
+       this.storeImages = item.storeImages
+       var ArrImg = []
+       item.storeImages.forEach(v=>{
+         var obj = {}
+         obj.url = v
+         obj.name = v.split("/").pop()
+         ArrImg.push(obj)
+       })
+       this.fileList_1 = ArrImg
+     }
       this.alterDisabled = true
       this.inputDisabled = true
       this.disabledBtn = true
@@ -980,6 +1018,7 @@ export default {
       findYuyueAreasByCityid({cityid: item.cityId}).then(res=>{
         this.countyList = res.data
       })
+      this.arrLngLat = [item.latitude,item.longitude]
       item.cityId = String(item.cityId)
       item.provinceId = String(item.provinceId)
       item.regionId = String(item.regionId)
@@ -989,6 +1028,40 @@ export default {
       this.editDialog = true
       this.dialogTitle = "编辑"
       this.itemObj = item
+      this.itemObj.longitude = item.latitude + "/" + item.longitude
+      this.itemObj.businessHours = [item.businessHours , item.businessHours2]
+      if(item.trafficImage){
+        var trafficImage = JSON.parse(item.trafficImage)
+        this.trafficImage = trafficImage[0]
+      }
+      if(item.receptionImage){
+        var receptionImage = JSON.parse(item.receptionImage)
+        this.receptionImage = receptionImage[0]
+      }
+      if(item.honorImage){
+         var honorImage = JSON.parse(item.honorImage)
+         this.honorImage = honorImage[0]
+      }
+     if(item.constructionImage){
+       var constructionImage = JSON.parse(item.constructionImage)
+       this.constructionImage = constructionImage[0]
+     }
+     if(item.businessImage){
+       var businessImage = JSON.parse(item.businessImage)
+       this.businessImage = businessImage[0]
+     }
+    if(item.storeImages){
+       this.storeImage = item.storeImages
+       this.storeImages = item.storeImages
+       var ArrImg = []
+       item.storeImages.forEach(v=>{
+         var obj = {}
+         obj.url = v
+         obj.name = v.split("/").pop()
+         ArrImg.push(obj)
+       })
+       this.fileList_1 = ArrImg
+    }
       this.alterDisabled = true
       this.inputDisabled = false
       this.disabledBtn = false
@@ -1016,7 +1089,6 @@ export default {
     },
     editDialogVisible(){
       this.itemObj.storeImage = JSON.stringify(this.storeImage)
-      console.log(this.itemObj);
       // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
       // var data = this.itemObj
       // var arr = Object.keys(data);
@@ -1035,7 +1107,11 @@ export default {
             // this.loadingBootm = true
             this.itemObj.longitude = this.arrLngLat[0]
             this.itemObj.latitude = this.arrLngLat[1]
-            this.itemObj.businessHours = JSON.stringify(this.itemObj.businessHours)
+            // this.itemObj.businessHours = JSON.stringify(this.itemObj.businessHours)
+            var bus = this.itemObj.businessHours
+            this.itemObj.businessHours = bus[0]
+            this.itemObj.businessHours2 = bus[1]
+            console.log(this.itemObj);
             if(this.urlBl){
               saveDot(this.itemObj).then(res=>{
                 // this.loadingBootm = false
@@ -1051,7 +1127,6 @@ export default {
                     type: 'warning'
                   })
                 }
-                console.log(res);
               })
             }else{
               updateDot(this.itemObj).then(res=>{
@@ -1121,43 +1196,21 @@ export default {
     },
     ApiAreaJson(){
       findYuyueProvinces().then(res=>{
-        // console.log(res);
         this.areaJson = res.data
       })
     },
     changeCity(){
-      // var id
-      // this.areaJson.forEach(v=>{
-      //   if(v.province === this.itemObj.province){
-      //     id = v.provinceid
-      //   }
-      // })
       findYuyueCityByProvinceid({provinceid: this.itemObj.provinceId}).then(res=>{
         this.cityList = res.data
-        // this.itemObj.city = this.cityList[0].city
         this.itemObj.cityId = this.cityList[0].cityid
         this.changeCounty()
       })
-      // areaJson.forEach(val =>{
-      //     if(this.itemObj.province === val.n){
-      //     this.cityList = val.s
-      //     this.itemObj.city = this.cityList[0].n
-      //     this.itemObj.region = this.cityList[0].s[0].n
-      //     }
-      // })
     },
     changeCounty(){
       findYuyueAreasByCityid({cityid: this.itemObj.cityId}).then(res=>{
         this.countyList = res.data
-        // this.itemObj.region = this.countyList[0].area
         this.itemObj.regionId = this.countyList[0].areaid
       })
-      //  this.cityList.forEach(item=>{
-      //       if(this.itemObj.city === item.n){
-      //         this.countyList = item.s
-      //         this.itemObj.region = this.countyList[0].n
-      //       }
-      //   })
     },
     pass(item){
       this.passDialog = true
@@ -1188,6 +1241,13 @@ export default {
       this.itemObj = {}
       this.getData()
       this.urlBl = false
+      this.storeImage = []
+      this.storeImages =  ""
+      this.receptionImage = ""
+      this.honorImage = ""
+      this.constructionImage = ""
+      this.trafficImage = ""
+      this.businessImage = ""
     },
     reset(){
       this.queryList = {
@@ -1223,7 +1283,6 @@ export default {
     },
     apiUploadImg(formData , num){
       dotOssUpload(formData).then(res => {
-        console.log(res);
             if(res.code == 200){
                this.$message({
                 type: 'success',
@@ -1257,7 +1316,7 @@ export default {
         this.dialogImageUrl = file.url;
         this.updateDialog = true;
     },
-   handleRemove1(file, fileList){
+    handleRemove1(file, fileList){
         let a = file
         let b = this.fileList_1.indexOf(a)
         if(this.storeImage[b] == undefined){
@@ -1273,6 +1332,7 @@ export default {
       if(fileList.length>0){
         // this.fileList_1 = [fileList[fileList.length - 1]] //展示最后一次选择文件
          this.fileList_1 = fileList
+         console.log(this.fileList_1);
          this.storeImagess = URL.createObjectURL(file.raw);
       }
       if (this.fileList_1) {
@@ -1373,6 +1433,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.fuwu_xan{
+  padding: 0px 20px;
+  .xian_type{
+    .input_checkbox{
+      width: 100%;
+      padding-left: 20px;
+    }
+  }
+}
 // 地图样式
 .con-map {
   height: 190px;

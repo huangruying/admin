@@ -110,3 +110,11 @@ export function findHallServiceInfos(data) {
     data
   })
 }
+
+export function findCarwashTypesInfos(data) {
+  return request({
+    url: '/wash/findCarwashTypesInfos',
+    method: 'post',
+    data
+  })
+}
