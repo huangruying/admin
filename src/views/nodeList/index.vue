@@ -40,7 +40,31 @@
           ></el-date-picker>
        </div> 
        <div class="input_box">
-          <el-input
+          <el-select v-model="queryList.province" @change="getDataProvince" class="input fl" placeholder="请选择省份">
+            <el-option
+              v-for="item in areaJson"
+              :label="item.province"
+              :value="item.provinceid"
+              :key="item.provinceid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.city" @change="getDataCity" class="input fl" placeholder="请选择城市">
+            <el-option
+              v-for="item in cityListJson"
+              :label="item.city"
+              :value="item.cityid"
+              :key="item.cityid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.region" @change="getData" class="input fl" placeholder="请选择区/县">
+            <el-option
+              v-for="item in regionListJson"
+              :label="item.area"
+              :value="item.areaid"
+              :key="item.areaid"
+            ></el-option>
+          </el-select>
+          <!-- <el-input
           v-model="queryList.province"
           placeholder="请输入省份"
           class="input fl"
@@ -54,7 +78,7 @@
           v-model="queryList.region"
           placeholder="请输入区/县"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter"/> -->
            <el-input
           v-model="queryList.recommender"
           placeholder="推荐人"
@@ -541,6 +565,8 @@ export default {
         }
     };
     return {
+      cityListJson: [],
+      regionListJson: [],
       serviceItemList: [],
       itemVcheckList: [],
       valueVcheckList: [],
@@ -841,7 +867,22 @@ export default {
       }, 1000);
     },
     // 以上是地图需要的函数
-    Vchange(Vid){
+    getDataProvince(){
+      findYuyueCityByProvinceid({provinceid: this.queryList.province}).then(res=>{
+        this.cityListJson = res.data
+      })
+      this.queryList.city = null
+      this.queryList.region = null
+      this.getData()
+    },
+    getDataCity(){
+      findYuyueAreasByCityid({cityid: this.queryList.city}).then(res=>{
+        this.regionListJson = res.data
+      })
+      this.queryList.region = null
+      this.getData()
+    },
+    Vchange(){
       console.log(this.valueVcheckList)
     },
     serviceItem(){
@@ -875,12 +916,6 @@ export default {
       if (queryList.dotCode) {
         data.dotCode = queryList.dotCode
       }
-      // if (queryList.status) {
-      //   data.status = queryList.status
-      //   console.log(data.status);
-      //   // console.log(typeof queryList.status);
-      //   // console.log(queryList.status);
-      // }
       if(queryList.status == null){
       }else{
         data.status = queryList.status
@@ -888,14 +923,14 @@ export default {
       if (queryList.dotName) {
         data.dotName = queryList.dotName
       }
-      if (queryList.province) {
-        data.province = queryList.province
+      if (!(queryList.province == null)) {
+        data.provinceId = queryList.province
       }
-      if (queryList.city) {
-        data.city = queryList.city
+      if (!(queryList.city == null)) {
+        data.cityId = queryList.city
       }
-      if (queryList.region) {
-        data.region = queryList.region
+      if (!(queryList.region == null)) {
+        data.regionId = queryList.region
       }
       if (queryList.chargePhone) {
         data.chargePhone = queryList.chargePhone   
@@ -1050,7 +1085,7 @@ export default {
        var businessImage = JSON.parse(item.businessImage)
        this.businessImage = businessImage[0]
      }
-    if(item.storeImages){
+     if(item.storeImages){
        this.storeImage = item.storeImages
        this.storeImages = item.storeImages
        var ArrImg = []
@@ -1061,7 +1096,7 @@ export default {
          ArrImg.push(obj)
        })
        this.fileList_1 = ArrImg
-    }
+      }
       this.alterDisabled = true
       this.inputDisabled = false
       this.disabledBtn = false
