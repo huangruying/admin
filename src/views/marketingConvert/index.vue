@@ -260,16 +260,20 @@ export default {
           usetypeid: 1
         },
         {
-          name: "已核销",
+          name: "未领取",
           usetypeid: 0
         },
         {
-          name: "已注销",
+          name: "已核销",
           usetypeid: 2
         },
         {
-          name: "已过期",
+          name: "已注销",
           usetypeid: 3
+        },
+        {
+          name: "已过期",
+          usetypeid: 4
         }
       ],
       statusList: [
@@ -303,7 +307,7 @@ export default {
         if (this.fileList) {
           var formData = new FormData()
           formData.append('file', this.fileList[0].raw)
-          // formData.append('id', this.facilitatorId)
+          formData.append('id', this.codeId)
           importYyBearercardByCode(formData).then(res => {
             this.loadingUpload = false
             if(res.code == 200){
@@ -473,12 +477,14 @@ export default {
             this.codeData.total = res.total
             this.codeData.data.forEach(v=>{
               if(v.state == 0){
-                v.stateCopy = "已核销"
+                v.stateCopy = "未领取"
               }else if(v.state == 1){
                 v.stateCopy = "未核销"
               }else if(v.state == 2){
-                v.stateCopy = "已注销"
+                v.stateCopy = "已核销"
               }else if(v.state == 3){
+                v.stateCopy = "已注销"
+              }else{
                 v.stateCopy = "已过期"
               }
             })

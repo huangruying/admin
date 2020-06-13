@@ -101,9 +101,14 @@
           <div v-for="(ditch,idx) in scope.row.channels" :key="idx">{{ditch.channelName}}</div>
         </template>
       </el-table-column>
+      <el-table-column label="组合" prop="combinations" align="center">
+        <template slot-scope="scope">
+          <div v-for="(items,ids) in scope.row.combinations" :key="ids">{{items}}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="审核是否通过" prop="examine" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.examine == 0 ? "未审核" : "审核已通过" }}</span>
+          <span>{{ scope.row.examine == 0 ? "未审核" : "已通过" }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
