@@ -317,7 +317,7 @@ export default {
     },
     apiGetChannelName(){
       getChannelName().then(res=>{
-        console.log(res);
+        // console.log(res);
       })
     },
     itemEditDialog(){

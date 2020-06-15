@@ -88,14 +88,14 @@
       center>
       <!--上传文件的弹窗-->
       <el-dialog center width="50%" @close="close3" :visible.sync="uploaddialogVisible" append-to-body title="导入数据">
-        <!-- <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
-              <el-option
-                v-for="item in statusInfoList"
-                :label="item.name"
-                :value="item.id"
-                :key="item.value"
-              ></el-option>
-        </el-select> -->
+        <el-date-picker
+          v-if="number === 1"
+          v-model="valueDate"
+          format="yyyy 年 MM 月 dd 日"
+          value-format="yyyy-MM-dd"
+          type="date"
+          placeholder="请选择过期日期">
+        </el-date-picker>
         <div style="margin: 0 auto;">
           <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
             :limit="1" action="" drag class="upload-demo">
@@ -120,6 +120,11 @@
                   :key="item.usetypeid"
                 ></el-option>
               </el-select>
+              <el-input
+                v-model="dialogList.code"
+                placeholder="请输入兑换码"
+                class="input fl"
+                @keyup.enter.native="apiCodeState"/>
           </div> 
           <div class="btn_box">
             <div>
@@ -169,6 +174,11 @@
             <el-table-column label="领取时间" prop="getdate" align="center">
               <template slot-scope="scope">
                 <span>{{scope.row.getdate}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="过期时间" prop="pirationTime" align="center">
+              <template slot-scope="scope">
+                <span>{{scope.row.pirationTime}}</span>
               </template>
             </el-table-column>
             <el-table-column label="兑换账号" prop="exchangeuser" align="center">
@@ -227,6 +237,7 @@ export default {
       uploaddialogVisible: false,
       loadingBootm: false,
       codeLoading: false,
+      valueDate: "",
       text: "",
       visibleCode: false,
       loading: false,
@@ -250,6 +261,7 @@ export default {
       },
       dialogList:{
         state: null,
+        code: null
       },
       queryList: {
         cardno: null,
@@ -303,11 +315,18 @@ export default {
     },
     submitImportExcel() {
       if(this.number == 1){
+        if(!this.valueDate){
+          this.$message({
+            message: '请选择过期日期!'
+          })
+          return
+        }
          this.loadingUpload = true
         if (this.fileList) {
           var formData = new FormData()
           formData.append('file', this.fileList[0].raw)
           formData.append('id', this.codeId)
+          formData.append('pirationTime', this.valueDate)
           importYyBearercardByCode(formData).then(res => {
             this.loadingUpload = false
             if(res.code == 200){
@@ -325,6 +344,7 @@ export default {
             }
           })
         } else {
+          this.loadingUpload = false
           this.$message({
             message: '请选择Excle文件!'
           })
@@ -457,6 +477,9 @@ export default {
       if(!(this.dialogList.state == null)){
         data.state = this.dialogList.state
       }
+      if(this.dialogList.code){
+        data.code = this.dialogList.code
+      }
       if (filter && this.codeData.current_page > 1) {
         data.page = this.codeData.current_page;
       } else {
@@ -537,6 +560,7 @@ export default {
     close3(){
       this.number = null
       this.fileList = ""
+      this.valueDate = ""
     },
     handleFilter(){
       this.getData()

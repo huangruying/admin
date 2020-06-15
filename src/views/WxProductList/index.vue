@@ -211,7 +211,7 @@ export default {
     confirm(){
         this.itemList.id = this.itemID
         updateYyProductGoonLine(this.itemList).then(res=>{
-            console.log(res);
+            // console.log(res);
             if(res.code == 200){
               this.$message({
                   type: 'success',

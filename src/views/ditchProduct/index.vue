@@ -425,7 +425,7 @@ export default {
     async smallIcon(){
       var res = await findHallServiceInfos()
       this.imgList = res.data
-      console.log(res);
+      // console.log(res);
     },
     audit(item){
       this.open2('确定审核通过？' , item.id)

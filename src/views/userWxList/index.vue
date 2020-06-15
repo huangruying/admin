@@ -301,7 +301,7 @@ export default {
           this.data.data = []
         }
         if( res.data && res.data.length > 0){
-          console.log(res);
+          // console.log(res);
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize

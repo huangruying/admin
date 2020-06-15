@@ -285,7 +285,7 @@ export default {
       this.innerVisible = true
       this.lobbyObj = item
       this.imageUrl = item.pic
-      console.log(item);
+      // console.log(item);
       var admin =  item.roles.indexOf("admin")
       if(admin == -1){
         this.lobbyObj.type = "2"

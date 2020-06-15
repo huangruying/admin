@@ -859,7 +859,7 @@ export default {
     onSearchLi(e) {
       console.log(e.lng + "-" + e.lat);
       this.center = [e.lng, e.lat];
-      console.log(this.center);
+      // console.log(this.center);
       this.search_key = "";
       // this.loading=true;
       setTimeout(() => {
@@ -1367,7 +1367,7 @@ export default {
       if(fileList.length>0){
         // this.fileList_1 = [fileList[fileList.length - 1]] //展示最后一次选择文件
          this.fileList_1 = fileList
-         console.log(this.fileList_1);
+        //  console.log(this.fileList_1);
          this.storeImagess = URL.createObjectURL(file.raw);
       }
       if (this.fileList_1) {
@@ -1398,7 +1398,7 @@ export default {
       if(fileList.length>0){
          this.fileList_3 = [fileList[fileList.length - 1]] //展示最后一次选择文件
          this.constructionImage = URL.createObjectURL(file.raw);
-         console.log(this.itemObj.constructionImage);
+        //  console.log(this.itemObj.constructionImage);
           if (this.fileList_3) {
             var formData = new FormData()
             // formData.append('dotCode', this.dotCode)
