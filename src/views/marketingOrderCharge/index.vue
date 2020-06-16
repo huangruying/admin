@@ -4,23 +4,8 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.channelName"
+          v-model="queryList.name"
           placeholder="请输入渠道名称"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.customerId"
-          placeholder="请输入客户ID"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.belongOrg"
-          placeholder="请输入发放机构ID"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.bindMemName"
-          placeholder="请输入姓名"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -28,6 +13,19 @@
           placeholder="请输入手机号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.goodsname"
+          placeholder="请输入商品名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
+            <el-option
+              v-for="item in statusList"
+              :label="item.name"
+              :value="item.value"
+              :key="item.value"
+            ></el-option>
+          </el-select>
        </div> 
        <div class="btn_box">
          <div>
@@ -36,10 +34,11 @@
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
          <div class="btn_top">
-            <div class="btn" :class="btnss == 1? 'click' : ''" @click="btn(1)">收费</div>
             <div class="btns" :class="btnss == 2? 'click' : ''" @click="btn(2)">不收费</div>
+            <div class="btn" :class="btnss == 1? 'click' : ''" @click="btn(1)">收费</div>
          </div>
          <div>
+           <el-button type="primary" @click="exportFile">导出</el-button>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
          </div>
        </div>
@@ -63,24 +62,29 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="客户ID" prop="customerId" align="center">
+      <el-table-column label="商品名称" prop="goodsname" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.customerId }}</span>
+          <span>{{ scope.row.goodsname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单ID" prop="orderId" align="center">
+      <el-table-column label="平台订单号" prop="orderno" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderno }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="第三方平台订单号" prop="orderId" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.orderId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="渠道商" prop="channelName" align="center">
+      <el-table-column label="券码" prop="code" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.channelName }}</span>
+          <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="商品名称" prop="goodsname" align="center">
+      <el-table-column label="订单价格" prop="orderprice" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.goodsname }}</span>
+          <span>{{ scope.row.orderprice }}</span>
         </template>
       </el-table-column>
       <el-table-column label="发放机构ID" prop="belongOrg" align="center">
@@ -93,19 +97,34 @@
           <span>{{ scope.row.belongSys }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="生效时间" prop="cardEffTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cardEffTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="失效时间" prop="cardInvTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cardInvTime }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="真实姓名" prop="bindMemName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.bindMemName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="电话号码" prop="bindMemPhone" align="center">
+      <el-table-column label="手机号码" prop="bindMemPhone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.bindMemPhone }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="下单时间" prop="dateline" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dateline }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="订单状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
@@ -132,23 +151,26 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="客户ID：" prop="customerId" style="width: 100%">
-                  <el-input v-model="itemObj.customerId" style="width:50%" disabled></el-input>
+              <el-form-item label="平台订单号：" prop="orderno" style="width: 100%">
+                  <el-input v-model="itemObj.orderno" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="订单ID：" prop="orderId" style="width: 100%">
+              <el-form-item label="第三方平台订单号：" prop="orderId" style="width: 100%">
                   <el-input v-model="itemObj.orderId" style="width:50%" disabled></el-input>
               </el-form-item>
               <el-form-item label="发放机构ID：" prop="belongOrg" style="width: 100%">
                   <el-input v-model="itemObj.belongOrg" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="渠道商：" prop="channelName" style="width: 100%">
-                  <el-input v-model="itemObj.channelName" style="width:50%" disabled></el-input>
-              </el-form-item>
               <el-form-item label="真实姓名：" prop="bindMemName" style="width: 100%">
                   <el-input v-model="itemObj.bindMemName" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="发放系统：" prop="belongSys" style="width: 100%">
-                  <el-input v-model="itemObj.belongSys" style="width:50%" disabled></el-input>
+              <el-form-item label="下单时间：" prop="dateline" style="width: 100%">
+                  <el-input v-model="itemObj.dateline" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="生效时间：" prop="cardEffTime" style="width: 100%">
+                  <el-input v-model="itemObj.cardEffTime" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="失效时间：" prop="cardInvTime" style="width: 100%">
+                  <el-input v-model="itemObj.cardInvTime" style="width:50%" disabled></el-input>
               </el-form-item>
           </el-form>
         </div>
@@ -166,9 +188,9 @@
                   <span>{{ scope.row.goodsname }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="电话号码" prop="bindMemPhone" align="center">
+              <el-table-column label="券码" prop="code" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.bindMemPhone }}</span>
+                  <span>{{ scope.row.code }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="发放系统" prop="belongSys" align="center">
@@ -176,9 +198,14 @@
                   <span>{{ scope.row.belongSys }}</span>
                 </template>
               </el-table-column>
+              <el-table-column label="订单价格" prop="orderprice" align="center" width="120">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.orderprice }}</span>
+                </template>
+              </el-table-column>
               <el-table-column label="订单状态" prop="status" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.status }}</span>
+                  <span>{{ scope.row.statusCopy }}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -191,7 +218,7 @@
 </template>
 
 <script>
-import { findYyExchangelogInfos , delYyExchangelog } from '@/api/guest/marketingOrderCharge'
+import { findYyBearercardorderInfos , delYyExchangelog , yyBearercardorderExpor } from '@/api/guest/marketingOrderCharge'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -214,11 +241,10 @@ export default {
         link: ""
       },
       queryList: {
-        channelName: null,
-        customerId: null,
-        belongOrg: null,
-        bindMemName: null,
-        bindMemPhone: null
+        goodsname: null,
+        name: null,
+        status: null,
+        bindMemPhone: null,
       },
       statusList: [
         {
@@ -236,6 +262,17 @@ export default {
     this.getData()
   },
   methods: {
+    exportFile(){
+      if(this.data.data.length <= 0){
+        this.$message({
+            message: '暂无数据可导出~',
+            type: 'warning'
+          })
+      }else{
+          var { goodsname,name,status,bindMemPhone } = this.queryList
+          window.location.href = `http://test2.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExpor?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
+      }
+    },
     btn(index){
       this.btnss = index
       if(index == 2){
@@ -304,21 +341,19 @@ export default {
     getData(filter){
       this.loading = true
       let data = {}
+      data.type = 3
       var queryList = this.queryList
-      if (queryList.channelName) {
-        data.channelName = queryList.channelName
+      if (queryList.goodsname) {
+        data.goodsname = queryList.goodsname
       }
-      if (queryList.customerId) {
-        data.customerId = queryList.customerId
-      }
-      if (queryList.belongOrg) {
-        data.belongOrg = queryList.belongOrg
-      }
-      if (queryList.bindMemName) {
-        data.bindMemName = queryList.bindMemName
+      if (queryList.name) {
+        data.name = queryList.name
       }
       if (queryList.bindMemPhone) {
         data.bindMemPhone = queryList.bindMemPhone
+      }
+      if(!(queryList.status == null)){
+        data.status = queryList.status
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -327,7 +362,7 @@ export default {
       }
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findYyExchangelogInfos(data).then(res=>{
+      findYyBearercardorderInfos(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
@@ -341,9 +376,11 @@ export default {
           this.data.total = res.total
           this.data.data.forEach(v=>{
             if(v.status == 1){
-                v.status = "待使用"
+              v.statusCopy = "待支付"
             }else if(v.status == 2){
-                v.status = "已使用"
+              v.statusCopy = "已支付"
+            }else if(v.status == 3){
+              v.statusCopy = "无需支付"
             }
           })
         }
@@ -364,11 +401,10 @@ export default {
     },
     reset(){
       this.queryList = {
-        channelName: null,
-        customerId: null,
-        belongOrg: null,
-        bindMemName: null,
-        bindMemPhone: null
+        goodsname: null,
+        name: null,
+        status: null,
+        bindMemPhone: null,
       }
     },
     resetGetData(){

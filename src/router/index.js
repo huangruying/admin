@@ -299,17 +299,17 @@ export const asyncRoutes = [
                 meta: { title: '券码管理'}
               },
               {
-                path: 'marketingOrder',
-                name: 'marketingOrder',
-                component: () => import('@/views/marketingOrder/index'),
-                meta: { title: '订单管理'}
-              },
-              {
                 path: 'marketingOrderCharge',
                 name: 'marketingOrderCharge',
-                hidden: true, // 不在侧边栏线上
                 component: () => import('@/views/marketingOrderCharge/index'),
-                meta: { title: '收费订单管理', activeMenu: '/service/marketing/marketingCertificate/marketingOrder', }
+                meta: { title: '订单管理'} // 不收费
+              },
+              {
+                path: 'marketingOrder',
+                name: 'marketingOrder',
+                hidden: true, // 不在侧边栏线上 
+                component: () => import('@/views/marketingOrder/index'),
+                meta: { title: '收费订单管理', activeMenu: '/service/marketing/marketingCertificate/marketingOrderCharge', }
               }
             ]
           },

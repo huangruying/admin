@@ -15,3 +15,11 @@ export function delYyBearercardorderById(data) {
       data
     })
 }
+
+export function yyBearercardorderExpor(data) {
+  return request({
+    url: '/wash/bearercard/yyBearercardorderExpor',
+    method: 'get',
+    params: data
+  })
+}

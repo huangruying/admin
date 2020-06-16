@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function findYyExchangelogInfos(data) {
+export function findYyBearercardorderInfos(data) {
   return request({
-    url: '/wash/bearercard/findYyExchangelogInfos',
+    url: '/wash/bearercard/findYyBearercardorderInfos',
     method: 'post',
     data
   })
@@ -14,4 +14,12 @@ export function delYyExchangelog(data) {
       method: 'post',
       data
     })
+}
+
+export function yyBearercardorderExpor(data) {
+  return request({
+    url: '/wash/bearercard/yyBearercardorderExpor',
+    method: 'get',
+    params: data
+  })
 }

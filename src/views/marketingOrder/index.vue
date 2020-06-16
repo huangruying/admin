@@ -34,10 +34,11 @@
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
          <div class="btn_top">
-            <div class="btn" :class="btnss == 1? 'click' : ''" @click="btn(1)">收费</div>
             <div class="btns" :class="btnss == 2? 'click' : ''" @click="btn(2)">不收费</div>
+            <div class="btn" :class="btnss == 1? 'click' : ''" @click="btn(1)">收费</div>
          </div>
          <div>
+           <el-button type="primary" @click="exportFile">导出</el-button>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
          </div>
        </div>
@@ -123,7 +124,7 @@
       </el-table-column>
       <el-table-column label="订单状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status == 1? "待支付": "已支付" }}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
@@ -204,7 +205,7 @@
               </el-table-column>
               <el-table-column label="订单状态" prop="status" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.status == 1? "待支付": "已支付" }}</span>
+                  <span>{{ scope.row.statusCopy }}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -217,7 +218,7 @@
 </template>
 
 <script>
-import { findYyBearercardorderInfos , delYyBearercardorderById } from '@/api/guest/marketingOrder'
+import { findYyBearercardorderInfos , delYyBearercardorderById , yyBearercardorderExpor } from '@/api/guest/marketingOrder'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -253,6 +254,10 @@ export default {
         {
           name: "已支付",
           value: 2
+        },
+        {
+          name: "无需支付",
+          value: 3
         }
       ]
     }
@@ -261,6 +266,17 @@ export default {
     this.getData()
   },
   methods: {
+    exportFile(){
+      if(this.data.data.length <= 0){
+        this.$message({
+            message: '暂无数据可导出~',
+            type: 'warning'
+          })
+      }else{
+          var { goodsname,name,status,bindMemPhone } = this.queryList
+          window.location.href = `http://test2.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExpor?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
+      }
+    },
     btn(index){
       this.btnss = index
       if(index == 2){
@@ -362,7 +378,13 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if(v.status == 1){
+              v.statusCopy = "待支付"
+            }else if(v.status == 2){
+              v.statusCopy = "已支付"
+            }else if(v.status == 3){
+              v.statusCopy = "无需支付"
+            }
           })
         }
       })

@@ -181,7 +181,7 @@
                 <span>{{scope.row.pirationTime}}</span>
               </template>
             </el-table-column>
-            <el-table-column label="兑换账号" prop="exchangeuser" align="center">
+            <!-- <el-table-column label="兑换账号" prop="exchangeuser" align="center">
               <template slot-scope="scope">
                 <span>{{scope.row.exchangeuser}}</span>
               </template>
@@ -192,6 +192,11 @@
               </template>
             </el-table-column>
             <el-table-column label="兑换日期" prop="exchangedate" align="center">
+              <template slot-scope="scope">
+                <span>{{scope.row.exchangedate}}</span>
+              </template>
+            </el-table-column> -->
+            <el-table-column label="核销日期" prop="exchangedate" align="center">
               <template slot-scope="scope">
                 <span>{{scope.row.exchangedate}}</span>
               </template>
