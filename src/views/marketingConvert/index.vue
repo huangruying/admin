@@ -82,12 +82,13 @@
     />
     <el-dialog
       :title="text"
+      :close-on-click-modal="false"
       :visible.sync="visibleCode"
       width="90%"
       @close="close2"
       center>
       <!--上传文件的弹窗-->
-      <el-dialog center width="50%" @close="close3" :visible.sync="uploaddialogVisible" append-to-body title="导入数据">
+      <el-dialog center width="50%" @close="close3" :close-on-click-modal="false" :visible.sync="uploaddialogVisible" append-to-body title="导入数据">
         <el-date-picker
           v-if="number === 1"
           v-model="valueDate"
@@ -129,6 +130,7 @@
           <div class="btn_box">
             <div>
               <el-button type="danger" @click="remove(2)">批量删除</el-button>
+              <el-button type="info" @click="exportData">下载模板</el-button>
             </div>
             <div>
               <el-button type="primary" @click="uploadDV(1)">导入不记名卡</el-button>
@@ -232,6 +234,7 @@
 <script>
 import { findYyProductBearercardor , findYyBearercardByPid , delYyBearercardById , updateYyBearercardByState , importYyBearercardByCode , importYyBearercardByState } from '@/api/guest/marketingConvert'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
 export default {
   components: {
     Pagination
@@ -311,6 +314,9 @@ export default {
     this.getData()
   },
   methods: {
+    exportData(){
+      window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/mode/bearercard.xlsx`
+    },
     uploadDV(num){
       this.number = num
       this.uploaddialogVisible = true
@@ -548,7 +554,9 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+              if( v.dateline){
+                v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+              }
           })
         }
       })

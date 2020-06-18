@@ -64,47 +64,47 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column label="ID" prop="id" fixed align="center">
+      <el-table-column label="ID" prop="id" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品名称" prop="name" fixed align="center">
+      <el-table-column label="产品名称" prop="name" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="副标题" prop="otherName" fixed align="center">
+      <el-table-column label="副标题" prop="otherName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.otherName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="价格" prop="price" fixed align="center">
+      <el-table-column label="价格" prop="price" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用途" prop="usetypeid" fixed align="center">
+      <el-table-column label="用途" prop="usetypeid" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.usetypeid == 1? "高铁" : "空铁" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="来源" prop="channelName" fixed align="center">
+      <!-- <el-table-column label="来源" prop="channelName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.channelName }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="次数" prop="typeid" fixed align="center">
+      </el-table-column> -->
+      <el-table-column label="次数" prop="typeid" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.typeid == 1 ? "1次卡" : "2年卡"}}</span>
+          <span>{{ scope.row.typeidCopy}}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="产品内容" prop="content" fixed align="center">
+      <!-- <el-table-column label="产品内容" prop="content" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.content }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="创建时间" prop="dateline" fixed align="center">
+      <el-table-column label="创建时间" prop="dateline" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dateline }}</span>
         </template>
@@ -133,6 +133,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
+      :close-on-click-modal="false"
       width="80%"
       @close="close"
       center>
@@ -149,8 +150,8 @@
               <el-form-item label="产品价格：" prop="price" style="width: 100%">
                   <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入产品价格"></el-input>
               </el-form-item>
-              <el-form-item label="悦途商品编号：" prop="commodityCode" style="width: 100%">
-                  <el-input v-model="itemObj.commodityCode" style="width:50%" placeholder="请输入悦途商品编号"></el-input>
+              <el-form-item label="商品编号：" prop="commodityCode" style="width: 100%">
+                  <el-input v-model="itemObj.commodityCode" style="width:50%" placeholder="请输入悦途商品编号" :disabled="alterDisabled"></el-input>
               </el-form-item>
               <el-form-item label="简介：" prop="desc" style="width: 100%">
                   <el-input type="textarea" v-model="itemObj.desc" style="width:50%" autosize maxlength="300" show-word-limit placeholder="请输入产品简介"></el-input>
@@ -164,7 +165,13 @@
               <el-form-item label="会员卡类型：" style="width: 100%">
                 <el-radio-group v-model="itemObj.typeid">
                   <el-radio label="1">次卡</el-radio>
-                  <el-radio label="2">年卡</el-radio>
+                  <el-radio label="2">周卡</el-radio>
+                  <el-radio label="3">月卡</el-radio>
+                  <el-radio label="4">季卡</el-radio>
+                  <el-radio label="5">半年卡</el-radio>
+                  <el-radio label="6">1年卡</el-radio>
+                  <el-radio label="7">2年卡</el-radio>
+                  <el-radio label="8">3年卡</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="产品图片：" style="width: 100%">
@@ -201,6 +208,7 @@ import { findYuyueIproduct , deleteYuyueIproductById , updateYuyueIproduct , sav
 import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 import { quillEditor } from 'vue-quill-editor'
+import formatTime from "@/utils/formatTime"
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
@@ -220,6 +228,7 @@ export default {
       imageUrl: "",
       dialogTitle: "",
       thishostName: '',
+      alterDisabled: false,
       loadingBootm: false,
       loading: false,
       editDialog: false,
@@ -334,7 +343,6 @@ export default {
               message: '操作成功！'
             })
             this.editDialog = false
-            this.getData()
           }else{
             this.$message({
               type: 'error',
@@ -351,7 +359,6 @@ export default {
               message: '操作成功！'
             })
             this.editDialog = false
-            this.getData()
           }else{
             this.$message({
               type: 'error',
@@ -472,12 +479,32 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+              if( v.dateline){
+                v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+              }
+              if(v.typeid == 1){
+                v.typeidCopy = "次卡"
+              }else if(v.typeid == 2){
+                v.typeidCopy = "周卡"
+              }else if(v.typeid == 3){
+                v.typeidCopy = "月卡"
+              }else if(v.typeid == 4){
+                v.typeidCopy = "季卡"
+              }else if(v.typeid == 5){
+                v.typeidCopy = "半年卡"
+              }else if(v.typeid == 6){
+                v.typeidCopy = "1年卡"
+              }else if(v.typeid == 7){
+                v.typeidCopy = "2年卡"
+              }else if(v.typeid == 8){
+                v.typeidCopy = "3年卡"
+              }
           })
         }
       })
     },
     compile(item){
+      this.alterDisabled = true
       this.itemObj = item
       this.editDialog = true
       this.dialogTitle = "编辑"
@@ -485,6 +512,7 @@ export default {
     },
     newlyIncreased(){
       this.itemObj = {}
+      this.alterDisabled = false
       this.editDialog = true
       this.dialogTitle = "新增"
     },
@@ -493,6 +521,7 @@ export default {
       this.itemID = null
       this.imageUrl = ""
       this.loadingBootm = false
+      this.getData()
     },
     handleFilter(){
       this.getData()

@@ -23,13 +23,23 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="会员卡：" prop="pid" style="width: 100%">
-                <el-select v-model="itemObj.pid" filterable placeholder="请选择会员卡">
+                <el-select v-model="itemObj.pid" filterable placeholder="请选择会员卡" style="width: 290px">
                     <el-option
                         v-for="item in options" 
                         :key="item.id"
                         :label="item.name"
                         :value="item.id">
                     </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="所属渠道商：" prop="channelid" style="width: 100%">
+                <el-select v-model="itemObj.channelid" filterable placeholder="请选择所属渠道商" style="width: 290px" @change="changeID">
+                  <el-option
+                    v-for="item in channelList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="截止日期：" prop="time" style="width: 100%">
@@ -51,7 +61,7 @@
      </div>
 
         <!--上传文件的弹窗-->
-    <el-dialog :visible.sync="uploaddialogVisible" title="导入excel">
+    <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入excel">
       <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
         :limit="1" :on-exceed="onExceed" action="" drag class="upload-demo">
         <i class="el-icon-upload"></i>
@@ -68,22 +78,25 @@
 
 <script>
 import { findYyProductData, giveCard } from "@/api/guest/giveCard"
+import { getChannelName } from '@/api/guest/ditchProduct'
 export default {
     data(){
         return{
             itemObj: {
                 type: 0,
                 virtualCard: 2,
-                time: ["" , ""],
+                time: ["" , ""]
             },
             uploaddialogVisible: false,
             loadingBootm: false,
             fileList: null,
             options: [],
+            channelList: [],
         }
     },
     mounted(){
         this.apiOptions()
+        this.apiGetChannelName()
     },
     methods: {
         submitForm(formName) {
@@ -101,6 +114,7 @@ export default {
                     formData.append('cardInvTime', data.cardInvTime)
                     formData.append('pid', data.pid)
                     formData.append('type', data.type)
+                    formData.append('channelid', data.channelid)
                     giveCard(formData).then(res=>{
                         this.loadingBootm = false
                         if(res.code == 200){
@@ -160,6 +174,7 @@ export default {
         },
         resetForm(formName) {
             this.$refs[formName].resetFields();
+
         },
         handleChange(file, fileList) {
             this.fileList = file
@@ -176,7 +191,7 @@ export default {
             this.uploaddialogVisible = false
         },
         exportData(){
-           window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/giveCard.xlsx`
+           window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/mode/giveCard.xlsx`
         },
         submitImportExcel() {
             if (this.fileList) {
@@ -190,6 +205,14 @@ export default {
                     message: '请选择Excle文件!'
                 })
             }
+        },
+        apiGetChannelName(){
+            getChannelName().then(res=>{
+                this.channelList = res.data
+            })
+        },
+        changeID(){
+            this.$forceUpdate()
         },
     }
 }

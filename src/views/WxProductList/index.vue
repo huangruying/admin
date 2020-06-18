@@ -91,6 +91,7 @@
     <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="50%"
       @close="close"

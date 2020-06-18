@@ -107,6 +107,7 @@
     <!-- 新增编辑 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="60%"
       @close="close"
@@ -146,6 +147,7 @@
     <el-dialog
       :title="text"
       :visible.sync="visibleLobby"
+      :close-on-click-modal="false"
       width="80%"
       @close="close2"
       center>
@@ -153,6 +155,7 @@
         width="70%"
         :title="textInner"
         :visible.sync="innerVisible"
+        :close-on-click-modal="false"
          @close="close3"
         append-to-body
         center>
@@ -708,6 +711,7 @@ export default {
     },
     close(){
       this.itemObj = {}
+      this.getData()
     },
     handleFilter(){
       this.getData()

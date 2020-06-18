@@ -51,6 +51,7 @@
     <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="70%"
       @close="close"
@@ -167,7 +168,6 @@ export default {
                         type: 'success',
                         message: '操作成功!'
                     })
-                    this.getList()
                     this.editDialog = false
                   }else{
                     this.$message({
@@ -184,7 +184,6 @@ export default {
                         type: 'success',
                         message: '操作成功!'
                     })
-                    this.getList()
                     this.editDialog = false
                   }else{
                     this.$message({
@@ -258,6 +257,7 @@ export default {
       close(){
         this.loadingBootm = false
         this.itemList = {}
+        this.getList()
       }
     }
 }

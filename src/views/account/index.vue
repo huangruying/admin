@@ -123,6 +123,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
+      :close-on-click-modal="false"
       width="40%"
       @close="close"
       center>

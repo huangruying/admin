@@ -204,6 +204,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
+      :close-on-click-modal="false"
       width="80%"
       @close="close"
       center>

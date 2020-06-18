@@ -106,6 +106,7 @@
     <!-- 新增编辑 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="50%"
       @close="close"
@@ -146,6 +147,7 @@
     <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="lookEditDialog"
       width="83%"
       @close="close2"
@@ -462,7 +464,6 @@ export default {
                 type: 'success',
                 message: '操作成功!'
             })
-            this.getData()
             this.editDialog = false
           }else{
             this.$message({
@@ -479,7 +480,6 @@ export default {
                 type: 'success',
                 message: '操作成功!'
             })
-            this.getData()
             this.editDialog = false
           }else{
             this.$message({
@@ -628,6 +628,7 @@ export default {
     },
     close(){
       this.itemObj = {}
+      this.getData()
     },
     close2(){
       

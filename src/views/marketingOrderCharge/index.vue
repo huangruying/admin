@@ -144,6 +144,7 @@
     <!-- 查看 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="60%"
       @close="close"
@@ -220,6 +221,7 @@
 <script>
 import { findYyBearercardorderInfos , delYyExchangelog , yyBearercardorderExpor } from '@/api/guest/marketingOrderCharge'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
 export default {
   components: {
     Pagination
@@ -381,6 +383,9 @@ export default {
               v.statusCopy = "已支付"
             }else if(v.status == 3){
               v.statusCopy = "无需支付"
+            }
+            if( v.dateline){
+              v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
             }
           })
         }

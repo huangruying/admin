@@ -86,6 +86,7 @@
     <el-dialog
         width="70%"
         :title="textInner"
+        :close-on-click-modal="false"
         :visible.sync="innerVisible"
          @close="close"
         center>
@@ -244,7 +245,6 @@ export default {
               message: '操作成功！'
             })
             this.innerVisible = false
-            this.getData()
           }else{
             this.$message.error(res.msg);
           }
@@ -258,7 +258,6 @@ export default {
               message: '操作成功！'
             })
             this.innerVisible = false
-            this.getData()
           }else{
             this.$message.error(res.msg);
           }
@@ -364,6 +363,7 @@ export default {
       this.itemID = null
       this.imageUrl = ""
       this.loadingBootm = false
+      this.getData()
     },
     handleFilter(){
       this.getData()

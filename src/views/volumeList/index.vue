@@ -139,7 +139,7 @@
     />
 
     <!--上传文件的弹窗-->
-    <el-dialog :visible.sync="uploaddialogVisible" title="导入数据">
+    <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入数据">
       <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
             <el-option
               v-for="item in statusInfoList"

@@ -51,11 +51,11 @@
         type="selection"
         width="50">
      </el-table-column>
-      <!-- <el-table-column label="用户id" prop="uid" fixed align="center" width="80PX">
+      <el-table-column label="产品id" prop="id" fixed align="center" width="80PX">
         <template slot-scope="scope">
-          <span>{{ scope.row.uid }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column label="产品图片" prop="picfilepath" align="center">
         <template slot-scope="scope">
           <img :src="scope.row.picfilepath" alt="" style="height: 55px; width: 82px;">
@@ -132,6 +132,7 @@
       :title="dialogTitle"
       :visible.sync="editDialog"
       width="80%"
+      :close-on-click-modal="false"
       @close="close"
       center>
       <div class="btn_top">
@@ -153,7 +154,7 @@
                   <el-input v-model="itemObj.desc" style="width:50%" placeholder="请输入产品简介"></el-input>
               </el-form-item>
               <el-form-item label="所属渠道商：" prop="desc" style="width: 100%">
-                <el-select v-model="itemObj.channelids" filterable multiple placeholder="请选择所属渠道商" style="width: 50%">
+                <el-select v-model="itemObj.channelids" filterable multiple placeholder="请选择所属渠道商" style="width: 50%" @change="changeID">
                   <el-option
                     v-for="item in channelList"
                     :key="item.id"
@@ -427,6 +428,9 @@ export default {
       this.imgList = res.data
       // console.log(res);
     },
+    changeID(){
+      this.$forceUpdate()
+    },
     audit(item){
       this.open2('确定审核通过？' , item.id)
     },
@@ -597,7 +601,6 @@ export default {
               message: '操作成功！'
             })
             this.editDialog = false
-            this.getData()
           }else{
             this.$message({
               type: 'error',
@@ -614,7 +617,6 @@ export default {
               message: '操作成功！'
             })
             this.editDialog = false
-            this.getData()
           }else{
             this.$message({
               type: 'error',
@@ -698,13 +700,12 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-              // v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
-              // v.updatetime = formatTime(v.updatetime*1000,'yyyy-mm-dd hh:mm:ss')
-              // if( v.topdateline == 0 ){
-              //   v.topdateline = ''
-              // }else{
-              //   v.topdateline = formatTime(v.topdateline*1000,'yyyy-mm-dd hh:mm:ss')
-              // }
+              if( v.dateline){
+                v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+              }
+              if( v.updatetime){
+                v.updatetime = formatTime(v.updatetime*1000,'yyyy-mm-dd hh:mm:ss')
+              }
           })
         }
       })
@@ -716,32 +717,39 @@ export default {
       this.dialogTitle = "编辑"
       this.itemID = item.id
       var ListArr = []
-      item.services.forEach(v=>{
-        ListArr.push(v.serviceId)
-      })
-      this.checkList = ListArr
+      // console.log(item);
+      if(item.services){
+        item.services.forEach(v=>{
+          ListArr.push(v.serviceId)
+        })
+        this.checkList = ListArr
+      }
       getYyProductById({id: item.id}).then(res=>{
         var arr = []
-        res.data.productList.forEach(v=>{
-          var arrNum = Number(v.productid)
-          arr.push([v.productid])
-          this.infoList.forEach(valueId=>{
-              if(valueId.value == v.productid){
-                if(valueId.label.indexOf("/") == -1){
-                  valueId.label = valueId.label + "/" + v.num
-                  valueId.num = v.num
-                }else{
-                  var str = valueId.label.split('/') 
-                  valueId.label = str[0] + "/" + v.num
+        if(res.data.productList){
+          res.data.productList.forEach(v=>{
+            var arrNum = Number(v.productid)
+            arr.push([v.productid])
+            this.infoList.forEach(valueId=>{
+                if(valueId.value == v.productid){
+                  if(valueId.label.indexOf("/") == -1){
+                    valueId.label = valueId.label + "/" + v.num
+                    valueId.num = v.num
+                  }else{
+                    var str = valueId.label.split('/') 
+                    valueId.label = str[0] + "/" + v.num
+                  }
                 }
-              }
+            }) 
           })
-        })
+        }
         var channelsArr = []
-        res.data.channels.forEach(v=>{
-          var id = Number(v.channelId)
-          channelsArr.push(id)
-        })
+        if(res.data.channels){
+          res.data.channels.forEach(v=>{
+            var id = Number(v.channelId)
+            channelsArr.push(id)
+          })
+        }
         this.itemObj.channelids = channelsArr
         this.valueList = arr 
         this.infoArr = arr
@@ -772,6 +780,7 @@ export default {
       this.loadingBootm = false
       this.apiFindIproductInfos()
       this.checkList = []
+      this.getData()
     },
     handleFilter(){
       this.getData()

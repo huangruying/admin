@@ -108,6 +108,7 @@
     <!-- 新增编辑 -->
     <el-dialog
       :title="dialogTitle"
+      :close-on-click-modal="false"
       :visible.sync="editDialog"
       width="50%"
       @close="close"
@@ -234,7 +235,6 @@ export default {
                 type: 'success',
                 message: '操作成功!'
             })
-            this.getData()
             this.editDialog = false
           }else{
             this.$message({
@@ -252,7 +252,6 @@ export default {
                 type: 'success',
                 message: '操作成功!'
             })
-            this.getData()
             this.editDialog = false
           }else{
             this.$message({
@@ -352,6 +351,7 @@ export default {
     },
     close(){
       this.itemObj = {}
+      this.getData()
     },
     handleFilter(){
       this.getData()

@@ -55,6 +55,16 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="用户姓名" prop="ytgoodsname" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.ytgoodsname }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户电话" prop="ytgoodsname" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.ytgoodsname }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="产品名称" prop="ytgoodsname" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.ytgoodsname }}</span>
@@ -65,7 +75,7 @@
           <span>{{ scope.row.cardno }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型" prop="typeid" fixed align="center">
+      <!-- <el-table-column label="类型" prop="typeid" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.typeid == 1? "次卡" : "年卡" }}</span>
         </template>
@@ -74,18 +84,23 @@
         <template slot-scope="scope">
           <span>{{ scope.row.usetypeid == 1? "高铁" : "空铁" }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="来源" prop="channelName" fixed align="center">
+      </el-table-column> -->
+      <el-table-column label="所属渠道商" prop="channelName" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="次数" prop="typeid" fixed align="center">
+      <!-- <el-table-column label="次数" prop="typeid" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.typeid == 1 ? "1次卡" : "2年卡"}}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="创建时间" prop="dateline" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dateline }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="有效时间" prop="dateline" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dateline }}</span>
         </template>
