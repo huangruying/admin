@@ -29,7 +29,7 @@ export default {
     },
     limit: {
       type: Number,
-      default: 10
+      default: 15
     },
     layout: {
       type: String,
@@ -50,7 +50,7 @@ export default {
     pageSizes: {
       type: Array,
       default() {
-        return [10, 20, 50]
+        return [15, 30, 50]
       }
     },
   },

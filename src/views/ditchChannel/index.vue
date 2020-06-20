@@ -141,6 +141,7 @@
 <script>
 import { findYyChannelInfos , delYyChannelById , updateYyChannel , saveYyChannel , updateExamine } from '@/api/guest/ditchChannel'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
 export default {
   components: {
     Pagination
@@ -162,7 +163,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -344,7 +345,9 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if( v.dateline){
+              v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+            }
           })
         }
       })

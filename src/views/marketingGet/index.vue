@@ -42,37 +42,37 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column label="ID" prop="id" fixed align="center">
+      <el-table-column label="ID" prop="id" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠劵名称" prop="title" fixed align="center">
+      <el-table-column label="优惠劵名称" prop="title" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取用户" prop="username" fixed align="center">
+      <el-table-column label="领取用户" prop="username" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" prop="phone" fixed align="center">
+      <el-table-column label="手机号" prop="phone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠金额" prop="price" fixed align="center">
+      <el-table-column label="优惠金额" prop="price" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="领取时间" prop="collectionTime" fixed align="center">
+      <el-table-column label="领取时间" prop="collectionTime" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.collectionTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="status" fixed align="center">
+      <el-table-column label="状态" prop="status" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.status ==1? "已使用" : "未使用" }}</span>
         </template>
@@ -108,7 +108,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },

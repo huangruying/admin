@@ -47,10 +47,11 @@
                     v-model="itemObj.time"
                     type="daterange"
                     range-separator="至"
-                    value-format="yyyy-MM-dd hh:mm:ss"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     :default-time="['00:00:00', '23:59:59']"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
+                    start-placeholder="有效期开始"
+                    end-placeholder="有效期结束"
+                    :picker-options="pickerOptions"
                 ></el-date-picker>
             </el-form-item>
              <el-form-item>
@@ -82,6 +83,11 @@ import { getChannelName } from '@/api/guest/ditchProduct'
 export default {
     data(){
         return{
+            pickerOptions: {
+                disabledDate(time) {
+                    return time.getTime() < Date.now() - 8.64e7;
+                }
+            },
             itemObj: {
                 type: 0,
                 virtualCard: 2,
@@ -138,7 +144,15 @@ export default {
                     this.loadingBootm = false
                 }else{
                     delete data.time
-                    giveCard(data).then(res=>{
+                    var formData = new FormData()
+                    formData.append('cardEffTime', data.cardEffTime)
+                    formData.append('cardInvTime', data.cardInvTime)
+                    formData.append('pid', data.pid)
+                    formData.append('type', data.type)
+                    formData.append('channelid', data.channelid)
+                    formData.append('bindMemPhone', data.bindMemPhone)
+                    formData.append('bindMemName', data.bindMemName)
+                    giveCard(formData).then(res=>{
                         this.loadingBootm = false
                         if(res.code == 200){
                             this.$message({
@@ -174,7 +188,7 @@ export default {
         },
         resetForm(formName) {
             this.$refs[formName].resetFields();
-
+            this.loadingBootm = false
         },
         handleChange(file, fileList) {
             this.fileList = file

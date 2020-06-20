@@ -55,14 +55,14 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户姓名" prop="ytgoodsname" fixed align="center">
+      <el-table-column label="用户姓名" prop="bindMemName" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.ytgoodsname }}</span>
+          <span>{{ scope.row.bindMemName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户电话" prop="ytgoodsname" fixed align="center">
+      <el-table-column label="用户电话" prop="bindMemPhone" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.ytgoodsname }}</span>
+          <span>{{ scope.row.bindMemPhone }}</span>
         </template>
       </el-table-column>
       <el-table-column label="产品名称" prop="ytgoodsname" fixed align="center">
@@ -90,6 +90,11 @@
           <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="订单号" prop="totalOrderno" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.totalOrderno }}</span>
+        </template>
+      </el-table-column>
       <!-- <el-table-column label="次数" prop="typeid" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.typeid == 1 ? "1次卡" : "2年卡"}}</span>
@@ -100,9 +105,9 @@
           <span>{{ scope.row.dateline }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="有效时间" prop="dateline" fixed align="center">
+      <el-table-column label="失效时间" prop="cardInvTime" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dateline }}</span>
+          <span>{{ scope.row.cardInvTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="90" fixed="right" prop="audit_status" align="center">
@@ -124,6 +129,7 @@
 <script>
 import { findYyOrderytdetail , delYyOrderytdetailById } from '@/api/guest/serviceOrder'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
 export default {
   components: {
     Pagination
@@ -136,7 +142,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -254,7 +260,12 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if( v.dateline){
+              v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+            }
+            // if( v.cardEffTime){
+            //   v.cardEffTime = formatTime(v.cardEffTime*1000,'yyyy-mm-dd hh:mm:ss')
+            // }
           })
         }
       })

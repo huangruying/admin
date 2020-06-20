@@ -46,6 +46,11 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="渠道" prop="channels" align="center">
+        <template slot-scope="scope">
+          <div v-for="(v,i) in scope.row.channels" :key="i">{{v.channelName}}</div>
+        </template>
+      </el-table-column>
       <el-table-column label="产品名称" prop="name">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
@@ -61,9 +66,9 @@
           <span>{{ scope.row.dateline }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="组合" prop="dateline" align="center">
+      <el-table-column label="产品组合" prop="combinations" align="center">
         <template slot-scope="scope">
-          <span>待接口</span>
+          <div v-for="(l,t) in scope.row.combinations" :key="t">{{l}}</div>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="130" fixed="right" prop="audit_status" align="center">
@@ -130,7 +135,8 @@
           <div class="btn_box">
             <div>
               <el-button type="danger" @click="remove(2)">批量删除</el-button>
-              <el-button type="info" @click="exportData">下载模板</el-button>
+              <el-button type="info" @click="exportData">下载导入模板</el-button>
+              <el-button type="info" @click="exportData2">下载导入兑换编号核销不记名卡模板</el-button>
             </div>
             <div>
               <el-button type="primary" @click="uploadDV(1)">导入不记名卡</el-button>
@@ -255,7 +261,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -263,7 +269,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -316,6 +322,9 @@ export default {
   methods: {
     exportData(){
       window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/mode/bearercard.xlsx`
+    },
+    exportData2(){
+      window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/mode/Destruction.xlsx`
     },
     uploadDV(num){
       this.number = num
@@ -484,7 +493,7 @@ export default {
     apiCode(id,filter){
       this.codeLoading = true
       let data = {}
-      data.pid = id
+      // data.pid = id
       if(!(this.dialogList.state == null)){
         data.state = this.dialogList.state
       }
@@ -520,6 +529,12 @@ export default {
                 v.stateCopy = "已注销"
               }else{
                 v.stateCopy = "已过期"
+              }
+              if( v.getdate){
+                v.getdate = formatTime(v.getdate*1000,'yyyy-mm-dd hh:mm:ss')
+              }
+              if( v.exchangedate){
+                v.exchangedate = formatTime(v.exchangedate*1000,'yyyy-mm-dd hh:mm:ss')
               }
             })
           }
@@ -568,7 +583,14 @@ export default {
       this.loadingBootm = false
     },
     close2(){
-
+      this.codeData = {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 15,
+        total: 0,
+        link: ""
+      }
     },
     close3(){
       this.number = null

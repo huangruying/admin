@@ -86,11 +86,17 @@
           <span>{{ scope.row.couponsNum }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="状态" prop="type" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type? "未过期": "已过期" }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" fixed="right" prop="audit_status" width="210px" align="center">
         <template slot-scope="scope">
-          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button></div>
+          <!-- 券码过期不能再编辑及生成券码 -->
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)" v-if="scope.row.type">编辑</el-button></div>
           <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
-          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)">生成券码</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)" v-if="scope.row.type">生成券码</el-button></div>
           <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="info" @click="look(scope.row)">查看券码</el-button></div>
         </template>
       </el-table-column>
@@ -118,21 +124,33 @@
                   <el-input v-model="itemObj.title" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
               </el-form-item>
               <el-form-item label="优惠劵金额：" prop="price" style="width: 100%">
-                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入优惠劵金额"></el-input>
+                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入优惠劵金额" :disabled="disabledPrice" ></el-input>
               </el-form-item>
-              <el-form-item label="有效期：" prop="couponMoney" style="width: 100%">
+              <el-form-item :label="itemPicker" prop="couponMoney" style="width: 100%" v-show="!period">
                  <el-date-picker
                     style="width:50%"
                     v-model="itemObj.time"
                     type="daterange"
                     format="yyyy 年 MM 月 dd 日"
-                    value-format="yyyy-MM-dd hh:mm:ss"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     :default-time="['00:00:00', '23:59:59']"
                     range-separator="至"
                     start-placeholder="有效期开始"
                     end-placeholder="有效期结束"
                     :picker-options="pickerOptions"
+                    @blur="changePicker"
                   ></el-date-picker>
+              </el-form-item>
+              <el-form-item :label="itemPicker" prop="couponMoney" style="width: 100%" v-show="period">
+                  <el-date-picker
+                    v-model="itemObj.enddate"
+                    type="datetime"
+                    default-time="23:59:59"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    :picker-options="pickerOptions2"
+                    placeholder="有效期结束">
+                  </el-date-picker>
+                  <!-- <div class="color_period">可以延长有效期，严禁缩短有效期!</div> -->
               </el-form-item>
               <el-form-item label="使用说明：" prop="content" style="width: 100%">
                   <el-input type="textarea" v-model="itemObj.content" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
@@ -266,21 +284,34 @@ export default {
     Pagination
   },
   data() {
+    const dar = this
     return {
       pickerOptions: {
         disabledDate(time) {
-            return time.getTime() < Date.now() - 8.64e7;
+          return time.getTime() < Date.now() - 8.64e7;
         }
       },
+      pickerOptions2: {
+         // disabledDate是一个函数,参数是当前选中的日期值,这个函数需要返回一个Boolean值,
+        disabledDate(time) {
+          return time.getTime() < new Date(dar.enddate).getTime();
+        }
+      },
+      itemPicker: "有效期：",
       dialogTitle: "",
+      disabledPrice: true,
       loadingBootm: false,
       editDialog: false,
       lookEditDialog: false,
       loading: false,
       loading2: false,
+      period: false,
       itemArr: [],
       itemArr2: [],
-      itemObj: {},
+      itemObj: {
+        time:[]
+      },
+      enddate: "",
       item: {},
       rules: {
           username: [
@@ -291,7 +322,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -299,7 +330,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -336,6 +367,9 @@ export default {
     this.getData()
   },
   methods: {
+    changePicker(){
+      this.$forceUpdate()
+    },
     exportData(item){
       if(this.dialog.data.length <= 0){
         this.$message({
@@ -440,24 +474,30 @@ export default {
         });
     },
     compile(item){
+      this.itemPicker = "有效期结束："
       this.editDialog = true
+      this.disabledPrice = true
+      this.period = true
       this.itemObj = item
       this.itemObj.time = [item.startdate , item.enddate]
+      this.enddate = item.enddate
     },
     newlyIncreased(){
+      this.itemPicker = "有效期："
       this.editDialog = true
+      this.period = false
+      this.disabledPrice = false
     },
     itemEditDialog(){
         var data = {}
         data.title = this.itemObj.title
         data.price = this.itemObj.price
         data.content = this.itemObj.content
-        if(this.itemObj.time[0] && this.itemObj.time[1]) {
-          data.startdate = this.itemObj.time[0]
-          data.enddate = this.itemObj.time[1]
-        }
       if(this.itemObj.couponsId){
+        data.startdate = this.itemObj.startdate
+        data.enddate = this.itemObj.enddate
         data.id = this.itemObj.couponsId
+        // console.log(data);
         updateYuyueCoupons(data).then(res=>{
           if(res.code == 200){
             this.$message({
@@ -474,6 +514,10 @@ export default {
         })
       }else{
         data.uid = 1
+        if(this.itemObj.time[0] && this.itemObj.time[1]) {
+          data.startdate = this.itemObj.time[0]
+          data.enddate = this.itemObj.time[1]
+        }
         saveYuyueCoupons(data).then(res=>{
           if(res.code == 200){
             this.$message({
@@ -621,14 +665,43 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+              var blDate = this.isThreeHourAgo(v.enddate)
+              if(!blDate){
+                v.type = true
+              }else{
+                v.type = false
+              }
           })
         }
       })
     },
+    // 比较是否超过当前时间，后台懒得做，严格上讲时间戳在后台生成是比较好的
+    isThreeHourAgo(time) {
+      const now = Date.now()
+      const d = new Date(time)
+      const secDiff = (now - d) / 1000
+      return secDiff > 3 * 60 * 60
+    },
+    //获取当前时间
+    FormatDate () {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth();
+        var date = now.getDate();
+        month = month + 1;
+        if (month < 10){
+          month = "0" + month;
+        }
+        if (date < 10) {
+          date = "0" + date;
+        }
+        var time = year + "-" + month + "-" + date
+        return time;
+    },
     close(){
       this.itemObj = {}
       this.getData()
+      this.enddate = ""
     },
     close2(){
       
@@ -662,6 +735,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.color_period{
+  color: #f00;
+}
 .title{
   font-size: 18px;
   font-weight: 600;

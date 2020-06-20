@@ -57,72 +57,82 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column width="80" label="ID" prop="id" align="center">
+      <el-table-column width="70" label="ID" prop="id" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="商品名称" prop="goodsname" align="center">
+      <el-table-column label="商品名称" width="220" prop="goodsname" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.goodsname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="平台订单号" prop="orderno" align="center">
+      <el-table-column label="渠道商" width="170" prop="name" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderno }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="第三方平台订单号" prop="orderId" align="center">
+      <el-table-column label="订单号" width="190" prop="orderCode" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderCode }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="第三方平台订单号" width="220" prop="orderId" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.orderId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="券码" prop="code" align="center">
+      <el-table-column label="券码" prop="code" width="220" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单价格" prop="orderprice" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.orderprice }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="发放机构ID" prop="belongOrg" align="center">
+      <el-table-column label="发放机构ID" width="190" prop="belongOrg" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.belongOrg }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="发放系统" prop="belongSys" align="center">
+      <el-table-column label="发放系统" width="170" prop="belongSys" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.belongSys }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="生效时间" prop="cardEffTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cardEffTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="失效时间" prop="cardInvTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cardInvTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="真实姓名" prop="bindMemName" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.bindMemName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="手机号码" prop="bindMemPhone" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.bindMemPhone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="下单时间" prop="dateline" align="center">
+      <el-table-column label="下单时间" width="190" prop="dateline" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dateline }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="status" align="center">
+      <el-table-column label="客户ID" prop="customerId" width="160" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.customerId }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="真实姓名" width="180" prop="bindMemName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.bindMemName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="手机号码" width="170" prop="bindMemPhone" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.bindMemPhone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="生效时间" width="190" prop="cardEffTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cardEffTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="失效时间" width="190" prop="cardInvTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cardInvTime }}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="订单价格" width="120" prop="orderprice" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderprice }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="订单状态" width="120" prop="status" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.statusCopy }}</span>
         </template>
@@ -152,14 +162,17 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="平台订单号：" prop="orderno" style="width: 100%">
-                  <el-input v-model="itemObj.orderno" style="width:50%" disabled></el-input>
+              <el-form-item label="订单号：" prop="orderCode" style="width: 100%">
+                  <el-input v-model="itemObj.orderCode" style="width:50%" disabled></el-input>
               </el-form-item>
               <el-form-item label="第三方平台订单号：" prop="orderId" style="width: 100%">
                   <el-input v-model="itemObj.orderId" style="width:50%" disabled></el-input>
               </el-form-item>
               <el-form-item label="发放机构ID：" prop="belongOrg" style="width: 100%">
                   <el-input v-model="itemObj.belongOrg" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="客户ID：" prop="customerId" style="width: 100%">
+                  <el-input v-model="itemObj.customerId" style="width:50%" disabled></el-input>
               </el-form-item>
               <el-form-item label="真实姓名：" prop="bindMemName" style="width: 100%">
                   <el-input v-model="itemObj.bindMemName" style="width:50%" disabled></el-input>
@@ -187,6 +200,11 @@
               <el-table-column label="商品名称" prop="goodsname" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.goodsname }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="渠道商" prop="name" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.name }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="券码" prop="code" align="center">
@@ -238,7 +256,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -386,6 +404,12 @@ export default {
             }
             if( v.dateline){
               v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
+            }
+            if( v.cardEffTime){
+              v.cardEffTime = formatTime(v.cardEffTime*1000,'yyyy-mm-dd hh:mm:ss')
+            }
+            if( v.cardInvTime){
+              v.cardInvTime = formatTime(v.cardInvTime*1000,'yyyy-mm-dd hh:mm:ss')
             }
           })
         }
