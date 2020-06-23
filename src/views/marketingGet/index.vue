@@ -52,6 +52,11 @@
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="券码号" prop="barcode" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.barcode }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="领取用户" prop="username" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
@@ -74,7 +79,7 @@
       </el-table-column>
       <el-table-column label="状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status ==1? "已使用" : "未使用" }}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="90" fixed="right" prop="audit_status" align="center">
@@ -223,7 +228,13 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if(v.status == 1){
+              v.statusCopy = "未使用"
+            }else if(v.status == 2){
+              v.statusCopy = "已使用"
+            }else if(v.status == 3){
+              v.statusCopy = "已过期"
+            }
           })
         }
       })

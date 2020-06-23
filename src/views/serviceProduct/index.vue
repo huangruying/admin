@@ -169,7 +169,7 @@
                   <el-radio label="3">月卡</el-radio>
                   <el-radio label="4">季卡</el-radio>
                   <el-radio label="5">半年卡</el-radio>
-                  <el-radio label="6">1年卡</el-radio>
+                  <el-radio label="6">年卡</el-radio>
                   <el-radio label="7">2年卡</el-radio>
                   <el-radio label="8">3年卡</el-radio>
                 </el-radio-group>
@@ -272,17 +272,41 @@ export default {
           typeid: 1
         },
         {
-          name: "年卡",
+          name: "周卡",
           typeid: 2
+        },
+        {
+          name: "月卡",
+          typeid: 3
+        },
+        {
+          name: "季卡",
+          typeid: 4
+        },
+        {
+          name: "半年卡",
+          typeid: 5
+        },
+        {
+          name: "年卡",
+          typeid: 6
+        },
+        {
+          name: "2年卡",
+          typeid: 7
+        },
+        {
+          name: "3年卡",
+          typeid: 8
         }
       ],
       auditList: [
         {
-          name: '已审核',
+          name: '已通过',
           value: 1
         },
         {
-          name: '未审核',
+          name: '未通过',
           value: 0
         }
       ],
@@ -493,7 +517,7 @@ export default {
               }else if(v.typeid == 5){
                 v.typeidCopy = "半年卡"
               }else if(v.typeid == 6){
-                v.typeidCopy = "1年卡"
+                v.typeidCopy = "年卡"
               }else if(v.typeid == 7){
                 v.typeidCopy = "2年卡"
               }else if(v.typeid == 8){

@@ -124,7 +124,7 @@
                   </el-select>
               </el-form-item>
               <el-form-item label="城市：">
-                  <el-select v-model="itemObj.cityId" placeholder="请选择城市" filterable>
+                  <el-select v-model="itemObj.cityId" placeholder="请选择城市" filterable @change="itemCityList">
                     <el-option v-for="value in cityList" :key="value.id" :label="value.city" :value="value.cityid"></el-option>
                   </el-select>
               </el-form-item>
@@ -165,6 +165,9 @@
                 <el-form-item label="大厅名称：" prop="hallName" style="width: 100%">
                     <el-input v-model="lobbyObj.hallName" style="width:50%" placeholder="请输入大厅名称"></el-input>
                 </el-form-item>
+                <!-- <el-form-item label="门头名称：" prop="hallName" style="width: 100%">
+                    <el-input v-model="lobbyObj.hallName" style="width:50%" placeholder="请输入门头名称"></el-input>
+                </el-form-item> -->
                 <el-form-item label="营业时间：" prop="businessHours" style="width: 100%">
                     <el-time-picker
                       @change="businessHours"
@@ -179,11 +182,17 @@
                     </el-time-picker>
                 </el-form-item>
                 <el-form-item label="客服电话：" prop="servicePhone" style="width: 100%">
-                    <el-input v-model="lobbyObj.servicePhone" style="width:50%" placeholder="请输入大厅名称"></el-input>
+                    <el-input v-model="lobbyObj.servicePhone" style="width:50%" placeholder="请输入客服电话"></el-input>
                 </el-form-item>
                 <el-form-item label="大厅地址：" prop="hallLocation" style="width: 100%">
-                    <el-input v-model="lobbyObj.hallLocation" style="width:50%" placeholder="请输入大厅名称"></el-input>
+                    <el-input v-model="lobbyObj.hallLocation" style="width:50%" placeholder="请输入大厅地址"></el-input>
                 </el-form-item>
+                <!-- <el-form-item label="营业状态：" prop="type" style="width: 100%">
+                  <el-radio-group v-model="lobbyObj.type">
+                    <el-radio label="1">正常</el-radio>
+                    <el-radio label="2">因疫情关闭</el-radio>
+                  </el-radio-group>
+                </el-form-item> -->
                 <el-form-item label="产品图片：" style="width: 100%">
                   <el-upload
                     action=""
@@ -234,6 +243,11 @@
                 <span>{{ scope.row.hallName }}</span>
               </template>
             </el-table-column>
+            <!-- <el-table-column label="门头名称" prop="hallName" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.hallName }}</span>
+              </template>
+            </el-table-column> -->
             <el-table-column label="营业时间" prop="businessHours" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.businessHours }}</span>
@@ -254,6 +268,11 @@
                 <span>{{ scope.row.updateTime }}</span>
               </template>
             </el-table-column>
+            <!-- <el-table-column label="营业状态" prop="type" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.typeCopy }}</span>
+              </template>
+            </el-table-column> -->
             <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" @click="lobbyCompile(scope.row)">编辑</el-button>
@@ -335,7 +354,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 10,
+        per_page: 15,
         total: 0,
         link: ""
       },
@@ -369,6 +388,9 @@ export default {
     this.apiProvince()
   },
   methods: {
+    itemCityList(){
+      this.$forceUpdate()
+    },
     newlyDivider(){
       this.innerVisible = true
       this.lobbyObj = {}
@@ -390,6 +412,7 @@ export default {
       this.lobbyObj = {}
       this.checkList = []
       this.newlyData = false
+      this.imageUrl = ""
     },
     lobbyDialog(){
         var obj = this.lobbyObj
@@ -463,6 +486,9 @@ export default {
     lobbyCompile(item){
       this.innerVisible = true
       this.textInner = item.hallName
+      if(item.hallPic){
+        this.imageUrl = item.hallPic
+      }
       if(item.businessHours.indexOf("-") == -1){
 
       }else{

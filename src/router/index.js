@@ -317,7 +317,7 @@ export const asyncRoutes = [
             path: 'giveCard',
             name: 'giveCard',
             component: () => import('@/views/giveCard/index'),
-            meta: { title: '赠送会员卡', icon: 'dashboard'}
+            meta: { title: '发放会员卡', icon: 'dashboard'}
           }
         ]
       },

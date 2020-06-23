@@ -6,7 +6,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'dashboard',
   computed: {
@@ -41,3 +40,4 @@ export default {
   }
 }
 </style>
+

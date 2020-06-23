@@ -68,59 +68,64 @@
         type="selection"
         width="50">
      </el-table-column>
-      <el-table-column width="80" label="ID" prop="id" fixed align="center">
+      <el-table-column width="80" label="ID" prop="id" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品名称" prop="name" fixed align="center">
+      <el-table-column label="产品名称" prop="name" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单号" prop="orderNo" fixed align="center">
+      <el-table-column label="订单号" prop="orderNo" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="购买用户" prop="username" fixed align="center">
+      <el-table-column label="渠道" prop="channelNames" align="center">
+        <template slot-scope="scope">
+          <div v-for="(ditch,idx) in scope.row.channelNames" :key="idx">{{ditch}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column label="购买用户" prop="username" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="购买用户手机号" prop="phone" fixed align="center">
+      <el-table-column label="购买用户手机号" prop="phone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="购买时间" prop="purchaseTime" fixed align="center">
+      <el-table-column label="购买时间" prop="purchaseTime" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.purchaseTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品价格" prop="price" fixed align="center">
+      <el-table-column label="产品价格" prop="price" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="实际支付金额" prop="payAmount" fixed align="center">
+      <el-table-column label="实际支付金额" prop="payAmount" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.payAmount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠金额" prop="money" fixed align="center">
+      <el-table-column label="优惠金额" prop="money" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠券使用状态" prop="money" fixed align="center">
+      <el-table-column label="优惠券使用状态" prop="money" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type == 0? "未使用优惠劵": "已使用优惠劵"}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="status" fixed align="center">
+      <el-table-column label="订单状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status == 0? "未支付": "已支付" }}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column label="操作" width="180" fixed="right" prop="audit_status" align="center">
@@ -180,7 +185,7 @@
               </el-table-column>
               <el-table-column label="状态" prop="status" fixed align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.status == 1? "未完成": "已完成" }}</span>
+                  <span>{{ scope.row.statusCopy }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="金额" prop="money" fixed align="center" width="120">
@@ -348,7 +353,15 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            
+            if(v.status == 0){
+              v.statusCopy = "未支付"
+            }else if(v.status == 1){
+              v.statusCopy = "已支付"
+            }else if(v.status == 2){
+              v.statusCopy = "已完成"
+            }else if(v.status == 3){
+              v.statusCopy = "未完成"
+            }
           })
         }
       })

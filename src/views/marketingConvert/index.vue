@@ -78,8 +78,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页，只需要2条数据，后期需求请打开v-if -->
     <pagination
       v-show="data.total>0"
+      v-if="false"
       :total="data.total"
       :page.sync="data.current_page"
       :limit.sync="data.per_page"
@@ -269,7 +271,7 @@ export default {
         current_page: 1,
         data: [],
         last_page: 1,
-        per_page: 15,
+        per_page: 50,
         total: 0,
         link: ""
       },
@@ -573,6 +575,12 @@ export default {
                 v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
               }
           })
+          // 只留下id为7和23的数据留下，后期需求请删除过滤器
+         const arrDate = this.data.data.filter(i=>{
+            return i.id == 7 || i.id == 23
+          })
+         this.data.data = arrDate
+         
         }
       })
     },
