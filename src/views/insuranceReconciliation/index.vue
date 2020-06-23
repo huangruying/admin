@@ -230,7 +230,7 @@ export default {
           var {orderNo,couponCode,companyName,dotName,province,city,region,reconciliation,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/insuranceWriteoffOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/insuranceWriteoffOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
           &orderNo=${orderNo}&couponCode=${couponCode}&companyName=${companyName}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&reconciliation=${reconciliation}&startTime=${startTime}&endTime=${endTime}`
       }
     },

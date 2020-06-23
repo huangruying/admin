@@ -353,7 +353,7 @@ export default {
           var {licensePlate,phone,garageName,orderStatus,orderSource,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&dotName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&dotName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     getData(filter){

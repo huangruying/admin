@@ -514,6 +514,7 @@ export default {
           if (!res.data || res.data.length <= 0) {
             this.$message("暂无数据~")
             this.codeData.data = []
+            this.codeData.total = 0
           }
           if( res.data && res.data.length > 0){
             this.codeData = res;
@@ -532,11 +533,15 @@ export default {
               }else{
                 v.stateCopy = "已过期"
               }
-              if( v.getdate){
+              if( v.getdate && v.getdate != 0){
                 v.getdate = formatTime(v.getdate*1000,'yyyy-mm-dd hh:mm:ss')
+              }else{
+                v.getdate = ""
               }
-              if( v.exchangedate){
+              if( v.exchangedate && v.exchangedate != 0){
                 v.exchangedate = formatTime(v.exchangedate*1000,'yyyy-mm-dd hh:mm:ss')
+              }else{
+                v.exchangedate = ""
               }
             })
           }
@@ -564,6 +569,7 @@ export default {
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
           this.data.data = []
+          this.data.total = 0
         }
         if( res.data && res.data.length > 0){
           this.data = res;

@@ -275,7 +275,7 @@ export default {
           var {couponName,couponCode,name,alias,status,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
           &couponName=${couponName}&couponCode=${couponCode}&name=${name}&alias=${alias}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },

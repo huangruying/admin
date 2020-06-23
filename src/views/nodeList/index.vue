@@ -1215,7 +1215,7 @@ export default {
       var {dotCode,status,dotName,province,city,region,phone,nodeTypes,recommender,time} = this.queryList
         var startTime = time[0]
         var endTime = time[1]
-        window.location.href = `http://test2.yuyuetrip.com.cn/wash/dotExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&status=${status}&dotCode=${dotCode}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&phone=${phone}&nodeTypes=${nodeTypes}&recommender=${recommender}&startTime=${startTime}&endTime=${endTime}`
+        window.location.href = `http://mp.yuyuetrip.com.cn/wash/dotExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&status=${status}&dotCode=${dotCode}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&phone=${phone}&nodeTypes=${nodeTypes}&recommender=${recommender}&startTime=${startTime}&endTime=${endTime}`
         // row.exportDatabtn = false
         // dotExport({ pageNum: this.data.current_page , pageSize: this.data.per_page}).then(res => {
         //   console.log(res);

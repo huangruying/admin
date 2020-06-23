@@ -229,7 +229,7 @@ export default {
           var startTime = time[0]
           var endTime = time[1]
           // console.log(orderNo,couponCode,companyName,dotName,phone,licensePlate,startTime,endTime);
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/writeoffOrderHxExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/writeoffOrderHxExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
           &orderNo=${orderNo}&couponCode=${couponCode}&companyName=${companyName}&dotName=${dotName}&phone=${phone}&licensePlate=${licensePlate}&startTime=${startTime}&endTime=${endTime}`
       }
     },

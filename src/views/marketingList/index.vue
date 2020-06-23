@@ -279,6 +279,7 @@
 <script>
 import { findYuyueCoupons , deleteYuyueCouponsById , saveYuyueCoupons , updateYuyueCoupons , saveYuyueCouponscode , getYuyueCouponscodeByCid , deleteYuyueCouponscode } from '@/api/guest/marketingList'
 import Pagination from "@/components/Pagination"
+import formatTime from "@/utils/formatTime"
 export default {
   components: {
     Pagination
@@ -379,7 +380,7 @@ export default {
       }else{
           var { barcode , status , username } = this.dialogList
 
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/coupon/exportYuyueCouponscode?cid=${item.couponsId}&barcode=${barcode}&username=${username}&status=${status}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/coupon/exportYuyueCouponscode?cid=${item.couponsId}&barcode=${barcode}&username=${username}&status=${status}`
       }
     },
     look(item,filter){
@@ -665,11 +666,21 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-              var blDate = this.isThreeHourAgo(v.enddate)
-              if(!blDate){
-                v.type = true
+              if( v.startdate && v.startdate != 0){
+                v.startdate = formatTime(v.startdate*1000,'yyyy-mm-dd hh:mm:ss')
               }else{
-                v.type = false
+                v.startdate = ""
+              }
+              if( v.enddate && v.enddate != 0 ){
+                v.enddate = formatTime(v.enddate*1000,'yyyy-mm-dd hh:mm:ss')
+                var blDate = this.isThreeHourAgo(v.enddate)
+                if(!blDate){
+                  v.type = true
+                }else{
+                  v.type = false
+                }
+              }else{
+                v.enddate = ""
               }
           })
         }
