@@ -108,7 +108,19 @@ export const asyncRoutes = [
             name: 'nodeList',
             component: () => import('@/views/nodeList/index'),
             meta: { title: '网点列表', icon: 'table' }
-          }
+          },
+          {
+            path: 'institution',
+            name: 'institution',
+            component: () => import('@/views/institution/index'),
+            meta: { title: '所属机构管理', icon: 'table' }
+          },
+          {
+            path: 'nodeService',
+            name: 'nodeService',
+            component: () => import('@/views/nodeService/index'),
+            meta: { title: '网点服务项管理', icon: 'table' }
+          },
         ]
       },
       {

@@ -386,7 +386,7 @@
               <el-input v-model="itemObj.address" style="width:80%;" :disabled="inputDisabled"></el-input>
             </el-form-item>      
          </div>
-         <el-divider content-position="left"><span class="title">服务项信息</span></el-divider>
+         <el-divider content-position="left"><span class="title">服务项采购价格</span></el-divider>
          <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
             <!-- <el-checkbox-group v-model="itemVcheckList"> -->
               <div class="fuwu_xan">
@@ -397,8 +397,8 @@
                     <el-checkbox-group v-model="valueVcheckList">
                       <div style="width:100%;" class="clearFix">
                         <div style="width:50%; float: left;" v-for="(valueV,indexV) in itemV.carwashsTypes" :key="indexV">
-                            <el-checkbox :label="valueV.dotsType" @change="Vchange()">
-                              <el-input placeholder="请输入价格" type='number' min="0" onkeyup="this.value = this.value.replace(/[^\d.]/g,'');"  v-model="valueV.price" style="margin-bottom: 10px;">
+                            <el-checkbox :label="valueV.strObj" @change="Vchange()">
+                              <el-input placeholder="请输入价格" type='number' min="0" onkeyup="this.value = this.value.replace(/[^\d.]/g,'');"  v-model="valueV.price" style="margin-bottom: 10px;" @blur="Vchange">
                                 <template slot="prepend">{{ valueV.dotsType }}</template>
                                 <template slot="append">元</template>
                               </el-input>
@@ -569,8 +569,10 @@ export default {
       cityListJson: [],
       regionListJson: [],
       serviceItemList: [],
+      serviceList: [],
       itemVcheckList: [],
       valueVcheckList: [],
+      valueArr: [],
       center: [116.42792, 39.902896], //经度+纬度
       search_key: "", //搜索值
       lanbtn: true,
@@ -883,17 +885,47 @@ export default {
       this.queryList.region = null
       this.getData()
     },
-    Vchange(){
-      console.log(this.valueVcheckList)
+    Vchange(){  // 服务项
+      let arr = []
+      var itemArr = JSON.parse(JSON.stringify(this.valueVcheckList)) //拷贝选中数组
+      var sum = JSON.parse(JSON.stringify(this.serviceItemList)) //拷贝全部数据数组
+      itemArr.forEach(v=>{
+        var obj = JSON.parse(v)
+        sum.forEach(value=>{
+          if(obj.id == value.id){
+            value.carwashsTypes.forEach(item=>{
+              if(item.ids == obj.ids && obj.id == value.id){
+                let itemObj = {}
+                itemObj.carwashsId = item.ids
+                itemObj.price = item.price
+                itemObj.carwashId = obj.id
+                arr.push(itemObj)
+              }
+            })
+          }
+        })
+      })
+      this.valueArr = arr
     },
     serviceItem(){
       findCarwashTypesInfos().then(res=>{
         this.serviceItemList = res.data
-        // this.serviceItemList.map(v=>{
-        //   var obj = JSON.stringify(v)
-        //   v.arr = []
-        //   v.obj = obj
+        this.serviceItemList.forEach(v=>{
+          var obj = {
+            id: v.id
+          }
+          v.carwashsTypes.forEach(i=>{
+            obj.ids = i.ids
+            i.strObj = JSON.stringify(obj) // 2级id字符串
+          })
+        })
+        // let arr = []
+        // res.data.forEach(v=>{
+        //     v.carwashsTypes.forEach(i=>{
+        //       arr.push(i)
+        //     })
         // })
+        // this.serviceList = arr // 备用数据，暂时用不上
       })
     },
     lngLatDia(){
@@ -1147,7 +1179,8 @@ export default {
             var bus = this.itemObj.businessHours
             this.itemObj.businessHours = bus[0]
             this.itemObj.businessHours2 = bus[1]
-            console.log(this.itemObj);
+            this.itemObj.DotServices = JSON.stringify(this.valueArr)
+            // console.log(this.itemObj);
             if(this.urlBl){
               saveDot(this.itemObj).then(res=>{
                 // this.loadingBootm = false
@@ -1183,6 +1216,10 @@ export default {
             }
           } else {
             console.log('error submit!!');
+            this.$message({
+              message: "数据有误！",
+              type: 'warning'
+            })
             return false;
           }
       });
