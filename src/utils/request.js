@@ -7,7 +7,7 @@ import store from '../store'
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // api 的 base_url
-  timeout: 10000 // 请求超时时间
+  timeout: 2000000 // 请求超时时间
 })
 // axios默认值
 service.defaults.headers.post['Content-Type'] = 'application/json'
@@ -19,6 +19,10 @@ service.interceptors.response.use(
      * code为非20000是抛错 可结合自己业务进行修改
      */
     const res = response.data
+    if(res.code === '201'){
+      // 201 出错，但是还需要后续的处理
+      return response.data
+    }
     if (res.code !== '200') {
       Message({
         message: res.msg,

@@ -18,14 +18,26 @@
           placeholder="请输入商品名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
+          <!-- <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
             <el-option
               v-for="item in statusList"
               :label="item.name"
               :value="item.value"
               :key="item.value"
             ></el-option>
-          </el-select>
+          </el-select> -->
+          <el-date-picker
+            class="input fl"
+            style="width:360px"
+            v-model="queryList.time"
+            type="daterange"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="timestamp"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker>
        </div> 
        <div class="btn_box">
          <div>
@@ -265,6 +277,7 @@ export default {
         name: null,
         status: null,
         bindMemPhone: null,
+        time: "",
       },
       statusList: [
         {
@@ -290,7 +303,7 @@ export default {
           })
       }else{
           var { goodsname,name,status,bindMemPhone } = this.queryList
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExpor?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExport?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
       }
     },
     btn(index){
@@ -375,6 +388,10 @@ export default {
       if(!(queryList.status == null)){
         data.status = queryList.status
       }
+      if (queryList.time && queryList.time[0] && queryList.time[1]) {
+        data.startTime = queryList.time[0]
+        data.endTime = queryList.time[1]
+      }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -387,7 +404,14 @@ export default {
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
-          this.data.data = []
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
         if( res.data && res.data.length > 0){
           this.data = res;
@@ -402,13 +426,13 @@ export default {
             }else if(v.status == 3){
               v.statusCopy = "无需支付"
             }
-            if( v.dateline){
+            if(v.dateline){
               v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
             }
-            if( v.cardEffTime){
+            if(v.cardEffTime){
               v.cardEffTime = formatTime(v.cardEffTime*1000,'yyyy-mm-dd hh:mm:ss')
             }
-            if( v.cardInvTime){
+            if(v.cardInvTime){
               v.cardInvTime = formatTime(v.cardInvTime*1000,'yyyy-mm-dd hh:mm:ss')
             }
           })
@@ -445,6 +469,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
 .el-table .warning-row {
     background: oldlace;
   }

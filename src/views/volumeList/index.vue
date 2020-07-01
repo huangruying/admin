@@ -5,12 +5,12 @@
        <div class="input_box">
           <el-input
           v-model="queryList.couponName"
-          placeholder="请输入券名称"
+          placeholder="请输入券码名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.couponCode"
-          placeholder="请输入券码号"
+          <el-input
+          v-model="queryList.alias"
+          placeholder="请输入别名"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -18,22 +18,17 @@
           placeholder="请输入用户名"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.alias"
-          placeholder="请输入别名"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getList" class="input fl" placeholder="状态">
+          <!-- <el-select v-model="queryList.status" @change="getList" class="input fl" placeholder="状态">
             <el-option
               v-for="item in statusList"
               :label="item.name"
               :value="item.value"
               :key="item.value"
             ></el-option>
-          </el-select>
+          </el-select> -->
           <el-date-picker
             class="input fl"
-            style="width:260px"
+            style="width:360px"
             v-model="queryList.time"
             type="daterange"
             format="yyyy 年 MM 月 dd 日"
@@ -52,6 +47,7 @@
            <el-button type="primary" @click="exportData">导出</el-button>
          </div>
          <div>
+           <el-button type="primary" @click="newlyIncreased">新增</el-button>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
          </div>
        </div>
@@ -64,34 +60,19 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="券名称" prop="couponName" fixed align="center">
+      <el-table-column label="券码名称" prop="couponName" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponName }}</span>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column label="网点类型" prop="realname" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.realname }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="金额" prop="couponMoney" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.couponMoney }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="券码号" prop="couponCode" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.couponCode }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="过期时间" prop="failureTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.failureTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="别名" prop="alias" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.alias }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="金额" prop="couponMoney" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.couponMoney }}</span>
         </template>
       </el-table-column>
       <el-table-column label="券码类型" prop="dotType" align="center">
@@ -109,26 +90,33 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="status" align="center">
+      <el-table-column label="状态" prop="type" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
+          <span>{{ scope.row.type? "未过期": "已过期" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="内容" prop="content" align="center">
+      <el-table-column label="使用说明" prop="content" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.content }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center">
+      <el-table-column label="有效时间" prop="failureTime" align="center" width="340px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.effectTime }}</span> &nbsp;&nbsp; ~ &nbsp;&nbsp; <span>{{ scope.row.failureTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" align="center" width="170px">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)" v-if="scope.row.type">编辑</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)" v-if="scope.row.type">生成券码</el-button></div>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
     <pagination
       v-show="data.total>0"
@@ -138,6 +126,106 @@
       @pagination="getPageData"
     />
 
+    <!-- 新增编辑 -->
+    <el-dialog
+      :title="dialogTitle"
+      :close-on-click-modal="false"
+      :visible.sync="editDialog"
+      width="50%"
+      @close="close"
+      center>
+        <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="优惠劵名称：" prop="couponName" style="width: 100%">
+                  <el-input v-model="itemObj.couponName" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
+              </el-form-item>
+              <el-form-item label="优惠劵金额：" prop="couponMoney" style="width: 100%">
+                  <el-input v-model="itemObj.couponMoney" style="width:50%" placeholder="请输入优惠劵金额" :disabled="disabledPrice" ></el-input>
+              </el-form-item>
+              <el-form-item :label="itemPicker" prop="failureTime" style="width: 100%" v-show="!period">
+                 <el-date-picker
+                    style="width:50%"
+                    v-model="itemObj.time"
+                    type="daterange"
+                    format="yyyy 年 MM 月 dd 日"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    :default-time="['00:00:00', '23:59:59']"
+                    range-separator="至"
+                    start-placeholder="有效期开始"
+                    end-placeholder="有效期结束"
+                    :picker-options="pickerOptions"
+                    @blur="changePicker"
+                  ></el-date-picker>
+              </el-form-item>
+              <el-form-item :label="itemPicker" prop="failureTime" style="width: 100%" v-show="period">
+                  <el-date-picker
+                    v-model="itemObj.failureTime"
+                    type="datetime"
+                    default-time="23:59:59"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    :picker-options="pickerOptions2"
+                    placeholder="有效期结束">
+                  </el-date-picker>
+                  <!-- <div class="color_period">可以延长有效期，严禁缩短有效期!</div> -->
+              </el-form-item>
+              <el-form-item label="使用说明：" prop="content" style="width: 100%">
+                  <el-input type="textarea" v-model="itemObj.content" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
+              </el-form-item>
+          </el-form>
+        </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialog = false">取 消</el-button>
+       <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 生成券码 -->
+    <el-dialog
+      title="确定生成券码?"
+      :visible.sync="centerDialogVisible"
+      width="30%"
+      center>
+      <div class="clearFix">
+        <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
+          <el-form-item prop="carwashId" label="一级分类" :rules="[{ required: true, message: '请选择一级分类', trigger: 'blur' }]">
+            <el-select v-model="dynamicValidateForm.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择一级分类">
+              <el-option
+                v-for="item in menuList"
+                :label="item.dotType"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="carwashsId" label="二级分类" :rules="[{ required: true, message: '请选择二级分类', trigger: 'blur' }]">
+            <el-select v-model="dynamicValidateForm.carwashsId" class="input fl" placeholder="请选择二级分类">
+              <el-option
+                v-for="item in menu2List"
+                :label="item.dotType"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="numberCode" label="券码数量" :rules="[{ required: true, message: '请输入生成券码数量', trigger: 'blur' },{ pattern: /^[1-9]\d*|0$/, trigger: 'blur' , message: '请输入正整数'}]">
+            <el-input
+              type="number"
+              placeholder="请输入生成券码数量"
+              v-model.number="dynamicValidateForm.numberCode"
+              :max="100"
+              :min="0"
+              class="inputNumber"
+              @mousewheel.native.prevent
+            >
+            </el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="getCouponCode">确 定</el-button>
+      </span>
+    </el-dialog>
     <!--上传文件的弹窗-->
     <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入数据">
       <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
@@ -164,7 +252,7 @@
 </template>
 
 <script>
-import { findGeneralCoupon , batchCouponImport , findCompanyInfos } from '@/api/volumeList'
+import { findGeneralCoupon , batchCouponImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashType , generateGeneralCouponcode } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -183,12 +271,31 @@ export default {
           } 
         }
     };
+    const dar = this
     return {
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
+      pickerOptions2: {
+         // disabledDate是一个函数,参数是当前选中的日期值,这个函数需要返回一个Boolean值,
+        disabledDate(time) {
+          return time.getTime() < new Date(dar.failureTime).getTime();
+        }
+      },
+      itemPicker: "有效期：",
       facilitatorId: null,
+      failureTime: "",
       dotCode: "",
       dialogTitle: "",
       thishostName: '',
       fileList: "",
+      itemId: null,
+      dynamicValidateForm: {},
+      centerDialogVisible: false,
+      disabledPrice: true,
+      period: false,
       uploaddialogVisible: false,
       loadingBootm: false,
       urlBl: false,
@@ -199,27 +306,12 @@ export default {
       passDialog: false,
       editDialog: false,
       itemObj: {
-        openingBank: false
+        openingBank: false,
+        time:[]
       },
       rules: {
           username: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          password: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
-          ],
-          dotType: [
-            { required: true, message: '请选择类型', trigger: 'change' }
-          ],
-          dotName: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          phone: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { validator: storePhone, trigger: 'blur' }
+            { required: true, message: '不能为空', trigger: 'blur' }
           ]
       },
       data: {
@@ -252,7 +344,9 @@ export default {
           value: 2
         },
       ],
-      statusInfoList: []
+      statusInfoList: [],
+      menuList: [],
+      menu2List: []
     }
   },
   created() {
@@ -261,6 +355,132 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    getCouponCode(){
+      this.$refs['dynamicValidateForm'].validate((valid) => {
+          if (valid){
+            var data = this.dynamicValidateForm
+            data.generalId = this.itemId
+            generateGeneralCouponcode(data).then(res=>{
+              console.log(res);  // 数据待接口
+            })
+          }
+      })
+    },
+    menuTwoList(){
+      findCarwashType({carwashId: this.carwashId}).then(res=>{
+        // console.log(res); 数据出错，后台修改中
+      })
+    },
+    audit(item){
+      this.itemId = item.id
+      this.centerDialogVisible = true
+      findCarwashType().then(res=>{
+        if(res.code == 200){
+          this.menuList = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
+    newlyIncreased(){
+      this.itemPicker = "有效期："
+      this.editDialog = true
+      this.period = false
+      this.disabledPrice = false
+    },
+    changePicker(){
+      this.$forceUpdate()
+    },
+    remove(item){
+      this.open('确定删除？' , item.id)
+    },
+    open(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true
+          delGeneralCouponById({id: id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    compile(item){
+      this.itemPicker = "有效期结束："
+      this.editDialog = true
+      this.disabledPrice = true
+      this.period = true
+      this.itemObj = item
+      this.itemObj.time = [item.effectTime , item.failureTime]
+      this.failureTime = item.failureTime
+    },
+    itemEditDialog(){
+       var data = {}
+        data.couponName = this.itemObj.couponName
+        data.couponMoney = this.itemObj.couponMoney
+        data.content = this.itemObj.content
+      if(this.itemObj.id){
+        data.effectTime = this.itemObj.effectTime
+        data.failureTime = this.itemObj.failureTime
+        data.id = this.itemObj.id
+        // console.log(data);
+        modifyGeneralCouponById(data).then(res=>{
+          if(res.code == 200){
+            this.$message({
+                type: 'success',
+                message: '操作成功!'
+            })
+            this.editDialog = false
+          }else{
+            this.$message({
+                type: 'info',
+                message: res.msg
+            })
+          }
+        })
+      }else{
+        if(this.itemObj.time[0] && this.itemObj.time[1]) {
+          data.effectTime = this.itemObj.time[0]
+          data.failureTime = this.itemObj.time[1]
+        }
+        saveGeneralCoupon(data).then(res=>{
+          if(res.code == 200){
+            this.$message({
+                type: 'success',
+                message: '操作成功!'
+            })
+            this.editDialog = false
+          }else{
+            this.$message({
+                type: 'info',
+                message: res.msg
+            })
+          }
+        })
+      }
+    },
+    close(){
+      this.itemObj = {}
+      this.getData()
+      this.failureTime = ""
+    },
     async selectInfo(){
       var res = await findCompanyInfos()
       this.statusInfoList = res.data
@@ -292,7 +512,7 @@ export default {
           formData.append('file', this.fileList[0].raw)
           formData.append('id', this.facilitatorId)
           batchCouponImport(formData).then(res => {
-            console.log(res);
+            // console.log(res);
             this.getData()
             this.$message({
               type: 'success',
@@ -325,6 +545,13 @@ export default {
     getList(data){
       this.getData()
     },
+    // 比较是否超过当前时间，后台懒得做，严格上讲时间戳在后台生成是比较好的
+    isThreeHourAgo(time) {
+      const now = Date.now()
+      const d = new Date(time)
+      const secDiff = (now - d) / 1000
+      return secDiff > 3 * 60 * 60
+    },
     getData(filter){
       this.loading = true
       let data = {}
@@ -342,11 +569,10 @@ export default {
         data.alias = queryList.alias   
       }
       // console.log(queryList.status);
-      if(queryList.status == null){
-      }else{
+      if(!(queryList.status == null)){
         data.status = queryList.status
       }
-      if (queryList.time[0] && queryList.time[1]) {
+      if (queryList.time && queryList.time[0] && queryList.time[1]) {
         data.startTime = queryList.time[0]
         data.endTime = queryList.time[1]
       }
@@ -376,8 +602,14 @@ export default {
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
-          // this.data.data.forEach(v=>{
-          // })
+          this.data.data.forEach(v=>{
+            var blDate = this.isThreeHourAgo(v.failureTime)
+            if(!blDate){
+              v.type = true
+            }else{
+              v.type = false
+            }
+          })
         }
       })
     },
@@ -406,6 +638,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/* element样式重置 start */
+ // 处理input type = number的上下箭头
+ @import "../../styles/cascader.css";
+.inputNumber{
+  width: 200px;
+  margin-left: 20px;
+}
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
 .title{
   font-size: 18px;
   font-weight: 600;

@@ -15,7 +15,7 @@
           @keyup.enter.native="handleFilter"/>
           <el-input
           v-model="queryList.companyName"
-          placeholder="请输入服务商名称"
+          placeholder="请输入渠道商名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -88,7 +88,7 @@
           <span>{{ scope.row.couponCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="服务商" prop="companyName" align="center">
+      <el-table-column label="渠道商" prop="companyName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.companyName }}</span>
         </template>

@@ -150,25 +150,6 @@ export const asyncRoutes = [
         ]
       },
       {
-        path: '/charge',
-        component: () => import('@/views/routerView/index'), // Parent router-view
-        meta: { title: '费用设置', icon: 'example'},
-        children: [
-          {
-            path: 'charge',
-            name: 'charge',
-            component: () => import('@/views/charge/index'),
-            meta: { title: '网点费用列表', icon: 'table' }
-          },
-          {
-            path: 'chargeList',
-            name: 'chargeList',
-            component: () => import('@/views/chargeList/index'),
-            meta: { title: '市场费用列表', icon: 'table' }
-          }
-        ]
-      },
-      {
         path: '/audit',
         alwaysShow: true,
         component: () => import('@/views/routerView/index'), // Parent router-view
@@ -202,6 +183,12 @@ export const asyncRoutes = [
         meta: { title: '对账管理', icon: 'example' },
         children: [
           {
+            path: 'channel',
+            name: 'channel',
+            component: () => import('@/views/channel/index'),
+            meta: { title: '渠道管理', icon: 'table' }
+          },
+          {
             path: 'nodeReconciliation',
             name: 'nodeReconciliation',
             component: () => import('@/views/nodeReconciliation/index'),
@@ -211,7 +198,7 @@ export const asyncRoutes = [
             path: 'insuranceReconciliation',
             name: 'insuranceReconciliation',
             component: () => import('@/views/insuranceReconciliation/index'),
-            meta: { title: '保险公司对账', icon: 'table' }
+            meta: { title: '渠道对账', icon: 'table' }
           }
         ]
       },

@@ -8,29 +8,9 @@
           placeholder="请输入渠道名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.examine" @change="getData" class="input fl" placeholder="审核是否通过">
-            <el-option
-              v-for="item in auditList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
-            ></el-option>
-          </el-select>
-          <el-date-picker
-          class="picker fl"
-            v-model="queryList.time"
-            type="daterange"
-            range-separator="至"
-            value-format="yyyy-MM-dd hh:mm:ss"
-            :default-time="['00:00:00', '23:59:59']"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            @change="getData"
-          ></el-date-picker>
        </div> 
        <div class="btn_box">
          <div>
-           <el-button type="danger" @click="remove(2)">批量删除</el-button>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
          </div>
@@ -64,14 +44,9 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="渠道令牌" prop="token" fixed align="center">
+      <el-table-column label="对账金额" prop="reconAmount" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.token }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="渠道秘钥" prop="secret" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.secret }}</span>
+          <span>{{ scope.row.reconAmount }}</span>
         </template>
       </el-table-column>
       <el-table-column label="别名" prop="alias" fixed align="center">
@@ -116,17 +91,14 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="渠道名：" prop="name" style="width: 100%">
+              <el-form-item label="渠道名称：" prop="name" style="width: 100%">
                   <el-input v-model="itemObj.name" style="width:50%" placeholder="请输入渠道名"></el-input>
               </el-form-item>
               <el-form-item label="别名：" prop="alias" style="width: 100%">
                   <el-input v-model="itemObj.alias" style="width:50%" placeholder="请输入别名"></el-input>
               </el-form-item>
-              <el-form-item label="渠道令牌：" prop="token" style="width: 100%" v-if="itemObj.id">
-                  <el-input v-model="itemObj.token" style="width:50%" disabled></el-input>
-              </el-form-item>
-              <el-form-item label="渠道秘钥：" prop="secret" style="width: 100%" v-if="itemObj.id">
-                  <el-input v-model="itemObj.secret" style="width:50%" disabled></el-input>
+              <el-form-item label="对账金额：" prop="reconAmount" style="width: 100%">
+                  <el-input v-model="itemObj.reconAmount" style="width:50%" placeholder="请输入对账金额"></el-input>
               </el-form-item>
           </el-form>
         </div>
@@ -139,7 +111,7 @@
 </template>
 
 <script>
-import { findYyChannelInfos , delYyChannelById , updateYyChannel , saveYyChannel , updateExamine } from '@/api/guest/ditchChannel'
+import { findWashChannel, updateExamine, delWashChannel, updateWashChannel, saveWashChannel } from '@/api/channel'
 import Pagination from "@/components/Pagination"
 import formatTime from "@/utils/formatTime"
 export default {
@@ -178,9 +150,7 @@ export default {
         }
       ],
       queryList: {
-        examine: null,
-        name: null,
-        time: ["" , ""]
+        name: null
       }
     }
   },
@@ -231,7 +201,8 @@ export default {
         data.id = this.itemObj.id
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
-        updateYyChannel(data).then(res=>{
+        data.reconAmount = this.itemObj.reconAmount
+        updateWashChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -248,7 +219,8 @@ export default {
       }else{
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
-        saveYyChannel(data).then(res=>{
+        data.reconAmount = this.itemObj.reconAmount
+        saveWashChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({
                 type: 'success',
@@ -269,22 +241,7 @@ export default {
         this.itemArr = val
     },
     remove(item){
-      if(item === 2){
-        if(this.itemArr.length == 0){
-          this.$message({
-            type: 'info',
-            message: '请选择数据！'
-          })
-          return
-        }
-        var arr = []
-        this.itemArr.forEach(v=>{
-          arr.push(v.id)
-        })
-        this.open('确定批量删除？' , arr)
-      }else{
-        this.open('确定删除？' , [item.id])
-      }
+      this.open('确定删除？' , item.id)
     },
     open(text,id) {
         this.$confirm( text , '提示', {
@@ -293,7 +250,7 @@ export default {
           type: 'warning'
         }).then(() => {
           this.loading = true
-          delYyChannelById({ids: id}).then(res=>{
+          delWashChannel({id: id}).then(res=>{
             if(res.code == 200){
               this.$message({
                 type: 'success',
@@ -321,13 +278,6 @@ export default {
       if (queryList.name) {
         data.name = queryList.name
       }
-      if (!(queryList.examine == null)) {
-        data.examine = queryList.examine
-      }
-      if (queryList.time[0] && queryList.time[1]) {
-        data.startTime = queryList.time[0]
-        data.endTime = queryList.time[1]
-      }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -335,18 +285,18 @@ export default {
       }
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findYyChannelInfos(data).then(res=>{
+      findWashChannel(data).then(res=>{
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
           this.data = {
-            current_page: 1,
-            data: [],
-            last_page: 1,
-            per_page: 15,
-            total: 0,
-            link: ""
+              current_page: 1,
+              data: [],
+              last_page: 1,
+              per_page: 15,
+              total: 0,
+              link: ""
           }
         }
         if( res.data && res.data.length > 0){
@@ -375,8 +325,7 @@ export default {
     },
     reset(){
       this.queryList = {
-        name: null,
-        time: ["" , ""]
+        name: null
       }
     },
     resetGetData(){

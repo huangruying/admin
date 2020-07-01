@@ -95,7 +95,7 @@
       @close="close2"
       center>
       <!--上传文件的弹窗-->
-      <el-dialog center width="50%" @close="close3" :close-on-click-modal="false" :visible.sync="uploaddialogVisible" append-to-body title="导入数据">
+      <el-dialog center width="50%" @close="close3" :close-on-click-modal="false" :visible.sync="uploaddialogVisible" append-to-body title="导入数据" :before-close="handleClose">
         <el-date-picker
           v-if="number === 1"
           v-model="valueDate"
@@ -113,7 +113,7 @@
           </el-upload>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="uploaddialogVisible = false">返 回</el-button>
+          <el-button @click="handleClose2">返 回</el-button>
           <el-button type="primary" :loading="loadingUpload" @click="submitImportExcel">确 定</el-button>
         </span>
       </el-dialog>
@@ -184,6 +184,11 @@
             <el-table-column label="领取时间" prop="getdate" align="center">
               <template slot-scope="scope">
                 <span>{{scope.row.getdate}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="导入时间" prop="importTime" align="center">
+              <template slot-scope="scope">
+                <span>{{scope.row.importTime}}</span>
               </template>
             </el-table-column>
             <el-table-column label="过期时间" prop="pirationTime" align="center">
@@ -328,6 +333,36 @@ export default {
     exportData2(){
       window.location.href = `https://dot-bucket.oss-cn-shenzhen.aliyuncs.com/mode/Destruction.xlsx`
     },
+    handleClose(done) {
+      if(this.loadingBootm){
+        this.$confirm('关闭后进程仍会在后台处理。', '你有进程在处理中，确认关闭？', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          done();
+        }).catch(() => {
+                   
+        });
+      }else{
+        done();
+      }
+    },
+    handleClose2(){
+      if(this.loadingBootm){
+        this.$confirm('关闭后进程仍会在后台处理。', '你有进程在处理中，确认关闭？', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.uploaddialogVisible = false
+        }).catch(() => {
+                   
+        });
+      }else{
+        this.uploaddialogVisible = false
+      }
+    },
     uploadDV(num){
       this.number = num
       this.uploaddialogVisible = true
@@ -356,7 +391,7 @@ export default {
               this.apiCode(this.codeId)
               this.$message({
                 type: 'success',
-                message: `上传成功!`
+                message: res.msg
               })
             }else{
               this.$message({
@@ -384,7 +419,7 @@ export default {
               this.apiCode(this.codeId)
               this.$message({
                 type: 'success',
-                message: `上传成功!`
+                message: res.msg
               })
             }else{
               this.$message({
@@ -568,7 +603,14 @@ export default {
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
-          this.data.data = []
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 50,
+            total: 0,
+            link: ""
+          }
           this.data.total = 0
         }
         if( res.data && res.data.length > 0){

@@ -4,8 +4,8 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.id"
-          placeholder="请输入账号ID"
+          v-model="queryList.dotAbbreviation"
+          placeholder="请输入网点简称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
@@ -14,8 +14,8 @@
           class="input fl"
           @keyup.enter.native="handleFilter"/>
            <el-input
-          v-model="queryList.phone"
-          placeholder="请输入手机号码"
+          v-model="queryList.storePhone"
+          placeholder="请输入店长手机号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
@@ -26,26 +26,14 @@
               :key="item.value"
             ></el-option>
           </el-select>
-          <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="类型">
+          <el-select v-model="queryList.dotType" @change="getData" class="input fl" placeholder="类型">
             <el-option
               v-for="item in nodeTypesList"
               :label="item.type"
-              :value="item.type"
+              :value="item.id"
               :key="item.id"
             ></el-option>
           </el-select>
-          <el-date-picker
-            class="input fl"
-            style="width:260px"
-            v-model="queryList.time"
-            type="daterange"
-            format="yyyy 年 MM 月 dd 日"
-            value-format="yyyy-MM-dd"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            @change="getData"
-          ></el-date-picker>
        </div> 
        <div class="btn_box">
          <div>
@@ -66,34 +54,14 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="账号ID" prop="id" fixed align="center">
+      <el-table-column label="ID" prop="id" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="网点类型" prop="realname" align="center">
+      <el-table-column label="网点简称" prop="dotAbbreviation" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.realname }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="用户名" prop="username" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="手机号码" prop="phone" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" prop="status" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="类型" prop="type" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.type }}</span>
+          <span>{{ scope.row.dotAbbreviation }}</span>
         </template>
       </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
@@ -101,7 +69,22 @@
           <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" prop="createTime" align="center" width="250">
+      <el-table-column label="店长手机号" prop="storePhone" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.storePhone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" prop="status" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.status == 1?"已审核": "未审核" }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" prop="dotType" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotType == 1? "代办机构": "车行" }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" align="center" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -129,14 +112,11 @@
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
            <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="用户名:" prop="username" style="width:100%">
-              <el-input v-model="itemObj.username" style="width:210px"></el-input>
+           <el-form-item label="网点名称:" prop="dotName" style="width:100%">
+              <el-input v-model="itemObj.dotName" style="width:210px"></el-input>
            </el-form-item>
-           <el-form-item label="手机号码:" prop="phone" style="width:100%">
-              <el-input v-model="itemObj.phone" style="width:210px"></el-input>
-           </el-form-item>
-           <el-form-item label="用户密码:" prop="password" style="width:100%">
-              <el-input v-model="itemObj.password" style="width:210px" type="password"></el-input>
+           <el-form-item label="店长手机号:" prop="storePhone" style="width:100%">
+              <el-input v-model="itemObj.storePhone" style="width:210px"></el-input>
            </el-form-item>
            <el-form-item label="状态:" prop="status" style="width:100%">
              <el-switch
@@ -144,18 +124,18 @@
               active-color="#13ce66">
             </el-switch>
            </el-form-item>
+           <el-form-item label="网点简称:" prop="dotAbbreviation" style="width:100%">
+              <el-input v-model="itemObj.dotAbbreviation" style="width:210px" :disabled="inputDisabled"></el-input>
+           </el-form-item>
            <el-form-item label="类型:" prop="dotType" style="width:100%">
               <el-select v-model="itemObj.dotType" @change="getData" tyle="width:210px" placeholder="类型" :disabled="inputDisabled">
                 <el-option
                   v-for="item in nodeTypesList2"
                   :label="item.type"
-                  :value="item.type"
+                  :value="item.id"
                   :key="item.id"
                 ></el-option>
               </el-select>
-           </el-form-item>
-           <el-form-item label="网点名称:" prop="dotName" style="width:100%">
-              <el-input v-model="itemObj.dotName" style="width:210px" :disabled="inputDisabled"></el-input>
            </el-form-item>
        </el-form>
       <span slot="footer" class="dialog-footer">
@@ -198,7 +178,6 @@ export default {
         }
     };
     return {
-      dotCode: "",
       dialogTitle: "",
       thishostName: '',
       loadingBootm: false,
@@ -226,10 +205,9 @@ export default {
             { required: true, message: '请选择类型', trigger: 'change' }
           ],
           dotName: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+            { required: true, message: '不能为空', trigger: 'blur' }
           ],
-          phone: [
+          storePhone: [
             { required: true, message: '不能为空', trigger: 'blur' },
             { validator: storePhone, trigger: 'blur' }
           ]
@@ -243,20 +221,19 @@ export default {
         link: ""
       },
       queryList: {
-        id: null,
+        dotAbbreviation: null,
         status: null,
         dotName: null,
-        phone: null,
-        nodeTypes: null,
-        time: ["", ""],
+        storePhone: null,
+        dotType: null
       },
       statusList: [
         {
-          name: '启用',
+          name: '已审核',
           value: 1
         },
         {
-          name: '禁用',
+          name: '未审核',
           value: 0
         },
       ],
@@ -273,11 +250,11 @@ export default {
       nodeTypesList2: [
         {
           type: '车行',
-          id: 0
+          id: '0'
         },
         {
           type: '代办机构',
-          id: 1
+          id: '1'
         }
       ]
     }
@@ -298,24 +275,20 @@ export default {
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.id) {
-        data.id = queryList.id
+      if (queryList.dotAbbreviation) {
+        data.dotAbbreviation = queryList.dotAbbreviation
       }
-      if (!queryList.status) {
+      if (!(queryList.status == null)) {
         data.status = queryList.status
       }
       if (queryList.dotName) {
         data.dotName = queryList.dotName
       }
-      if (queryList.phone) {
-        data.phone = queryList.phone   
+      if (queryList.storePhone) {
+        data.storePhone = queryList.storePhone   
       }
-      if (queryList.nodeTypes) {
-        data.nodeTypes = queryList.nodeTypes
-      }
-      if (queryList.time[0] && queryList.time[1]) {
-        data.startTime = queryList.time[0]
-        data.endTime = queryList.time[1]
+      if (!(queryList.dotType == null)) {
+        data.dotType = queryList.dotType
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -327,22 +300,24 @@ export default {
       data.pageSize = this.data.per_page
       // console.log(data);
       findDotUserInfos(data).then(res=>{
-        console.log(res);
-        this.data = res;
         this.loading = false;
-        if (res.data.length <= 0) {
+        if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
+          this.data = {
+             current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
-        if( res.data.length > 0){
+        if(res.data && res.data.length > 0){
+          this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.status == 1){
-              v.statusCopy = "启用"
-            }else if(v.status == 0){
-              v.statusCopy = "禁用"
-            }
             
           })
         }
@@ -355,11 +330,15 @@ export default {
       this.getData("page");
     },
     compile(item){
-      this.dotCode = item.dotCode
       this.editDialog = true
       this.dialogTitle = "编辑"
       this.itemObj = item
       this.inputDisabled = true
+      if(item.status == 1){
+        this.itemObj.status = true
+      }else{
+        this.itemObj.status = false
+      }
     },
     newly(){
       this.editDialog = true
@@ -394,7 +373,7 @@ export default {
                     type: 'warning'
                   })
                 }
-                console.log(res);
+                // console.log(res);
               })
             }else{
               updateDotUserById(this.itemObj).then(res=>{
@@ -426,12 +405,11 @@ export default {
     },
     reset(){
       this.queryList = {
-        id: null,
+        dotAbbreviation: null,
         status: null,
         dotName: null,
-        phone: null,
-        nodeTypes: null,
-        time: ["", ""],
+        storePhone: null,
+        dotType: null
       }
     },
     resetGetData(){

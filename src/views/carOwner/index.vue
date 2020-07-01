@@ -216,10 +216,18 @@ export default {
         // console.log(res);
         this.data = res;
         this.loading = false;
-        if (res.data.length <= 0) {
+        if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
-        if( res.data.length > 0){
+        if(res.data && res.data.length > 0){
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total

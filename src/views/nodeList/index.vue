@@ -886,6 +886,7 @@ export default {
       this.getData()
     },
     Vchange(){  // 服务项
+    // console.log(this.valueVcheckList)
       let arr = []
       var itemArr = JSON.parse(JSON.stringify(this.valueVcheckList)) //拷贝选中数组
       var sum = JSON.parse(JSON.stringify(this.serviceItemList)) //拷贝全部数据数组
@@ -949,8 +950,7 @@ export default {
       if (queryList.dotCode) {
         data.dotCode = queryList.dotCode
       }
-      if(queryList.status == null){
-      }else{
+      if(!(queryList.status == null)){
         data.status = queryList.status
       }
       if (queryList.dotName) {
@@ -971,7 +971,7 @@ export default {
       if (queryList.recommender) {
         data.recommender = queryList.recommender
       }
-      if (queryList.mechanismName) {
+      if (!(queryList.mechanismName == null)) {
         data.mechanismName = queryList.mechanismName   
       }
       if (queryList.nodeTypes) {
@@ -1008,7 +1008,14 @@ export default {
           })
         }else{
           this.$message("暂无数据~")
-          this.data.data = []
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
       })
     },
@@ -1026,6 +1033,24 @@ export default {
       })
     },
     edit(item){
+      // 改造数据获取绑定值，后台数据非常混乱，编辑查看新增以下代码均是改造数据
+      if(item.dotServices){
+        item.dotServices.forEach(v=>{
+          var dotObj = {}
+          dotObj.id = Number(v.carwashId)
+          dotObj.ids = Number(v.carwashsId)
+          this.valueVcheckList.push(JSON.stringify(dotObj))
+          this.serviceItemList.forEach(i=>{
+              if(i.id == v.carwashId){
+                i.carwashsTypes.forEach(t=>{
+                  if(t.ids == v.carwashsId){
+                    t.price = v.price
+                  }
+                })
+              }
+          })
+        })
+      }
       findYuyueCityByProvinceid({provinceid: item.provinceId}).then(res=>{
         this.cityList = res.data
       })
@@ -1080,6 +1105,24 @@ export default {
       this.compileBtn = false
     },
     compile(item){
+      // 改造数据获取绑定值，后台数据非常混乱，编辑查看新增以下代码均是改造数据
+      if(item.dotServices){
+        item.dotServices.forEach(v=>{
+          var dotObj = {}
+          dotObj.id = Number(v.carwashId)
+          dotObj.ids = Number(v.carwashsId)
+          this.valueVcheckList.push(JSON.stringify(dotObj))
+          this.serviceItemList.forEach(i=>{
+              if(i.id == v.carwashId){
+                i.carwashsTypes.forEach(t=>{
+                  if(t.ids == v.carwashsId){
+                    t.price = v.price
+                  }
+                })
+              }
+          })
+        })
+      }
       findYuyueCityByProvinceid({provinceid: item.provinceId}).then(res=>{
         this.cityList = res.data
       })
@@ -1179,11 +1222,9 @@ export default {
             var bus = this.itemObj.businessHours
             this.itemObj.businessHours = bus[0]
             this.itemObj.businessHours2 = bus[1]
-            this.itemObj.DotServices = JSON.stringify(this.valueArr)
-            // console.log(this.itemObj);
+            this.itemObj.dotServices = this.valueArr // 服务项绑定数据
             if(this.urlBl){
               saveDot(this.itemObj).then(res=>{
-                // this.loadingBootm = false
                 this.editDialog = false 
                 if(res.code == 200){
                   this.$message({
@@ -1199,7 +1240,6 @@ export default {
               })
             }else{
               updateDot(this.itemObj).then(res=>{
-                // this.loadingBootm = false
                 if(res.code == 200){
                   this.$message({
                     message: '操作成功',
@@ -1217,7 +1257,7 @@ export default {
           } else {
             console.log('error submit!!');
             this.$message({
-              message: "数据有误！",
+              message: "填写有误！",
               type: 'warning'
             })
             return false;
@@ -1321,6 +1361,8 @@ export default {
       this.constructionImage = ""
       this.trafficImage = ""
       this.businessImage = ""
+      this.valueVcheckList = []
+      this.serviceItem() // 重置服务项数据
     },
     reset(){
       this.queryList = {

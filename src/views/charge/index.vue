@@ -1,6 +1,6 @@
 <template>
   <div class="charge">
-      <div class="noData">该功能小哥哥在努力开发中...</div>
+      <div class="noData">该页面已废弃，调试专用页面。。。</div>
 
       <!-- <div class="info">
           <div>

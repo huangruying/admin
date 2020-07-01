@@ -26,6 +26,18 @@
               :key="item.value"
             ></el-option>
           </el-select>
+          <el-date-picker
+            class="input fl"
+            style="width:360px"
+            v-model="queryList.time"
+            type="daterange"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="timestamp"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker>
        </div> 
        <div class="btn_box">
          <div>
@@ -265,6 +277,7 @@ export default {
         name: null,
         status: null,
         bindMemPhone: null,
+        time: "",
       },
       statusList: [
         {
@@ -374,6 +387,10 @@ export default {
       if(!(queryList.status == null)){
         data.status = queryList.status
       }
+      if (queryList.time && queryList.time[0] && queryList.time[1]) {
+        data.startTime = queryList.time[0]
+        data.endTime = queryList.time[1]
+      }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
       } else {
@@ -386,7 +403,14 @@ export default {
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
-          this.data.data = []
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
         if( res.data && res.data.length > 0){
           this.data = res;
@@ -444,6 +468,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
 .el-table .warning-row {
     background: oldlace;
   }

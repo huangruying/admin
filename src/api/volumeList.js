@@ -31,3 +31,43 @@ export function findCompanyInfos(data) {
     data: data
   })
 }
+
+export function delGeneralCouponById(data) {
+  return request({
+    url: '/wash/delGeneralCouponById',
+    method: 'post',
+    data: data
+  })
+}
+
+export function saveGeneralCoupon(data) {
+  return request({
+    url: '/wash/saveGeneralCoupon',
+    method: 'post',
+    data: data
+  })
+}
+
+export function modifyGeneralCouponById(data) {
+  return request({
+    url: '/wash/modifyGeneralCouponById',
+    method: 'post',
+    data: data
+  })
+}
+
+export function findCarwashType(data) {
+  return request({
+    url: '/wash/findCarwashType',
+    method: 'post',
+    data: data
+  })
+}
+
+export function generateGeneralCouponcode(data) {
+  return request({
+    url: '/wash/generateGeneralCouponcode',
+    method: 'post',
+    data: data
+  })
+}

@@ -369,10 +369,10 @@ export default {
       if (queryList.garageName) {
         data.garageName = queryList.garageName   
       }
-      if (queryList.orderStatus) {
+      if (!(queryList.orderStatus == null)) {
         data.orderStatus = queryList.orderStatus   
       }
-      if (queryList.orderSource) {
+      if (!(queryList.orderSource == null)) {
         data.orderSource = queryList.orderSource   
       }
       if (queryList.time[0] && queryList.time[1]) {
@@ -392,7 +392,14 @@ export default {
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
-          this.data.data = []
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
         }
         if( res.data && res.data.length > 0){
           // console.log(res);
