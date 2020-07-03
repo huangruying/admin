@@ -302,8 +302,15 @@ export default {
             type: 'warning'
           })
       }else{
-          var { goodsname,name,status,bindMemPhone } = this.queryList
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExport?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
+          var { goodsname,name,status,bindMemPhone, time } = this.queryList
+          var startTime = null
+          var endTime = null
+          if (time && time[0] && time[1]) {
+             startTime = time[0]
+             endTime = time[1]
+          }
+          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExport?type=3&goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/bearercard/yyBearercardorderExport?type=3&goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     btn(index){

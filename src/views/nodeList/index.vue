@@ -886,7 +886,6 @@ export default {
       this.getData()
     },
     Vchange(){  // 服务项
-    // console.log(this.valueVcheckList)
       let arr = []
       var itemArr = JSON.parse(JSON.stringify(this.valueVcheckList)) //拷贝选中数组
       var sum = JSON.parse(JSON.stringify(this.serviceItemList)) //拷贝全部数据数组
@@ -895,9 +894,9 @@ export default {
         sum.forEach(value=>{
           if(obj.id == value.id){
             value.carwashsTypes.forEach(item=>{
-              if(item.ids == obj.ids && obj.id == value.id){
+              if(item.id == obj.ids && obj.id == value.id){
                 let itemObj = {}
-                itemObj.carwashsId = item.ids
+                itemObj.carwashsId = item.id
                 itemObj.price = item.price
                 itemObj.carwashId = obj.id
                 arr.push(itemObj)
@@ -912,11 +911,19 @@ export default {
       findCarwashTypesInfos().then(res=>{
         this.serviceItemList = res.data
         this.serviceItemList.forEach(v=>{
+          // var obj = {
+          //   id: v.id
+          // }
+          // v.carwashsTypes.forEach(i=>{
+          //   obj.ids = i.ids
+          //   i.strObj = JSON.stringify(obj) // 2级id字符串
+          // })
+          v.id = v.dtId
           var obj = {
-            id: v.id
+            id: v.dtId
           }
           v.carwashsTypes.forEach(i=>{
-            obj.ids = i.ids
+            obj.ids = i.id
             i.strObj = JSON.stringify(obj) // 2级id字符串
           })
         })
@@ -1037,8 +1044,10 @@ export default {
       if(item.dotServices){
         item.dotServices.forEach(v=>{
           var dotObj = {}
-          dotObj.id = Number(v.carwashId)
-          dotObj.ids = Number(v.carwashsId)
+          // dotObj.id = Number(v.carwashId)
+          dotObj.id = v.carwashId
+          // dotObj.ids = Number(v.carwashsId)
+          dotObj.ids = v.carwashsId
           this.valueVcheckList.push(JSON.stringify(dotObj))
           this.serviceItemList.forEach(i=>{
               if(i.id == v.carwashId){
@@ -1109,13 +1118,15 @@ export default {
       if(item.dotServices){
         item.dotServices.forEach(v=>{
           var dotObj = {}
-          dotObj.id = Number(v.carwashId)
-          dotObj.ids = Number(v.carwashsId)
+          // dotObj.id = Number(v.carwashId)
+          dotObj.id = v.carwashId
+          // dotObj.ids = Number(v.carwashsId)
+          dotObj.ids = v.carwashsId
           this.valueVcheckList.push(JSON.stringify(dotObj))
           this.serviceItemList.forEach(i=>{
               if(i.id == v.carwashId){
                 i.carwashsTypes.forEach(t=>{
-                  if(t.ids == v.carwashsId){
+                  if(t.id == v.carwashsId){
                     t.price = v.price
                   }
                 })

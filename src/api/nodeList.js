@@ -118,3 +118,11 @@ export function findCarwashTypesInfos(data) {
     data
   })
 }
+
+// export function findCarwashTypesInfos(data) {
+//   return request({
+//     url: '/wash/serviceType/findCarwashTypes',
+//     method: 'post',
+//     data
+//   })
+// }

@@ -54,9 +54,9 @@
         type="selection"
         width="50">
      </el-table-column> -->
-      <el-table-column width="80" label="ID" prop="id" align="center">
+      <el-table-column width="90" label="1级菜单ID" prop="id" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.dtId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="服务项图标" prop="washPic" align="center">
@@ -235,7 +235,7 @@ export default {
         this.itemArr = val
     },
     remove(item){
-        this.open('确定删除？' , item.id)
+        this.open('确定删除？' , item.dtId)
         //   if(item === 2){
         //     if(this.itemArr.length == 0){
         //       this.$message({
@@ -330,7 +330,7 @@ export default {
       this.itemObj = item
       this.editDialog = true
       this.dialogTitle = "编辑"
-      this.itemID = item.id
+      this.itemID = item.dtId
       if(item.washPic){
           this.imageUrl = item.washPic
       }
