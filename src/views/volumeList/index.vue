@@ -43,8 +43,7 @@
          <div>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
-           <el-button type="primary" @click="importExcel">导入</el-button>
-           <el-button type="primary" @click="exportData">导出</el-button>
+           <!-- <el-button type="primary" @click="exportData">导出</el-button> -->
          </div>
          <div>
            <el-button type="primary" @click="newlyIncreased">新增</el-button>
@@ -65,17 +64,17 @@
           <span>{{ scope.row.couponName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="别名" prop="alias" align="center">
+      <!-- <el-table-column label="别名" prop="alias" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.alias }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="金额" prop="couponMoney" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponMoney }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="券码类型" prop="dotType" align="center">
+      <!-- <el-table-column label="券码类型" prop="dotType" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotType }}</span>
         </template>
@@ -89,7 +88,7 @@
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="状态" prop="type" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type? "未过期": "已过期" }}</span>
@@ -115,6 +114,7 @@
           <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)" v-if="scope.row.type">编辑</el-button></div>
           <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
           <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)" v-if="scope.row.type">生成券码</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="info" @click="look(scope.row)">查看券码</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -184,11 +184,12 @@
       title="确定生成券码?"
       :visible.sync="centerDialogVisible"
       width="30%"
+      @close="closeVis"
       center>
       <div class="clearFix">
         <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
-          <el-form-item prop="carwashId" label="一级分类" :rules="[{ required: true, message: '请选择一级分类', trigger: 'blur' }]">
-            <el-select v-model="dynamicValidateForm.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择一级分类">
+          <el-form-item prop="carwashId" label="服务类型" :rules="[{ required: true, message: '请选择服务类型', trigger: 'blur' }]">
+            <el-select v-model="dynamicValidateForm.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择服务类型">
               <el-option
                 v-for="item in menuList"
                 :label="item.dotType"
@@ -197,22 +198,22 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="carwashsId" label="二级分类" :rules="[{ required: true, message: '请选择二级分类', trigger: 'blur' }]">
-            <el-select v-model="dynamicValidateForm.carwashsId" class="input fl" placeholder="请选择二级分类">
+          <el-form-item prop="carwashsId" label="服务名称" :rules="[{ required: true, message: '请选择服务名称', trigger: 'blur' }]">
+            <el-select v-model="dynamicValidateForm.carwashsId" class="input fl" placeholder="请选择服务名称">
               <el-option
                 v-for="item in menu2List"
-                :label="item.dotType"
-                :value="item.id"
-                :key="item.id"
+                :label="item.dotsType"
+                :value="item.ids"
+                :key="item.ids"
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="numberCode" label="券码数量" :rules="[{ required: true, message: '请输入生成券码数量', trigger: 'blur' },{ pattern: /^[1-9]\d*|0$/, trigger: 'blur' , message: '请输入正整数'}]">
+          <el-form-item prop="num" label="券码数量" :rules="[{ required: true, message: '请输入生成券码数量', trigger: 'blur' },{ pattern: /^[1-9]\d*|0$/, trigger: 'blur' , message: '请输入正整数'}]">
             <el-input
               type="number"
               placeholder="请输入生成券码数量"
-              v-model.number="dynamicValidateForm.numberCode"
-              :max="100"
+              v-model.number="dynamicValidateForm.num"
+              :max="10000"
               :min="0"
               class="inputNumber"
               @mousewheel.native.prevent
@@ -226,17 +227,176 @@
         <el-button type="primary" @click="getCouponCode">确 定</el-button>
       </span>
     </el-dialog>
-    <!--上传文件的弹窗-->
-    <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入数据">
-      <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
+    <!-- 查看 -->
+    <el-dialog
+      :title="dialogTitle"
+      :close-on-click-modal="false"
+      :visible.sync="lookEditDialog"
+      width="83%"
+      @close="close2"
+      center>
+      <el-divider content-position="left"><span class="title">查询</span></el-divider>
+      <div class="query">
+       <div class="input_box">
+         <el-input
+          v-model="dialogList.code"
+          placeholder="请输入劵码号"
+          class="input fl"
+          @keyup.enter.native="look(item)"/>
+          <el-select v-model="dialogList.status" @change="look(item)" class="input fl" placeholder="请选择券码状态">
             <el-option
-              v-for="item in statusInfoList"
+              v-for="item in statusList2"
               :label="item.name"
               :value="item.id"
-              :key="item.value"
+              :key="item.id"
             ></el-option>
-      </el-select>
-
+          </el-select>
+          <el-select v-model="dialogList.source" @change="look(item)" class="input fl" placeholder="请选择券码来源">
+            <el-option
+              v-for="item in statusList3"
+              :label="item.name"
+              :value="item.id"
+              :key="item.id"
+            ></el-option>
+          </el-select>
+          <el-date-picker
+            class="input fl"
+            style="width:360px"
+            v-model="dialogList.time"
+            type="daterange"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="look(item)"
+          ></el-date-picker>
+       </div>
+       <div class="btn_box">
+         <div>
+           <el-button type="danger" @click="dialogRemove(2)">批量删除</el-button>
+           <el-button type="primary" @click="exportData2(item)">导出券码</el-button>
+           <el-button type="primary" @click="importExcel">导入券码</el-button>
+           <el-button type="primary" icon="el-icon-search" @click="look(item)">搜索</el-button>
+         </div>
+         <div>
+           <el-button type="primary" icon="el-icon-refresh" @click="resetGetData2(item)"></el-button>
+         </div>
+       </div>
+      </div>
+        <el-table
+          v-loading="loading2"
+          :data="dialog.data"
+          border
+          stripe
+          fit
+          @selection-change="handleSelectionChange2"
+          style="width: 100%;">
+          <el-table-column
+            align="center"
+            type="selection"
+            width="50">
+        </el-table-column>
+          <el-table-column label="劵码ID" prop="id" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="劵码号" prop="code" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.code }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="服务类型" prop="carwashId" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.carwashId }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="服务名称" prop="carwashsId" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.carwashsId }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="券码来源" prop="source" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.sourceCopy }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领劵人" prop="username" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.username }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" prop="status" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.status }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领取时间" prop="collectionTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.collectionTimeCopy }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="使用时间" prop="useTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.useTimeCopy }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" prop="createTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.createTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="修改时间" prop="updateTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.updateTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed="right" prop="" align="center">
+            <template slot-scope="scope">
+              <el-button size="mini" type="danger" @click="dialogRemove(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="dialog.total>0"
+          :total="dialog.total"
+          :page.sync="dialog.current_page"
+          :limit.sync="dialog.per_page"
+          @pagination="getPageData2"
+        />
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="lookEditDialog = false">返回列表</el-button>
+      </span>
+    </el-dialog>
+    <!--上传文件的弹窗-->
+    <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入数据" center>
+      <div style="margin-bottom: 30px;">
+        <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
+        <el-option
+          v-for="item in statusInfoList"
+          :label="item.name"
+          :value="item.id"
+          :key="item.id"
+        ></el-option>
+        </el-select>
+        <el-select v-model="uploadCarwashId" @change="menuTwoList2" class="input fl" placeholder="请选择服务类型">
+          <el-option
+            v-for="item in menuList"
+            :label="item.dotType"
+            :value="item.id"
+            :key="item.id"
+          ></el-option>
+        </el-select>
+        <el-select v-model="uploadCarwashsId" class="input fl" placeholder="请选择服务名称">
+          <el-option
+            v-for="item in menu2List"
+            :label="item.dotsType"
+            :value="item.ids"
+            :key="item.ids"
+          ></el-option>
+        </el-select>
+      </div>
       <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
         :limit="1" action="" drag class="upload-demo">
         <i class="el-icon-upload"></i>
@@ -252,7 +412,7 @@
 </template>
 
 <script>
-import { findGeneralCoupon , batchCouponImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashType , generateGeneralCouponcode } from '@/api/volumeList'
+import { findGeneralCoupon , batchCouponcodeImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashsTypeById, findCarwashType , generateGeneralCouponcode, finGeneralCouponcode , delGeneralCouponcodeById , findChannelName } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -286,13 +446,17 @@ export default {
       },
       itemPicker: "有效期：",
       facilitatorId: null,
+      uploadCarwashId: null,
+      uploadCarwashsId: null,
       failureTime: "",
       dotCode: "",
       dialogTitle: "",
       thishostName: '',
       fileList: "",
       itemId: null,
+      item: {},
       dynamicValidateForm: {},
+      lookEditDialog: false,
       centerDialogVisible: false,
       disabledPrice: true,
       period: false,
@@ -303,8 +467,16 @@ export default {
       inputDisabled: false,
       passRadio: null,
       loading: false,
+      loading2: false,
       passDialog: false,
       editDialog: false,
+      itemArr2: [],
+      dialogList: {
+        code: null,
+        status: null,
+        source: null,
+        time: ["", ""]
+      },
       itemObj: {
         openingBank: false,
         time:[]
@@ -315,6 +487,14 @@ export default {
           ]
       },
       data: {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 15,
+        total: 0,
+        link: ""
+      },
+      dialog: {
         current_page: 1,
         data: [],
         last_page: 1,
@@ -344,6 +524,25 @@ export default {
           value: 2
         },
       ],
+      statusList2: [
+        {
+          name: "未领取",
+          id: 0
+        },
+        {
+          name: "已领取",
+          id: 1
+        },
+        {
+          name: "已使用",
+          id: 2
+        },
+        {
+          name: "已注销",
+          id: 3
+        },
+      ],
+      statusList3: [],
       statusInfoList: [],
       menuList: [],
       menu2List: []
@@ -355,25 +554,205 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    look(item,filter){
+      this.loading2 = true
+      this.lookEditDialog = true
+      this.item = item
+      var data = {}
+      data.generalId = item.cid
+      if (filter && this.dialog.current_page > 1) {
+        data.page = this.dialog.current_page;
+      } else {
+        this.data.current_page = 1;
+      }
+      if(this.dialogList.code){
+        data.code = this.dialogList.code
+      }
+      if(!(this.dialogList.status == null)){
+        data.status = this.dialogList.status
+      }
+      if(!(this.dialogList.source == null)){
+        data.source = this.dialogList.source
+      }
+      if(this.dialogList.time && this.dialogList.time[0] && this.dialogList.time[1]) {
+        data.startTime = this.dialogList.time[0]
+        data.endTime = this.dialogList.time[1]
+      }
+      data.pageNum = this.dialog.current_page
+      data.pageSize = this.dialog.per_page
+      finGeneralCouponcode(data).then(res=>{
+         this.loading2 = false;
+        if (!res.data || res.data.length <= 0) {
+          this.$message("暂无数据~")
+          this.dialog = {
+              current_page: 1,
+              data: [],
+              last_page: 1,
+              per_page: 10,
+              total: 0,
+              link: ""
+         }
+        }
+        if( res.data && res.data.length > 0){
+          // console.log(res);
+          this.dialog = res;
+          this.dialog.current_page = res.pageNum
+          this.dialog.per_page = res.pageSize
+          this.dialog.total = res.total
+          this.dialog.data.forEach(v=>{
+              if(v.status == 0){
+                v.status = "未领取"
+              }else if(v.status == 1){
+                v.status = "已领取"
+              }else if(v.status == 2){
+                v.status = "已使用"
+              }else if(v.status == 3){
+                v.status = "已注销"
+              }
+              if(v.collectionTime && v.collectionTime != 0){
+                v.collectionTimeCopy = v.collectionTime
+              }
+              if(v.useTime && v.useTime != 0){
+                v.useTimeCopy = v.useTime
+              }
+              if(v.source == 0){
+                v.sourceCopy = "生成"
+              }else{
+                this.statusInfoList.forEach(i=>{
+                  if(v.source == i.id){
+                    v.sourceCopy = i.name
+                  }
+                })
+              }
+          })
+        }
+      })
+    },
+    exportData2(item){
+      if(this.dialog.data.length <= 0){
+        this.$message({
+            message: '暂无数据可导出~',
+            type: 'warning'
+          })
+      }else{
+          var { code , status , source , time } = this.dialogList
+          var endTime = ""
+          var startTime = ""
+          if(time && time[0] && time[1]){
+            endTime = time[1]
+            startTime = time[0]
+          }
+          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+      }
+    },
+    resetGetData2(item){
+      this.dialogList = {
+        code: null,
+        status: null,
+        source: null,
+        time: ["", ""]
+      }
+      this.look(item)
+    },
+    handleSelectionChange2(val){
+       this.itemArr2 = val
+    },
+    dialogRemove(item){
+      if(item === 2){
+        if(this.itemArr2.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr2.forEach(v=>{
+          arr.push(v.id)
+        })
+        this.open3('确定批量删除？' , arr)
+      }else{
+        this.open3('确定删除？' , [item.id])
+      }
+    },
+    open3(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading2 = true
+          delGeneralCouponcodeById({ids: id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.look(this.item)
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    getPageData2(e) {
+      this.look( this.item , "page" )
+    },
     getCouponCode(){
       this.$refs['dynamicValidateForm'].validate((valid) => {
           if (valid){
             var data = this.dynamicValidateForm
             data.generalId = this.itemId
-            generateGeneralCouponcode(data).then(res=>{
-              console.log(res);  // 数据待接口
+            generateGeneralCouponcode(data).then(res=>{;
+              if(res.code == 200){
+                this.$message({
+                  type: 'success',
+                  message: '操作成功!'
+                });
+                this.centerDialogVisible = false
+              }else{
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                })
+              }  
             })
           }
       })
     },
     menuTwoList(){
-      findCarwashType({carwashId: this.carwashId}).then(res=>{
-        // console.log(res); 数据出错，后台修改中
+      findCarwashsTypeById({carwashId: this.dynamicValidateForm.carwashId}).then(res=>{
+        if(res.code == 200){
+          this.menu2List = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
+    menuTwoList2(){
+      findCarwashsTypeById({carwashId: this.uploadCarwashId}).then(res=>{
+        if(res.code == 200){
+          this.menu2List = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
       })
     },
     audit(item){
-      this.itemId = item.id
+      this.itemId = item.cid
       this.centerDialogVisible = true
+      this.apiFindCarwashType()
+    },
+    apiFindCarwashType(){
       findCarwashType().then(res=>{
         if(res.code == 200){
           this.menuList = res.data
@@ -392,7 +771,7 @@ export default {
       this.$forceUpdate()
     },
     remove(item){
-      this.open('确定删除？' , item.id)
+      this.open('确定删除？' , item.cid)
     },
     open(text,id) {
         this.$confirm( text , '提示', {
@@ -481,9 +860,22 @@ export default {
       this.getData()
       this.failureTime = ""
     },
+    close2(){
+      
+    },
+    closeVis(){
+      this.dynamicValidateForm = {}
+      this.itemId = null
+    },
     async selectInfo(){
-      var res = await findCompanyInfos()
+      var res = await findChannelName()
       this.statusInfoList = res.data
+      this.statusList3 = this.statusInfoList
+      var obj = {
+        id: 0,
+        name: "生成"
+      }
+      this.statusList3.push(obj)
     },
     exportData(){
       if(this.data.data.length <= 0){
@@ -500,24 +892,43 @@ export default {
       }
     },
     submitImportExcel() {
-      if(!this.facilitatorId){
+      if(this.facilitatorId == null){
         this.$message({
           type: "warning",
           message: "请选择服务商"
         })
+      }else if(this.uploadCarwashId == null){
+        this.$message({
+          type: "warning",
+          message: "请选择服务类型"
+        })
+      }else if(this.uploadCarwashsId == null){
+        this.$message({
+          type: "warning",
+          message: "请选择服务名称"
+        })
       }else{
         if (this.fileList) {
-          this.uploaddialogVisible = false
           var formData = new FormData()
           formData.append('file', this.fileList[0].raw)
-          formData.append('id', this.facilitatorId)
-          batchCouponImport(formData).then(res => {
-            // console.log(res);
-            this.getData()
-            this.$message({
-              type: 'success',
-              message: `上传成功!`
-            })
+          formData.append('generalId', this.item.cid)
+          formData.append('source', this.facilitatorId)
+          formData.append('carwashId', this.uploadCarwashId)
+          formData.append('carwashsId', this.uploadCarwashsId)
+          batchCouponcodeImport(formData).then(res => {
+            if(res.code == 200){
+              this.uploaddialogVisible = false
+              this.$message({
+                type: 'success',
+                message: `上传成功!`
+              })
+              this.look(this.item)
+            }else{
+              this.$message({
+                type: 'success',
+                message: res.msg
+              })
+            }
           })
         } else {
           this.$message({
@@ -529,6 +940,7 @@ export default {
     importExcel() {
         this.fileList = null
         this.uploaddialogVisible = true
+        this.apiFindCarwashType()
         this.$nextTick((i) => {
           this.$refs.upload.clearFiles()
         })

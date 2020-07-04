@@ -16,9 +16,9 @@ export function findGeneralCoupon(data) {
   })
 }
 
-export function batchCouponImport(data) {
+export function batchCouponcodeImport(data) {
     return request({
-      url: '/wash/batchCouponImport',
+      url: '/wash/batchCouponcodeImport',
       method: 'post',
       data: data
     })
@@ -69,5 +69,37 @@ export function generateGeneralCouponcode(data) {
     url: '/wash/generateGeneralCouponcode',
     method: 'post',
     data: data
+  })
+}
+
+export function findCarwashsTypeById(data) {
+  return request({
+    url: '/wash/findCarwashsTypeById',
+    method: 'post',
+    data: data
+  })
+}
+
+export function finGeneralCouponcode(data) {
+  return request({
+    url: '/wash/finGeneralCouponcode',
+    method: 'post',
+    data: data
+  })
+}
+
+export function delGeneralCouponcodeById(data) {
+  return request({
+    url: '/wash/delGeneralCouponcodeById',
+    method: 'post',
+    data: data
+  })
+}
+
+export function findChannelName(data) {
+  return request({
+    url: '/wash/findChannelName',
+    method: 'post',
+    data
   })
 }
