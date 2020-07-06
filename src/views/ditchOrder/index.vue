@@ -32,7 +32,7 @@
             ></el-option>
           </el-select>
           <el-date-picker
-          class="picker fl"
+            class="picker fl"
             v-model="queryList.time"
             type="daterange"
             range-separator="至"
@@ -404,10 +404,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
 .el-table .warning-row {
     background: oldlace;
   }
-
   .el-table .success-row {
     background: #f0f9eb;
   }
@@ -434,7 +436,7 @@ export default {
   margin-top: 10px;
 }
 .picker{
-  width: 250px;
+  width: 360px;
   margin-left:20px;
   margin-top: 10px;
 }

@@ -50,7 +50,7 @@
           @keyup.enter.native="handleFilter"/>
           <el-date-picker
             class="input fl"
-            style="width:260px"
+            style="width:360px"
             v-model="queryList.time"
             type="daterange"
             format="yyyy 年 MM 月 dd 日"
@@ -328,6 +328,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
 .title{
   font-size: 18px;
   font-weight: 600;

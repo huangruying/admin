@@ -1,0 +1,638 @@
+<template>
+  <div class="app-container">
+    <el-divider content-position="left"><span class="title">查询</span></el-divider>
+    <div class="query">
+       <div class="input_box">
+          <!-- <el-input
+          v-model="queryList.name"
+          placeholder="请输入渠道名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.province" @change="getDataProvince" class="input fl" placeholder="请选择省份">
+            <el-option
+              v-for="item in areaJson"
+              :label="item.province"
+              :value="item.provinceid"
+              :key="item.provinceid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.city" @change="getDataCity" class="input fl" placeholder="请选择城市">
+            <el-option
+              v-for="item in cityListJson"
+              :label="item.city"
+              :value="item.cityid"
+              :key="item.cityid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.region" @change="getData" class="input fl" placeholder="请选择区/县">
+            <el-option
+              v-for="item in regionListJson"
+              :label="item.area"
+              :value="item.areaid"
+              :key="item.areaid"
+            ></el-option>
+          </el-select> -->
+          <!-- <el-date-picker
+            class="picker fl"
+            v-model="queryList.time"
+            type="daterange"
+            range-separator="至"
+            value-format="yyyy-MM-dd hh:mm:ss"
+            :default-time="['00:00:00', '23:59:59']"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker> -->
+       </div> 
+       <div class="btn_box">
+         <div>
+           <el-button type="danger" @click="remove(2)">批量删除</el-button>
+           <!-- <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button> -->
+           <!-- <el-button type="primary" @click="reset">重置</el-button> -->
+         </div>
+         <div>
+           <el-button type="primary" @click="newly">新增</el-button>
+           <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
+         </div>
+       </div>
+    </div>
+    <el-table
+      v-loading="loading"
+      :data="data.data"
+      border
+      stripe
+      fit
+      @selection-change="handleSelectionChange"
+      style="width: 100%;">
+      <!-- fit highlight-current-row -->
+      <el-table-column
+        align="center"
+        type="selection"
+        width="50">
+     </el-table-column>
+      <el-table-column width="80" label="ID" prop="id" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="省" prop="province" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.province }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="市" prop="city" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.city }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="区" prop="area" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.area }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="原价" prop="originalPrice" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.originalPrice }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="优惠价" prop="price" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.price }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+        <template slot-scope="scope">
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"> <el-button size="mini" type="primary" @click="lookOver(scope.row)">查看</el-button> </div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"> <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button> </div>
+          <div style="width: 50%;padding:0 0 7px 7px; float: left;"> <el-button size="mini" type="primary" @click="editTheNew(scope.row)">编辑</el-button> </div>
+        </template>
+      </el-table-column>  
+    </el-table>
+    <pagination
+      v-show="data.total>0"
+      :total="data.total"
+      :page.sync="data.current_page"
+      :limit.sync="data.per_page"
+      @pagination="getPageData"
+    />
+    <!-- 查看 -->
+    <el-dialog
+      :title="dialogTitle"
+      :close-on-click-modal="false"
+      :visible.sync="editDialog"
+      width="60%"
+      @close="close"
+      center>
+        <el-divider content-position="left"><span class="title">详细信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-form label-position="right" ref="ruleForm" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="ID：" prop="id" style="width: 100%">
+                  <el-input v-model="itemObj.id" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="省：" prop="province" style="width: 100%">
+                  <el-input v-model="itemObj.province" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="市：" prop="city" style="width: 100%">
+                  <el-input v-model="itemObj.city" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="区：" prop="area" style="width: 100%">
+                  <el-input v-model="itemObj.area" style="width:50%" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="创建时间：" prop="createTime" style="width: 100%">
+                  <el-input v-model="itemObj.createTime" style="width:50%" disabled></el-input>
+              </el-form-item>
+          </el-form>
+        </div>
+        <el-divider content-position="left"><span class="title">重要信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+            <el-table
+              :data="[itemObj]"
+              border
+              stripe
+              fit
+              :row-class-name="tableRowClassName"
+              style="width: 100%;">
+              <el-table-column label="ID" prop="id" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.id }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="原价" prop="originalPrice" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.originalPrice }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="优惠价" prop="price" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.price }}</span>
+                </template>
+              </el-table-column>
+            </el-table>
+        </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="editDialog = false">返 回</el-button>
+      </span>
+    </el-dialog>
+    <!-- 新增编辑 -->
+    <el-dialog
+      :title="dialogTitle"
+      :close-on-click-modal="false"
+      :visible.sync="editTheNewDialog"
+      width="50%"
+      @close="close"
+      center>
+        <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
+        <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
+          <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+              <el-form-item label="原价：" prop="originalPrice" style="width: 100%">
+                  <el-input v-model="itemObj.originalPrice" style="width:50%" placeholder="请输入原价"></el-input>
+              </el-form-item>
+              <el-form-item label="金额：" prop="price" style="width: 100%">
+                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入金额"></el-input>
+              </el-form-item>
+              <el-form-item label="省:" prop="provinceid" style="width:100%">
+                <el-select v-model="itemObj.provinceid" placeholder="请选择省份" @change="changeCity(itemObj.provinceid)">
+                    <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.provinceid"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="市:" prop="cityid" style="width:100%">
+                <el-select v-model="itemObj.cityid" placeholder="请选择城市" @change="changeCounty(itemObj.cityid)">
+                    <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="区:" prop="areaid" style="width:100%">
+                <el-select v-model="itemObj.areaid" placeholder="请选择区/县"  @change="regionChange">
+                    <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
+                </el-select>
+              </el-form-item>
+          </el-form>
+        </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editTheNewDialog = false">取 消</el-button>
+       <el-button type="primary" :loading="loadingBootm" @click="itemEditDialog">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { findVehicleServicePrice , delVehicleServicePriceById , modifyVehicleServicePrice , saveVehicleServicePrice } from '@/api/platformPrice'
+import { findYuyueCityByProvinceid , findYuyueAreasByCityid , findYuyueProvinces } from '@/api/nodeList'  // 省市区接口
+import { findChannelName } from '@/api/volumeList'
+import Pagination from "@/components/Pagination"
+export default {
+  components: {
+    Pagination
+  },
+  data() {
+    return {
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
+      editDialog: false,
+      loadingBootm: false,
+      dialogTitle: "查看",
+      loading: false,
+      editTheNewDialog: false,
+      statusInfoList: [],
+      areaJson: [],
+      cityListJson: [],
+      regionListJson: [],
+      cityList: [],
+      countyList: [],
+      itemArr: [],
+      itemObj: {},
+      rules: {
+          channelId: [
+            { required: true, message: '请选择渠道', trigger: 'blur' }
+          ],
+          originalPrice: [
+            { required: true, message: '请输入原价', trigger: 'blur' }
+          ],
+          price: [
+              { required: true, message: '请输入金额', trigger: 'blur' }
+          ],
+          fromTime: [
+              { required: true, message: '请选择有效时间', trigger: 'blur' }
+          ],
+          toTime: [
+              { required: true, message: '请选择过期时间', trigger: 'blur' }
+          ],
+          provinceid: [
+              { required: true, message: '请选择省份', trigger: 'blur' }
+          ],
+          cityid: [
+              { required: true, message: '请选择城市', trigger: 'blur' }
+          ],
+          areaid: [
+              { required: true, message: '请选择区/县', trigger: 'blur' }
+          ]
+      },
+      data: {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 15,
+        total: 0,
+        link: ""
+      },
+      queryList: {
+        
+      }
+    }
+  },
+  created() {
+    this.getData()
+    // 省市区
+    this.ApiAreaJson()
+    // 服务商
+    this.selectInfo()
+  },
+  methods: {
+    async selectInfo(){
+      var res = await findChannelName()
+      this.statusInfoList = res.data
+    },
+    itemEditDialog(){
+        this.$refs["ruleForm"].validate((valid) => {
+          if (valid) {
+           if(this.itemObj.id){
+               modifyVehicleServicePrice(this.itemObj).then(res=>{
+                   if(res.code == 200){
+                       this.editTheNewDialog = false
+                       this.$message({
+                           message: '修改成功！',
+                           type: 'success'
+                       })
+                   }else{
+                       this.$message(res.msg)
+                   }
+               })
+           }else{
+               saveVehicleServicePrice(this.itemObj).then(res=>{
+                   if(res.code == 200){
+                       this.editTheNewDialog = false
+                       this.$message({
+                           message: '修改成功！',
+                           type: 'success'
+                       })
+                   }else{
+                       this.$message(res.msg)
+                   }
+               })
+           }
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+    },
+    ApiAreaJson(){
+      findYuyueProvinces().then(res=>{
+        this.areaJson = res.data
+      })
+    },
+    regionChange(){
+        this.$forceUpdate()
+    },
+    changeCity(id,num){
+      findYuyueCityByProvinceid({provinceid: id}).then(res=>{
+        this.cityList = res.data
+        this.itemObj.cityid = this.cityList[0].cityid
+        if(num === 1){
+            // 编辑数据初始化
+           findYuyueAreasByCityid({cityid: this.itemObj.cityid}).then(res=>{
+                this.countyList = res.data
+           })  
+        }else{
+            this.changeCounty(this.itemObj.cityid)
+        }
+      })
+    },
+    changeCounty(id){
+      findYuyueAreasByCityid({cityid: id}).then(res=>{
+        this.countyList = res.data
+        this.itemObj.areaid = this.countyList[0].areaid
+      })
+    },
+    getDataProvince(){
+      findYuyueCityByProvinceid({provinceid: this.queryList.province}).then(res=>{
+        this.cityListJson = res.data
+      })
+      this.queryList.city = null
+      this.queryList.region = null
+      this.getData()
+    },
+    getDataCity(){
+      findYuyueAreasByCityid({cityid: this.queryList.city}).then(res=>{
+        this.regionListJson = res.data
+      })
+      this.queryList.region = null
+      this.getData()
+    },
+    tableRowClassName({row, rowIndex}) {
+        if (rowIndex === 0) {
+          return 'warning-row';
+        } else if (rowIndex === 1) {
+          return 'success-row';
+        }
+        return '';
+    },
+    handleSelectionChange(val) {
+        this.itemArr = val
+    },
+    remove(item){
+      if(item === 2){
+        if(this.itemArr.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr.forEach(v=>{
+          arr.push(v.id)
+        })
+        this.open('确定批量删除？' , arr)
+      }else{
+        this.open('确定删除？' , [item.id])
+      }
+    },
+    open(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true
+          delVehicleServicePriceById({ids: id}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    getData(filter){
+      this.loading = true
+      let data = {}
+      var queryList = this.queryList
+      if (queryList.name) {
+        data.name = queryList.name
+      }
+      if (!(queryList.province == null)) {
+        data.provinceId = queryList.province
+      }
+      if (!(queryList.city == null)) {
+        data.cityId = queryList.city
+      }
+      if (!(queryList.region == null)) {
+        data.regionId = queryList.region
+      }
+    //   if (queryList.time[0] && queryList.time[1]) {
+    //     data.startTime = queryList.time[0]
+    //     data.endTime = queryList.time[1]
+    //   }
+      if (filter && this.data.current_page > 1) {
+        data.page = this.data.current_page;
+      } else {
+        this.data.current_page = 1;
+      }
+      data.pageNum = this.data.current_page
+      data.pageSize = this.data.per_page
+      findVehicleServicePrice(data).then(res=>{
+        // this.data = res;
+        this.loading = false;
+        if (!res.data || res.data.length <= 0) {
+          this.$message("暂无数据~")
+          this.data = {
+            current_page: 1,
+            data: [],
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+            link: ""
+          }
+        }
+        if( res.data && res.data.length > 0){
+          this.data = res;
+          this.data.current_page = res.pageNum
+          this.data.per_page = res.pageSize
+          this.data.total = res.total
+          this.data.data.forEach(v=>{
+            
+          })
+        }
+      })
+    },
+    lookOver(item){
+      this.itemObj = item
+      this.editDialog = true
+      this.dialogTitle = "查看"
+    },
+    editTheNew(item){
+        this.dialogTitle = "编辑"
+        this.editTheNewDialog = true
+        this.itemObj = item
+        this.changeCity(item.provinceid,1)
+    },
+    newly(){
+        this.dialogTitle = "新增"
+        this.editTheNewDialog = true
+    },
+    close(){
+      this.itemObj = {}
+      this.getData()
+    },
+    handleFilter(){
+      this.getData()
+    },
+    getPageData(e) {
+      this.getData("page");
+    },
+    reset(){
+      this.queryList = {
+        
+      }
+    },
+    resetGetData(){
+      this.reset()
+      this.getData()
+    },
+  }
+}
+</script>
+
+<style lang="less" scoped>
+/deep/.el-date-editor .el-range-input{
+  width: auto;
+}
+.el-table .warning-row {
+    background: oldlace;
+  }
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+.title{
+  font-size: 18px;
+  font-weight: 600;
+}
+/deep/.el-dialog__header{
+  background: #f8f8f8;
+}
+/deep/.el-divider--horizontal{
+  margin: 0;
+}
+.query{
+  width: 100%;
+  border: 1px solid #DCDFE6;
+  border-top: none;
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.input{
+  width: 200px;
+  margin-left:20px;
+  margin-top: 10px;
+}
+.picker{
+  width: 360px;
+  margin-left:20px;
+  margin-top: 10px;
+}
+.btn_box{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0;
+}
+/deep/.el-table .warning-row {
+    background: oldlace;
+  }
+
+/deep/.el-table .success-row {
+    background: #f0f9eb;
+}
+.center{
+  display: block;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+// .fl{
+//   float: left;
+//   }
+// .fr{
+//   float: right;
+//   }
+/deep/.el-form-item{
+  float: left;
+}
+.clearFix::before,
+.clearFix::after{
+      content: "";
+      display: block;
+      visibility: hidden;
+      height: 0;
+      line-height: 0;
+      clear: both;
+}
+.boxUpload{   
+    .textUp{
+      position: relative;
+      float: left;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 4.5%;
+      margin-top: 3%;
+      margin-left: 3%;
+      .uploadTransparency{
+          display: block;
+          width: 150px;
+          height: 100px;
+          opacity: 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 999;
+        }
+      .text{
+        margin-top: 5px;
+      }
+      .btn{
+        margin-top: 3px;
+      }
+    }
+}
+.avatar-uploader .el-upload:hover {
+   border-color: #409EFF;
+ }
+.avatar {
+   width: 148px;
+   height: 148px;
+   border-radius: 4px;
+   cursor: pointer;
+ }
+</style>

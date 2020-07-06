@@ -61,8 +61,7 @@
           label="所属渠道商："
           prop="channelid"
           style="width: 100%"
-          :rules="[{ required: true, message: '请选择所属渠道商', trigger: 'blur' }]"
-        >
+          :rules="[{ required: true, message: '请选择所属渠道商', trigger: 'blur' }]">
           <el-select
             v-model="itemObj.channelid"
             filterable
@@ -82,8 +81,7 @@
           label="截止日期："
           prop="time"
           style="width: 100%"
-          :rules="[{ required: true, message: '请选择截止日期', trigger: 'change' }]"
-        >
+          :rules="[{ required: true, message: '请选择截止日期', trigger: 'change' }]">
           <el-date-picker
             v-model="itemObj.time"
             type="daterange"

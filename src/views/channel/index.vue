@@ -29,11 +29,11 @@
       @selection-change="handleSelectionChange"
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column
+      <!-- <el-table-column
         align="center"
         type="selection"
         width="50">
-     </el-table-column>
+     </el-table-column> -->
       <el-table-column label="ID" prop="id" fixed align="center" width="90px">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -42,6 +42,21 @@
       <el-table-column label="渠道名称" prop="name" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="渠道令牌" prop="token" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.token }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="渠道秘钥" prop="secret" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.secret }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="渠道编码" prop="code" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
       <el-table-column label="对账金额" prop="reconAmount" fixed align="center">
@@ -96,6 +111,9 @@
               </el-form-item>
               <el-form-item label="别名：" prop="alias" style="width: 100%">
                   <el-input v-model="itemObj.alias" style="width:50%" placeholder="请输入别名"></el-input>
+              </el-form-item>
+              <el-form-item label="渠道编码：" prop="code" style="width: 100%">
+                  <el-input v-model="itemObj.code" style="width:50%" placeholder="请输入渠道编码"></el-input>
               </el-form-item>
               <el-form-item label="对账金额：" prop="reconAmount" style="width: 100%">
                   <el-input v-model="itemObj.reconAmount" style="width:50%" placeholder="请输入对账金额"></el-input>
@@ -202,6 +220,7 @@ export default {
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
         data.reconAmount = this.itemObj.reconAmount
+        data.code = this.itemObj.code
         updateWashChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({
@@ -220,6 +239,7 @@ export default {
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
         data.reconAmount = this.itemObj.reconAmount
+        data.code = this.itemObj.code
         saveWashChannel(data).then(res=>{
           if(res.code == 200){
             this.$message({

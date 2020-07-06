@@ -53,7 +53,7 @@ export const constantRoutes = [
   {
     path: '/index',
     component: Layout,
-    hidden: true,
+    hidden: true, // 首页不在侧边栏上
     // redirect: { name: '首页' },
     children: [
       {
@@ -182,12 +182,12 @@ export const asyncRoutes = [
         component: () => import('@/views/routerView/index'), // Parent router-view
         meta: { title: '对账管理', icon: 'example' },
         children: [
-          {
-            path: 'channel',
-            name: 'channel',
-            component: () => import('@/views/channel/index'),
-            meta: { title: '渠道管理', icon: 'table' }
-          },
+          // {
+          //   path: 'channel',
+          //   name: 'channel',
+          //   component: () => import('@/views/channel/index'),
+          //   meta: { title: '渠道管理', icon: 'table' }
+          // },
           {
             path: 'nodeReconciliation',
             name: 'nodeReconciliation',
@@ -195,10 +195,30 @@ export const asyncRoutes = [
             meta: { title: '网点对账', icon: 'table' }
           },
           {
-            path: 'insuranceReconciliation',
-            name: 'insuranceReconciliation',
-            component: () => import('@/views/insuranceReconciliation/index'),
-            meta: { title: '渠道对账', icon: 'table' }
+            path: 'channelList',
+            name: 'channelList',
+            meta: { title: '渠道', icon: 'table' },
+            component: () => import('@/views/routerView/index'),
+            children: [
+              {
+                path: 'insuranceReconciliation',
+                name: 'insuranceReconciliation',
+                component: () => import('@/views/insuranceReconciliation/index'),
+                meta: { title: '渠道对账', icon: 'table' }
+              },
+              {
+                path: 'channelPrice', 
+                name: 'channelPrice',
+                component: () => import('@/views/channelPrice/index'),
+                meta: { title: '渠道价格', icon: 'table' }
+              },
+              {
+                path: 'platformPrice', 
+                name: 'platformPrice',
+                component: () => import('@/views/platformPrice/index'),
+                meta: { title: '平台价格', icon: 'table' }
+              }
+            ]
           }
         ]
       },
@@ -240,12 +260,12 @@ export const asyncRoutes = [
         component: () => import('@/views/routerView/index'), // Parent router-view
         meta: { title: '渠道', icon: 'example'},
         children: [
-          {
-            path: 'ditchChannel',
-            name: 'ditchChannel',
-            component: () => import('@/views/ditchChannel/index'),
-            meta: { title: '渠道管理', icon: 'dashboard' ,}
-          },
+          // {  贵宾厅与洗车渠道已合并，页面依然保留，日后有需要可打开！
+          //   path: 'ditchChannel',
+          //   name: 'ditchChannel',
+          //   component: () => import('@/views/ditchChannel/index'),
+          //   meta: { title: '渠道管理', icon: 'dashboard' ,}
+          // },
           {
             path: 'ditchProduct',
             name: 'ditchProduct',
@@ -366,72 +386,20 @@ export const asyncRoutes = [
       },
     ]
   },
-  // 4级菜单测试用
-  // {
-  //   path: '/nested',
-  //   component: Layout,
-  //   redirect: '/nested/menu1',
-  //   name: 'Nested',
-  //   meta: {
-  //     title: 'Nested',
-  //     icon: 'nested',
-  //     roles:  ['user']
-  //   },
-  //   children: [
-  //     {
-  //       path: 'menu1',
-  //       component: () => import('@/views/nested/menu1/index'), // Parent router-view
-  //       name: 'Menu1',
-  //       meta: { title: 'Menu1'},
-  //       children: [
-  //         {
-  //           path: 'menu1-1',
-  //           component: () => import('@/views/nested/menu1/menu1-1'),
-  //           name: 'Menu1-1',
-  //           meta: { title: 'Menu1-1'}
-  //         },
-  //         {
-  //           path: 'menu1-2',
-  //           component: () => import('@/views/nested/menu1/menu1-2'),
-  //           name: 'Menu1-2',
-  //           meta: { title: 'Menu1-2' },
-  //           children: [
-  //             {
-  //               path: 'menu1-2-1',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-  //               name: 'Menu1-2-1',
-  //               meta: { title: 'Menu1-2-1'}
-  //             },
-  //             {
-  //               path: 'menu1-2-2',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-  //               name: 'Menu1-2-2',
-  //               meta: { title: 'Menu1-2-2' , roles: ['carWash']}
-  //             },
-  //             {
-  //               path: 'menu1-2-3',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-  //               name: 'Menu1-2-3',
-  //               meta: { title: 'Menu1-2-3' }
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           path: 'menu1-3',
-  //           component: () => import('@/views/nested/menu1/menu1-3'),
-  //           name: 'Menu1-3',
-  //           meta: { title: 'Menu1-3' }
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       path: 'menu2',
-  //       component: () => import('@/views/nested/menu2/index'),
-  //       meta: { title: 'menu2'}
-  //     }
-  //   ]
-  // },
-  // 404 page must be placed at the end !!!
+  {
+    path: '/channel',
+    component: Layout,
+    alwaysShow: true, // 日后可能会有新页面，保留侧边栏下拉，权限和用户管理保留一致
+    meta: { title: '渠道管理', icon: 'example' , roles:  ['userList'] },
+    children: [
+      {
+        path: 'channel',
+        name: 'channel',
+        component: () => import('@/views/channel/index'),
+        meta: { title: '渠道管理', icon: 'table' },
+      }
+    ]
+  },
   {
     path: '/userRight',
     component: Layout,
@@ -453,6 +421,7 @@ export const asyncRoutes = [
       },
     ]
   },
+  // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
 

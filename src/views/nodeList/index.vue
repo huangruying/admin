@@ -30,7 +30,7 @@
             ></el-option>
           </el-select>
           <el-date-picker
-          class="picker fl"
+            class="picker fl"
             v-model="queryList.time"
             type="daterange"
             range-separator="至"
@@ -355,6 +355,7 @@
             </el-form-item>
             <el-form-item label="营业时间:" prop="businessHours" style="width:50%">
             <el-time-picker
+              class="picker_tiem"
               is-range
               arrow-control
               :disabled="alterDisabled"
@@ -1559,6 +1560,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.picker_tiem{
+  /deep/.el-date-editor .el-range-input{
+    width: auto;
+  }
+}
 .fuwu_xan{
   padding: 0px 20px;
   .xian_type{
@@ -1761,7 +1767,7 @@ export default {
   margin-top: 10px;
 }
 .picker{
-  width: 250px;
+  width: 360px;
   margin-left:20px;
   margin-top: 10px;
 }
