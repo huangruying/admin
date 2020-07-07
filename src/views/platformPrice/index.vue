@@ -3,11 +3,6 @@
     <el-divider content-position="left"><span class="title">查询</span></el-divider>
     <div class="query">
        <div class="input_box">
-          <!-- <el-input
-          v-model="queryList.name"
-          placeholder="请输入渠道名称"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
           <el-select v-model="queryList.province" @change="getDataProvince" class="input fl" placeholder="请选择省份">
             <el-option
               v-for="item in areaJson"
@@ -31,7 +26,7 @@
               :value="item.areaid"
               :key="item.areaid"
             ></el-option>
-          </el-select> -->
+          </el-select>
           <!-- <el-date-picker
             class="picker fl"
             v-model="queryList.time"
@@ -254,10 +249,12 @@ export default {
             { required: true, message: '请选择渠道', trigger: 'blur' }
           ],
           originalPrice: [
-            { required: true, message: '请输入原价', trigger: 'blur' }
+            { required: true, message: '请输入原价', trigger: 'blur' },
+            { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
           ],
           price: [
-              { required: true, message: '请输入金额', trigger: 'blur' }
+              { required: true, message: '请输入金额', trigger: 'blur' },
+              { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
           ],
           fromTime: [
               { required: true, message: '请选择有效时间', trigger: 'blur' }
@@ -284,7 +281,9 @@ export default {
         link: ""
       },
       queryList: {
-        
+        province: null,
+        city: null,
+        region: null,
       }
     }
   },
@@ -442,13 +441,13 @@ export default {
         data.name = queryList.name
       }
       if (!(queryList.province == null)) {
-        data.provinceId = queryList.province
+        data.provinceid = queryList.province
       }
       if (!(queryList.city == null)) {
-        data.cityId = queryList.city
+        data.cityid = queryList.city
       }
       if (!(queryList.region == null)) {
-        data.regionId = queryList.region
+        data.areaid = queryList.region
       }
     //   if (queryList.time[0] && queryList.time[1]) {
     //     data.startTime = queryList.time[0]

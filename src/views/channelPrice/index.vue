@@ -305,10 +305,12 @@ export default {
             { required: true, message: '请选择渠道', trigger: 'blur' }
           ],
           originalPrice: [
-            { required: true, message: '请输入原价', trigger: 'blur' }
+            { required: true, message: '请输入原价', trigger: 'blur' },
+            { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
           ],
           price: [
-              { required: true, message: '请输入金额', trigger: 'blur' }
+              { required: true, message: '请输入金额', trigger: 'blur' },
+              { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
           ],
           fromTime: [
               { required: true, message: '请选择有效时间', trigger: 'blur' }
@@ -496,13 +498,13 @@ export default {
         data.name = queryList.name
       }
       if (!(queryList.province == null)) {
-        data.provinceId = queryList.province
+        data.provinceid = queryList.province
       }
       if (!(queryList.city == null)) {
-        data.cityId = queryList.city
+        data.cityid = queryList.city
       }
       if (!(queryList.region == null)) {
-        data.regionId = queryList.region
+        data.areaid = queryList.region
       }
     //   if (queryList.time[0] && queryList.time[1]) {
     //     data.startTime = queryList.time[0]

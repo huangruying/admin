@@ -18,6 +18,11 @@
           placeholder="请输入商品名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.code"
+          placeholder="请输入券码号"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
           <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="请选择订单状态">
             <el-option
               v-for="item in statusList"
@@ -278,6 +283,7 @@ export default {
         status: null,
         bindMemPhone: null,
         time: "",
+        code: null
       },
       statusList: [
         {
@@ -380,6 +386,9 @@ export default {
       }
       if (queryList.name) {
         data.name = queryList.name
+      }
+      if (queryList.code) {
+        data.code = queryList.code
       }
       if (queryList.bindMemPhone) {
         data.bindMemPhone = queryList.bindMemPhone
