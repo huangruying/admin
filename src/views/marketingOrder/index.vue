@@ -308,8 +308,8 @@ export default {
             type: 'warning'
           })
       }else{
-          var { goodsname,name,status,bindMemPhone } = this.queryList
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExport?goodsname=${goodsname}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
+          var { goodsname,name,status,bindMemPhone,code } = this.queryList
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/bearercard/yyBearercardorderExport?goodsname=${goodsname}&code=${code}&name=${name}&status=${status}&bindMemPhone=${bindMemPhone}`
       }
     },
     btn(index){

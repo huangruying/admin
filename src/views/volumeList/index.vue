@@ -188,6 +188,16 @@
       center>
       <div class="clearFix">
         <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
+          <el-form-item prop="source" label="服务类型" :rules="[{ required: true, message: '请选择服务商', trigger: 'blur' }]">
+            <el-select v-model="dynamicValidateForm.source" class="input fl" placeholder="请选择服务商">
+              <el-option
+                v-for="item in statusInfoList"
+                :label="item.name"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item prop="carwashId" label="服务类型" :rules="[{ required: true, message: '请选择服务类型', trigger: 'blur' }]">
             <el-select v-model="dynamicValidateForm.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择服务类型">
               <el-option
@@ -642,8 +652,8 @@ export default {
             endTime = time[1]
             startTime = time[0]
           }
-          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     resetGetData2(item){
