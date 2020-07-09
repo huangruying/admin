@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function findDotWriteoffOrder(data) {
+export function findServicerMonthly(data) {
   return request({
-    url: '/wash/findDotWriteoffOrder',
+    url: '/wash/servicerMonth/findServicerMonthly',
     method: 'post',
     data
   })
 }
 
-export function updateReconciliation(data) {
+export function findServiceOrderByMonth(data) {
   return request({
-    url: '/wash/updateReconciliation',
+    url: '/wash/servicerMonth/findServiceOrderByMonth',
     method: 'post',
     data
   })

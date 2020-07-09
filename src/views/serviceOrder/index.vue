@@ -95,11 +95,11 @@
           <span>{{ scope.row.totalOrderno }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="次数" prop="typeid" fixed align="center">
+      <el-table-column label="状态" prop="statusCopy" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.typeid == 1 ? "1次卡" : "2年卡"}}</span>
+          <span>{{ scope.row.statusCopy == 1 ? "1次卡" : "2年卡"}}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column label="创建时间" prop="dateline" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dateline }}</span>
@@ -270,9 +270,18 @@ export default {
             if( v.dateline){
               v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
             }
-            // if( v.cardEffTime){
-            //   v.cardEffTime = formatTime(v.cardEffTime*1000,'yyyy-mm-dd hh:mm:ss')
-            // }
+            if(v.status == 1){
+              v.statusCopy = "未支付"
+            }else if(v.status == 2){
+              v.statusCopy = "待使用"
+            }else if(v.status == 3){
+              v.statusCopy = "已核销"
+            }else{
+              v.statusCopy = "已退单"
+            }
+            if( v.cardInvTime){
+              v.cardInvTime = formatTime(v.cardInvTime*1000,'yyyy-mm-dd hh:mm:ss')
+            }
           })
         }
       })

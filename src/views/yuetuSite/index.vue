@@ -187,12 +187,12 @@
                 <el-form-item label="大厅地址：" prop="hallLocation" style="width: 100%">
                     <el-input v-model="lobbyObj.hallLocation" style="width:50%" placeholder="请输入大厅地址"></el-input>
                 </el-form-item>
-                <!-- <el-form-item label="营业状态：" prop="type" style="width: 100%">
-                  <el-radio-group v-model="lobbyObj.type">
+                <el-form-item label="营业状态：" prop="hallStatus" style="width: 100%">
+                  <el-radio-group v-model="lobbyObj.hallStatus">
                     <el-radio label="1">正常</el-radio>
-                    <el-radio label="2">因疫情关闭</el-radio>
+                    <el-radio label="2">关闭</el-radio>
                   </el-radio-group>
-                </el-form-item> -->
+                </el-form-item>
                 <el-form-item label="产品图片：" style="width: 100%">
                   <el-upload
                     action=""
@@ -268,11 +268,11 @@
                 <span>{{ scope.row.updateTime }}</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column label="营业状态" prop="type" align="center">
+            <el-table-column label="营业状态" prop="hallStatus" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.typeCopy }}</span>
+                <span>{{ scope.row.hallStatus==1? "正在营业": "已停业" }}</span>
               </template>
-            </el-table-column> -->
+            </el-table-column>
             <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" @click="lobbyCompile(scope.row)">编辑</el-button>

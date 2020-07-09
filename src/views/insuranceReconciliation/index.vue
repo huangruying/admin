@@ -219,7 +219,40 @@ export default {
     this.getData()
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
+  mounted(){
+    // var data = this.dateMethods()
+    // console.log(data);
+  },
   methods: {
+    dateMethods(){
+          var now = new Date();
+          var year = now.getFullYear();
+          var month = now.getMonth() + 1;//0-11表示1-12月
+          var day = now.getDate();
+          var dateObj = {};
+          dateObj.now = year + '-' + month + '-' + day;
+            var nowMonthDay = new Date(year, month, 0).getDate();    //当前月的总天数
+          if(month - 3 <= 0){ //如果是1、2、3月，年数往前推一年
+              var last3MonthDay = new Date((year - 1), (12 - (3 - parseInt(month))), 0).getDate();    //3个月前所在月的总天数
+              if(last3MonthDay < day){    //3个月前所在月的总天数小于现在的天日期
+                  dateObj.last = (year - 1) + '-' + (12 - (3 - month)) + '-' + last3MonthDay;
+              }else{
+                  dateObj.last = (year - 1) + '-' + (12 - (3 - month)) + '-' + day;
+              }
+          }else{
+              var last3MonthDay = new Date(year, (parseInt(month) - 3), 0).getDate();    //3个月前所在月的总天数
+              if(last3MonthDay < day){    //3个月前所在月的总天数小于现在的天日期
+                  if(day < nowMonthDay){        //当前天日期小于当前月总天数,2月份比较特殊的月份
+                      dateObj.last = year + '-' + (month - 3) + '-' + (last3MonthDay - (nowMonthDay - day));
+                  }else{
+                      dateObj.last = year + '-' + (month - 3) + '-' + last3MonthDay;
+                  }
+              }else{
+                  dateObj.last = year + '-' + (month - 3) + '-' + day;
+              }
+          }
+          return dateObj;
+    },
     exportData(){
       if(this.data.data.length <= 0){
         this.$message({
