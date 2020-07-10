@@ -95,12 +95,12 @@
           <span>{{ scope.row.area }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="原价" prop="originalPrice" align="center">
+      <!-- <el-table-column label="价格" prop="originalPrice" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.originalPrice }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="优惠价" prop="price" align="center">
+      </el-table-column> -->
+      <el-table-column label="价格" prop="price" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.price }}</span>
         </template>
@@ -183,12 +183,12 @@
                   <span>{{ scope.row.channelName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="原价" prop="originalPrice" align="center">
+              <!-- <el-table-column label="价格" prop="originalPrice" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.originalPrice }}</span>
                 </template>
-              </el-table-column>
-              <el-table-column label="优惠价" prop="price" align="center">
+              </el-table-column> -->
+              <el-table-column label="价格" prop="price" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.price }}</span>
                 </template>
@@ -220,9 +220,9 @@
                     ></el-option>
                   </el-select>
               </el-form-item>
-              <el-form-item label="原价：" prop="originalPrice" style="width: 100%">
+              <!-- <el-form-item label="原价：" prop="originalPrice" style="width: 100%">
                   <el-input v-model="itemObj.originalPrice" style="width:50%" placeholder="请输入原价"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="金额：" prop="price" style="width: 100%">
                   <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入金额"></el-input>
               </el-form-item>
@@ -304,10 +304,10 @@ export default {
           channelId: [
             { required: true, message: '请选择渠道', trigger: 'blur' }
           ],
-          originalPrice: [
-            { required: true, message: '请输入原价', trigger: 'blur' },
-            { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
-          ],
+          // originalPrice: [
+          //   { required: true, message: '请输入原价', trigger: 'blur' },
+          //   { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }
+          // ],
           price: [
               { required: true, message: '请输入金额', trigger: 'blur' },
               { pattern: /^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/, message: '输入格式有误', trigger: 'blur' }

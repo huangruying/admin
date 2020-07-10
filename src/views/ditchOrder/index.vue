@@ -85,7 +85,8 @@
       </el-table-column>
       <el-table-column label="渠道" prop="channelNames" align="center">
         <template slot-scope="scope">
-          <div v-for="(ditch,idx) in scope.row.channelNames" :key="idx">{{ditch}}</div>
+          <!-- <div v-for="(ditch,idx) in scope.row.channelNames" :key="idx">{{ditch}}</div> -->
+          <span>{{ scope.row.cname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="购买用户" prop="username" align="center">
@@ -368,6 +369,8 @@ export default {
               v.statusCopy = "已完成"
             }else if(v.status == 3){
               v.statusCopy = "未完成"
+            }else if(v.status == 4){
+              v.statusCopy = "已退单"
             }
           })
         }

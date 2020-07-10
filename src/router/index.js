@@ -178,6 +178,25 @@ export const asyncRoutes = [
         ]
       },
       {
+        path: '/priceControl',
+        component: () => import('@/views/routerView/index'), // Parent router-view
+        meta: { title: '价格管理', icon: 'example' },
+        children: [
+          {
+            path: 'channelPrice', 
+            name: 'channelPrice',
+            component: () => import('@/views/channelPrice/index'),
+            meta: { title: '渠道价格', icon: 'table' }
+          },
+          {
+            path: 'platformPrice', 
+            name: 'platformPrice',
+            component: () => import('@/views/platformPrice/index'),
+            meta: { title: '平台价格', icon: 'table' }
+          }
+        ]
+      },
+      {
         path: '/reconciliation',
         component: () => import('@/views/routerView/index'), // Parent router-view
         meta: { title: '对账管理', icon: 'example' },
@@ -195,30 +214,10 @@ export const asyncRoutes = [
             meta: { title: '网点对账', icon: 'table' }
           },
           {
-            path: 'channelList',
-            name: 'channelList',
-            meta: { title: '渠道', icon: 'table' },
-            component: () => import('@/views/routerView/index'),
-            children: [
-              {
-                path: 'insuranceReconciliation',
-                name: 'insuranceReconciliation',
-                component: () => import('@/views/insuranceReconciliation/index'),
-                meta: { title: '渠道对账', icon: 'table' }
-              },
-              {
-                path: 'channelPrice', 
-                name: 'channelPrice',
-                component: () => import('@/views/channelPrice/index'),
-                meta: { title: '渠道价格', icon: 'table' }
-              },
-              {
-                path: 'platformPrice', 
-                name: 'platformPrice',
-                component: () => import('@/views/platformPrice/index'),
-                meta: { title: '平台价格', icon: 'table' }
-              }
-            ]
+            path: 'insuranceReconciliation',
+            name: 'insuranceReconciliation',
+            component: () => import('@/views/insuranceReconciliation/index'),
+            meta: { title: '渠道对账', icon: 'table' }
           }
         ]
       },

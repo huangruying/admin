@@ -14,6 +14,7 @@
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-date-picker
+            class="input fl"
             v-model="queryList.time"
             value-format="yyyy-MM"
             @change="getData"
@@ -75,6 +76,31 @@
           <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="网点详细地址" prop="dotAddress" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotAddress }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="省" prop="province" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.province }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="市" prop="city" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.city }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="区" prop="area" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.area }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单总数" prop="totalOrder" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.totalOrder }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="结算总金额" prop="totalAmount" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.totalAmount }}</span>
@@ -85,7 +111,7 @@
           <span>{{ scope.row.status == 0? "未结算": "已结算" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center">
+      <!-- <el-table-column label="创建时间" prop="createTime" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -94,7 +120,7 @@
         <template slot-scope="scope">
           <span>{{ scope.row.updateTime }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="备注" prop="remark" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.remark }}</span>
@@ -103,6 +129,7 @@
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="compile(scope.row)">详 情</el-button>
+          <el-button size="mini" type="primary" @click="modification(scope.row)">修改备注</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,17 +154,17 @@
           v-model="queryList2.orderNo"
           placeholder="请输入订单号"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter2"/>
           <el-input
           v-model="queryList2.licensePlate"
           placeholder="请输入车牌号"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter2"/>
           <el-input
           v-model="queryList2.couponCode"
           placeholder="请输入劵码号"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter2"/>
           <!-- <el-select v-model="queryList2.reconciliation" @change="getList" class="input fl" placeholder="是否对账">
             <el-option
               v-for="item in statusList"
@@ -149,8 +176,10 @@
       </div>
        <div class="btn_box" style="margin-bottom:10px;">
            <div></div>
-           <el-button type="primary" icon="el-icon-refresh" @click="resetGetData2"></el-button>
-           <!-- <el-button type="primary" @click="newlyDivider">新增</el-button> -->
+           <div>
+             <el-button type="primary" @click="deriveData">导出</el-button>
+             <el-button type="primary" icon="el-icon-refresh" @click="resetGetData2"></el-button>
+           </div>
        </div>
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
@@ -161,6 +190,21 @@
             stripe
             fit
             class="itemTable">
+            <el-table-column label="渠道名称" prop="channelName" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.channelName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="服务名称" prop="dotType" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.dotType }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="项目名称" prop="dotsType" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.dotsType }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="订单号" prop="orderNo" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.orderNo }}</span>
@@ -181,29 +225,24 @@
                 <span>{{ scope.row.couponCode }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="项目名称" prop="dotsType" align="center">
-              <template slot-scope="scope">
-                <span>{{ scope.row.dotsType }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="预约时间" prop="appointmentTime" align="center">
+            <!-- <el-table-column label="预约时间" prop="appointmentTime" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.appointmentTime }}</span>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="下单时间" prop="placeTime" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.placeTime }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="备注" prop="remarks" align="center">
-              <template slot-scope="scope">
-                <span>{{ scope.row.remarks }}</span>
-              </template>
-            </el-table-column>
             <el-table-column label="订单状态" prop="orderStatus" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.orderStatus==0?"未支付":"已支付" }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="备注" prop="remarks" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.remarks }}</span>
               </template>
             </el-table-column>
             <!-- <el-table-column label="是否对账" prop="reconciliation" align="center">
@@ -213,8 +252,7 @@
             </el-table-column> -->
             <el-table-column label="操作" fixed="right" prop="audit_status" align="center">
               <template slot-scope="scope">
-                <!-- <el-button size="mini" type="primary" @click="lobbyCompile(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="lobbyRemove(scope.row)">删除</el-button> -->
+                <el-button size="mini" type="primary" @click="modification2(scope.row)">修改备注</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -235,7 +273,7 @@
 </template>
 
 <script>
-import { findServicerMonthly , findServiceOrderByMonth } from '@/api/nodeReconciliation'
+import { findServicerMonthly , findServiceOrderByMonth , modifyServicerMonthlyRemark , modifySoRemarks } from '@/api/nodeReconciliation'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -299,7 +337,6 @@ export default {
         orderNo: null,
         licensePlate: null,
         couponCode: null,
-        reconciliation: null
       },
       statusList: [
         {
@@ -318,19 +355,80 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
-    exportData(){
-      if(this.data.data.length <= 0){
+    deriveData(){
+      if(this.lobbyData.data.length <= 0){
         this.$message({
             message: '暂无数据可导出~',
             type: 'warning'
           })
       }else{
-          var {orderNo,couponCode,companyName,dotName,province,city,region,reconciliation,time} = this.queryList
-          var startTime = time[0]
-          var endTime = time[1]
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/insuranceWriteoffOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
-          &orderNo=${orderNo}&couponCode=${couponCode}&companyName=${companyName}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&reconciliation=${reconciliation}&startTime=${startTime}&endTime=${endTime}`
+          var {orderNo,licensePlate,couponCode} = this.queryList2
+          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/servicerMonth/serviceOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}
+          // &orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/servicerMonth/serviceOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}&orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}&dotId=${this.id}&month=${this.month}`
       }
+    },
+    open(id,remark) {
+        this.$prompt('请输入备注', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: remark,
+          inputPlaceholder: "请输入备注"
+        }).then(({ value }) => {
+          modifyServicerMonthlyRemark({id,remark: value}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功！'
+              });
+              this.getData()
+            }else{
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                }); 
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });       
+        });
+    },
+    open2(id,remark) {
+        this.$prompt('请输入备注', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: remark,
+          inputPlaceholder: "请输入备注"
+        }).then(({ value }) => {
+          modifySoRemarks({id,remark: value}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功！'
+              });
+              this.getList()
+            }else{
+                this.$message({
+                  type: 'info',
+                  message: res.msg
+                }); 
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });       
+        });
+    },
+    modification2(item){
+      this.open2(item.id,item.remarks)
+    },
+    modification(item){
+      this.open(item.id,item.remark)
     },
     getData(filter){
       this.loading = true
@@ -387,6 +485,9 @@ export default {
     handleFilter(){
       this.getData()
     },
+    handleFilter2(){
+      this.getList()
+    },
     getPageData(e) {
       this.getData("page");
     },
@@ -394,8 +495,9 @@ export default {
       this.getList("page");
     },
     compile(item){
-      this.id = item.id
+      this.id = item.servicerId
       this.month = item.month
+      // this.month = item.createTime.trim().split(/\s+/)[0]
       this.text = item.dotName + "信息"
       this.visibleLobby = true
       this.getList()

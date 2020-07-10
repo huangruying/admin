@@ -16,3 +16,18 @@ export function findServiceOrderByMonth(data) {
   })
 }
 
+export function modifyServicerMonthlyRemark(data) {
+  return request({
+    url: '/wash/servicerMonth/modifyServicerMonthlyRemark',
+    method: 'post',
+    data
+  })
+}
+
+export function modifySoRemarks(data) {
+  return request({
+    url: '/wash/servicerMonth/modifySoRemarks',
+    method: 'post',
+    data
+  })
+}
