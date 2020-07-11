@@ -59,7 +59,13 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="券码名称" prop="couponName" fixed align="center">
+      <el-table-column type="expand" fixed label="点击展开" width="100px;">
+        <template slot-scope="props">
+          <span>{{ props.row.couponName }}</span>
+          <el-button type="primary">导入导出信息</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="券码名称" prop="couponName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.couponName }}</span>
         </template>
@@ -74,21 +80,16 @@
           <span>{{ scope.row.couponMoney }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="券码类型" prop="dotType" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dotType }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="服务类型" prop="dotsType" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dotsType }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="用户名" prop="name" align="center">
+      <el-table-column label="服务商" prop="name" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
+      <el-table-column label="服务项" prop="name" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" prop="type" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type? "未过期": "已过期" }}</span>
@@ -261,14 +262,14 @@
               :key="item.id"
             ></el-option>
           </el-select>
-          <el-select v-model="dialogList.source" @change="look(item)" class="input fl" placeholder="请选择券码来源">
+          <!-- <el-select v-model="dialogList.source" @change="look(item)" class="input fl" placeholder="请选择券码来源">
             <el-option
               v-for="item in statusList3"
               :label="item.name"
               :value="item.id"
               :key="item.id"
             ></el-option>
-          </el-select>
+          </el-select> -->
           <el-date-picker
             class="input fl"
             style="width:360px"
@@ -335,6 +336,11 @@
           <el-table-column label="领劵人" prop="username" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.username }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领劵人手机号" prop="name" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.name }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" prop="status" align="center">
@@ -1063,6 +1069,12 @@ export default {
 /* element样式重置 start */
  // 处理input type = number的上下箭头
  @import "../../styles/cascader.css";
+ /deep/.el-table__expand-icon {
+   height: 60px;
+   >i{
+     font-size: 25px;
+   }
+ }
 .inputNumber{
   width: 200px;
   margin-left: 20px;

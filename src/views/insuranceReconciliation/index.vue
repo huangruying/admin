@@ -46,7 +46,7 @@
          <div>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
-           <!-- <el-button type="primary" @click="exportData">导出</el-button> -->
+           <el-button type="primary" @click="exportData">批量导出</el-button>
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
@@ -59,8 +59,14 @@
       border
       stripe
       fit
-      style="width: 100%;">
+      style="width: 100%;"
+      @selection-change="handleSelectionChange">
       <!-- fit highlight-current-row -->
+      <el-table-column
+        align="center"
+        type="selection"
+        width="50">
+     </el-table-column>
       <el-table-column label="ID" prop="id" width="80px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -81,12 +87,17 @@
           <span>{{ scope.row.alias }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="价格" prop="name" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="订单总数" prop="totalOrder" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.totalOrder }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="status" align="center">
+      <el-table-column label="状态" prop="status" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.status==0?"未支付": "已支付" }}</span>
         </template>
@@ -212,11 +223,11 @@
                 <span>{{ scope.row.reconciliation==0?"未对账":"已对账" }}</span>
               </template>
             </el-table-column> -->
-            <el-table-column label="预约时间" prop="appointmentTime" align="center">
+            <!-- <el-table-column label="预约时间" prop="appointmentTime" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.appointmentTime }}</span>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <!-- <el-table-column label="创建时间" prop="createTime" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.createTime }}</span>
@@ -296,6 +307,7 @@ export default {
       passDialog: false,
       editDialog: false,
       visibleLobby: false,
+      itemArr: [],
       itemObj: {
         openingBank: false
       },
@@ -342,6 +354,43 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    exportData(){
+        if(this.itemArr.length == 0){
+          this.$message({
+            type: 'info',
+            message: '请选择数据！'
+          })
+          return
+        }
+        var arr = []
+        this.itemArr.forEach(v=>{
+          arr.push(v.id)
+        })
+        var arrs = JSON.stringify(arr)
+        this.open3('确定批量导出？' , arrs)
+    },
+    handleSelectionChange(val) {
+        this.itemArr = val
+    },
+    open3(text,id) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
+          this.getData()
+          // serviceOrderMonthExports({monthIds: id}).then(res=>{
+          //   // this.down(`${this.thishostName}${res.url}`)
+          // })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
     deriveData(){
       if(this.lobbyData.data.length <= 0){
         this.$message({
@@ -350,9 +399,9 @@ export default {
           })
       }else{
           var {orderNo,licensePlate,couponCode} = this.queryList2
-          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/serviceOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}
+          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}
           // &orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}`
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/serviceOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}&orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}&channelId=${this.id}&month=${this.month}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}&orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}&channelId=${this.id}&month=${this.month}`
       }
     },
     open(id,remark) {

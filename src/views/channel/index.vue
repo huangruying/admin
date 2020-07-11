@@ -44,7 +44,12 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="渠道令牌" prop="token" fixed align="center">
+      <el-table-column label="别名" prop="alias" fixed align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.alias }}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="渠道令牌" prop="token" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.token }}</span>
         </template>
@@ -53,23 +58,18 @@
         <template slot-scope="scope">
           <span>{{ scope.row.secret }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="渠道编码" prop="code" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="对账金额" prop="reconAmount" fixed align="center">
+      <!-- <el-table-column label="对账金额" prop="reconAmount" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.reconAmount }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="别名" prop="alias" fixed align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.alias }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" prop="dateline" fixed align="center">
+      </el-table-column> -->
+      <el-table-column label="添加时间" prop="dateline" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dateline }}</span>
         </template>
@@ -115,9 +115,9 @@
               <el-form-item label="渠道编码：" prop="code" style="width: 100%">
                   <el-input v-model="itemObj.code" style="width:50%" placeholder="请输入渠道编码"></el-input>
               </el-form-item>
-              <el-form-item label="对账金额：" prop="reconAmount" style="width: 100%">
+              <!-- <el-form-item label="对账金额：" prop="reconAmount" style="width: 100%">
                   <el-input v-model="itemObj.reconAmount" style="width:50%" placeholder="请输入对账金额"></el-input>
-              </el-form-item>
+              </el-form-item> -->
           </el-form>
         </div>
       <span slot="footer" class="dialog-footer">
@@ -219,7 +219,7 @@ export default {
         data.id = this.itemObj.id
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
-        data.reconAmount = this.itemObj.reconAmount
+        // data.reconAmount = this.itemObj.reconAmount
         data.code = this.itemObj.code
         updateWashChannel(data).then(res=>{
           if(res.code == 200){
@@ -238,7 +238,7 @@ export default {
       }else{
         data.name = this.itemObj.name
         data.alias = this.itemObj.alias
-        data.reconAmount = this.itemObj.reconAmount
+        // data.reconAmount = this.itemObj.reconAmount
         data.code = this.itemObj.code
         saveWashChannel(data).then(res=>{
           if(res.code == 200){

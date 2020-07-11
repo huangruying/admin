@@ -80,6 +80,11 @@
           <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="别名" prop="alias" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.alias }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="省" prop="province" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.province }}</span>
@@ -100,7 +105,7 @@
           <span>{{ scope.row.originalPrice }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="价格" prop="price" align="center">
+      <el-table-column label="优惠价" prop="price" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.price }}</span>
         </template>
@@ -188,7 +193,7 @@
                   <span>{{ scope.row.originalPrice }}</span>
                 </template>
               </el-table-column> -->
-              <el-table-column label="价格" prop="price" align="center">
+              <el-table-column label="优惠价" prop="price" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.price }}</span>
                 </template>
@@ -220,10 +225,26 @@
                     ></el-option>
                   </el-select>
               </el-form-item>
+              <el-form-item label="省:" prop="provinceid" style="width:100%">
+                <el-select v-model="itemObj.provinceid" placeholder="请选择省份" @change="changeCity(itemObj.provinceid)" :disabled="disabledCity">
+                    <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.provinceid"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="市:" prop="cityid" style="width:100%">
+                <el-select v-model="itemObj.cityid" placeholder="请选择城市" @change="changeCounty(itemObj.cityid)" :disabled="disabledCity">
+                    <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
+                </el-select>
+                <el-checkbox v-model="itemObj.wholeCity" style="margin-left: 11px;" @change="changeBox">全市统一价</el-checkbox>
+              </el-form-item>
+              <el-form-item label="区:" prop="areaid" style="width:100%" v-if="!itemObj.wholeCity">
+                <el-select v-model="itemObj.areaid" placeholder="请选择区/县"  @change="regionChange" :disabled="disabledCity">
+                    <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
+                </el-select>
+              </el-form-item>
               <!-- <el-form-item label="原价：" prop="originalPrice" style="width: 100%">
                   <el-input v-model="itemObj.originalPrice" style="width:50%" placeholder="请输入原价"></el-input>
               </el-form-item> -->
-              <el-form-item label="金额：" prop="price" style="width: 100%">
+              <el-form-item label="优惠价：" prop="price" style="width: 100%">
                   <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入金额"></el-input>
               </el-form-item>
               <el-form-item label="有效时间" prop="fromTime" style="width: 100%">
@@ -245,21 +266,6 @@
                     :picker-options="pickerOptions"
                     placeholder="过期时间">
                   </el-date-picker>
-              </el-form-item>
-              <el-form-item label="省:" prop="provinceid" style="width:100%">
-                <el-select v-model="itemObj.provinceid" placeholder="请选择省份" @change="changeCity(itemObj.provinceid)">
-                    <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.provinceid"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="市:" prop="cityid" style="width:100%">
-                <el-select v-model="itemObj.cityid" placeholder="请选择城市" @change="changeCounty(itemObj.cityid)">
-                    <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="区:" prop="areaid" style="width:100%">
-                <el-select v-model="itemObj.areaid" placeholder="请选择区/县"  @change="regionChange">
-                    <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
-                </el-select>
               </el-form-item>
           </el-form>
         </div>
@@ -287,6 +293,7 @@ export default {
           return time.getTime() < Date.now() - 8.64e7;
         }
       },
+      disabledCity: false,
       editDialog: false,
       loadingBootm: false,
       dialogTitle: "查看",
@@ -299,7 +306,9 @@ export default {
       cityList: [],
       countyList: [],
       itemArr: [],
-      itemObj: {},
+      itemObj: {
+        wholeCity: false
+      },
       rules: {
           channelId: [
             { required: true, message: '请选择渠道', trigger: 'blur' }
@@ -359,6 +368,11 @@ export default {
     itemEditDialog(){
         this.$refs["ruleForm"].validate((valid) => {
           if (valid) {
+            if(this.itemObj.wholeCity){
+              this.itemObj.wholeCity = 1
+            }else{
+              this.itemObj.wholeCity = 0
+            }
            if(this.itemObj.id){
                modifyVehicleChannelPrice(this.itemObj).then(res=>{
                    if(res.code == 200){
@@ -401,13 +415,13 @@ export default {
     changeCity(id,num){
       findYuyueCityByProvinceid({provinceid: id}).then(res=>{
         this.cityList = res.data
-        this.itemObj.cityid = this.cityList[0].cityid
         if(num === 1){
             // 编辑数据初始化
            findYuyueAreasByCityid({cityid: this.itemObj.cityid}).then(res=>{
                 this.countyList = res.data
            })  
         }else{
+            this.itemObj.cityid = this.cityList[0].cityid
             this.changeCounty(this.itemObj.cityid)
         }
       })
@@ -553,14 +567,23 @@ export default {
         this.itemObj = item
         this.itemObj.channelId = Number(item.channelId)
         this.changeCity(item.provinceid,1)
+        this.itemObj.wholeCity = false
+        this.disabledCity = true
+        this.$forceUpdate()
+    },
+    changeBox(){
+      this.$forceUpdate()
     },
     newly(){
         this.dialogTitle = "新增"
         this.editTheNewDialog = true
     },
     close(){
-      this.itemObj = {}
+      this.itemObj = {
+        wholeCity: false
+      }
       this.getData()
+      this.disabledCity = false
     },
     handleFilter(){
       this.getData()

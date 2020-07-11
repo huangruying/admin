@@ -82,7 +82,7 @@
           <span>{{ scope.row.city }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime"  align="center">
+      <el-table-column label="添加时间" prop="createTime"  align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -134,7 +134,7 @@
               <el-form-item label="所在市：" prop="city" style="width: 100%">
                   <el-input v-model="itemObj.city" style="width:50%" disabled></el-input>
               </el-form-item>
-              <el-form-item label="创建时间：" prop="createTime" style="width: 100%">
+              <el-form-item label="添加时间：" prop="createTime" style="width: 100%">
                   <el-input v-model="itemObj.createTime" style="width:50%" disabled></el-input>
               </el-form-item>
           </el-form>

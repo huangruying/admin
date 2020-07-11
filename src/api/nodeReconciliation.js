@@ -31,3 +31,11 @@ export function modifySoRemarks(data) {
     data
   })
 }
+
+export function serviceOrderMonthExports(data) {
+  return request({
+    url: '/wash/servicerMonth/serviceOrderMonthExports',
+    method: 'post',
+    data
+  })
+}

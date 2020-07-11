@@ -8,38 +8,6 @@
           placeholder="网点编号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.dotName"
-          placeholder="网点名称"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
-            <el-option
-              v-for="item in statusList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
-            ></el-option>
-          </el-select>
-          <el-select v-model="queryList.mechanismName" @change="getData" class="input fl" placeholder="网点类型">
-            <el-option
-              v-for="item in nodeTypesList"
-              :label="item.name"
-              :value="item.mechanismName"
-              :key="item.name"
-            ></el-option>
-          </el-select>
-          <el-date-picker
-            class="picker fl"
-            v-model="queryList.time"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            @change="getData"
-          ></el-date-picker>
-       </div> 
-       <div class="input_box">
           <el-select v-model="queryList.province" @change="getDataProvince" class="input fl" placeholder="请选择省份">
             <el-option
               v-for="item in areaJson"
@@ -64,31 +32,48 @@
               :key="item.areaid"
             ></el-option>
           </el-select>
-          <!-- <el-input
-          v-model="queryList.province"
-          placeholder="请输入省份"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.city"
-          placeholder="请输入城市"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.region"
-          placeholder="请输入区/县"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/> -->
-           <el-input
+          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
+            <el-option
+              v-for="item in statusList"
+              :label="item.name"
+              :value="item.value"
+              :key="item.value"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.mechanismName" @change="getData" class="input fl" placeholder="网点类型">
+            <el-option
+              v-for="item in nodeTypesList"
+              :label="item.name"
+              :value="item.mechanismName"
+              :key="item.name"
+            ></el-option>
+          </el-select>
+          <el-input
           v-model="queryList.recommender"
           placeholder="推荐人"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-           <el-input
+       </div> 
+       <div class="input_box">
+          <el-input
           v-model="queryList.phone"
           placeholder="手机号码"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.dotName"
+          placeholder="网点名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-date-picker
+            class="picker fl"
+            v-model="queryList.time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="getData"
+          ></el-date-picker>
        </div>
        <div class="btn_box">
          <div>
@@ -126,6 +111,11 @@
           <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="网点简称" prop="dotAbbreviation" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotAbbreviation }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="客服电话" prop="mobile" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.mobile }}</span>
@@ -161,7 +151,7 @@
           <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center" width="170">
+      <el-table-column label="添加时间" prop="createTime" align="center" width="170">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
@@ -317,7 +307,8 @@
               <el-input v-model="itemObj.shopowner" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <el-form-item label="经理/店长手机号码:" prop="storePhone" style="width:50%">
-              <el-input v-model="itemObj.storePhone" style="width:210px" :disabled="inputDisabled"></el-input>
+                <el-input v-model="itemObj.storePhone" style="width:210px" :disabled="inputDisabled"></el-input>
+                <span class="phone_color">手机号是商家账号</span>
             </el-form-item>
             <el-form-item label="救援电话:" prop="rescueCall" style="width:50%">
               <el-input v-model="itemObj.rescueCall" style="width:210px" :disabled="alterDisabled"></el-input>
@@ -348,7 +339,7 @@
               <span style="color: #f00;" class="spanbtn" v-if="!lanbtn">请点击按钮选择经纬度</span>
             </el-form-item>
             <el-form-item label="网点推荐人:" prop="recommender" style="width:50%">
-              <el-input v-model="itemObj.recommender" style="width:210px" :disabled="inputDisabled"></el-input>
+              <el-input v-model="itemObj.recommender" style="width:210px" :disabled="alterDisabled"></el-input>
             </el-form-item>
             <el-form-item label="网点地址:" prop="dotAddress" style="width:50%">
               <el-input v-model="itemObj.dotAddress" style="width:210px" :disabled="inputDisabled"></el-input>
@@ -1560,6 +1551,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.phone_color{
+  color: #f00;
+  display: block;
+  line-height: 20px;
+
+}
 .picker_tiem{
   /deep/.el-date-editor .el-range-input{
     width: auto;

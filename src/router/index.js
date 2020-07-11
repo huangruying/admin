@@ -110,59 +110,47 @@ export const asyncRoutes = [
             meta: { title: '网点列表', icon: 'table' }
           },
           {
-            path: 'institution',
-            name: 'institution',
-            component: () => import('@/views/institution/index'),
-            meta: { title: '所属机构管理', icon: 'table' }
-          },
-          {
-            path: 'nodeService',
-            name: 'nodeService',
-            component: () => import('@/views/nodeService/index'),
-            meta: { title: '网点服务项管理', icon: 'table' }
-          },
-        ]
-      },
-      {
-        path: '/account',
-        alwaysShow: true,
-        component: () => import('@/views/routerView/index'), // Parent router-view
-        meta: { title: '账号管理', icon: 'example' , roles: ['ad'] },
-        children: [
-          // {
-          //   path: 'nodeList',
-          //   name: 'nodeList',
-          //   component: () => import('@/views/nodeList/index'),
-          //   meta: { title: '技师账号管理', icon: 'table' }
-          // },
-          {
             path: 'account',
             name: 'account',
             component: () => import('@/views/account/index'),
             meta: { title: '网点账号管理', icon: 'table' }
           },
-          // {
-          //   path: 'carOwner',
-          //   name: 'carOwner',
-          //   component: () => import('@/views/carOwner/index'),
-          //   meta: { title: '车主账号管理', icon: 'table' }
-          // }
+          {
+            path: 'institution',
+            name: 'institution',
+            component: () => import('@/views/institution/index'),
+            meta: { title: '所属机构管理', icon: 'table' }
+          },
         ]
       },
       {
-        path: '/audit',
+        path: '/basics',
         alwaysShow: true,
         component: () => import('@/views/routerView/index'), // Parent router-view
-        meta: { title: '核销管理', icon: 'example' },
+        meta: { title: '基础数据管理', icon: 'example' , roles: ['ad'] },
         children: [
-          {
-            path: 'audit',
-            name: 'audit',
-            component: () => import('@/views/audit/index'),
-            meta: { title: ' 核销统计', icon: 'table' }
-          }
+            {
+              path: 'nodeService',
+              name: 'nodeService',
+              component: () => import('@/views/nodeService/index'),
+              meta: { title: '网点服务项管理', icon: 'table' }
+            },
         ]
       },
+      // {
+      //   path: '/audit',
+      //   alwaysShow: true,
+      //   component: () => import('@/views/routerView/index'), // Parent router-view
+      //   meta: { title: '核销管理', icon: 'example' },
+      //   children: [
+      //     {
+      //       path: 'audit',
+      //       name: 'audit',
+      //       component: () => import('@/views/audit/index'),
+      //       meta: { title: ' 核销统计', icon: 'table' }
+      //     }
+      //   ]
+      // },
       {
         path: '/volume',
         alwaysShow: true,
