@@ -75,10 +75,16 @@
           <div v-for="item in scope.row.carwashsTypes" :key="item.ids">{{ item.dotsType }}</div>
         </template>
       </el-table-column>
+      <el-table-column label="是否上线" prop="isOnline" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.isOnline == 0?'否': '是' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="180" fixed="right" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button>
           <el-button size="mini" type="primary" @click="lookOver(scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="popUpOnline(scope.row)" style="margin-top: 10px;">修改上线状态</el-button>
         </template>
       </el-table-column>  
     </el-table>
@@ -120,10 +126,15 @@
       </div>
       <el-divider content-position="left"><span class="title">服务内容</span></el-divider>
       <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;padding-left:30px;">
-          <div v-for="(value,index) in itemObj.carwashsTypes" :key="index" style="margin-bottom: 9px;">
+          <div v-for="(value,index) in itemObj.carwashsTypes" :key="index" class="value_dialog_for">
               <el-input v-model="value.dotsType" style="width:190px" placeholder="请输入服务名称" @input="input"></el-input>
               <el-button type="primary" @click="addition(index)">+添加</el-button>
               <el-button type="danger" @click="removeDialog(index)">删除</el-button>
+              <div v-if="value.id" class="value_dialog">
+                 <el-button size="mini" type="success" @click="popDialog(value)">修改上线状态</el-button>
+                 <div class="val_dia">{{ value.isOnline == 0?'已下线': '上线中' }}</div>
+              </div>
+              <div class="popStatus" v-else>新增默认是下线状态</div>
           </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -135,7 +146,7 @@
 </template>
 
 <script>
-import { findCarwashTypes , delCarwashsType , updateCarwashsType , saveCarwashsType } from '@/api/nodeService'
+import { findCarwashTypes , delCarwashsType , updateCarwashsType , saveCarwashsType , goOnlineBydtId , goOnline , findCarwashTypesBydtId } from '@/api/nodeService'
 import { dotOssUpload } from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 export default {
@@ -172,6 +183,88 @@ export default {
     this.getData()
   },
   methods: {
+    apiFindCarwashTypesBydtId(dtId){
+      findCarwashTypesBydtId({dtId}).then(res=>{
+        if(res.code == 200){
+          this.lookOver(res.data)
+        }else{
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
+        }
+      })
+    },
+    popDialog(item){
+     if(item.isOnline == 0){
+        this.popDialogOpen("确定修改为 上线？", item.id, item.isOnline)
+      }else{
+        this.popDialogOpen("确定修改为 下线？", item.id, item.isOnline)
+      }
+    },
+    popDialogOpen(text,id,isOnline){
+      this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true
+          goOnline({id: id,isOnline}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              })
+              this.apiFindCarwashTypesBydtId(this.itemID) 
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
+    popUpOnline(item){
+      if(item.isOnline == 0){
+        this.openPop("确定修改为 上线？", item.dtId, item.isOnline)
+      }else{
+        this.openPop("确定修改为 下线？", item.dtId, item.isOnline)
+      }
+    },
+    openPop(text,id,isOnline) {
+        this.$confirm( text , '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true
+          goOnlineBydtId({dtId: id,isOnline}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
     addition(index){
         var obj = {
           dotsType: ""
@@ -352,11 +445,11 @@ export default {
                 dotTypes: this.itemObj.carwashsTypes
             }).then(res=>{
                 if(res.code == 200){
-                    this.editDialog = false
                     this.$message({
                         type: 'success',
                         message: '操作成功!'
                     });
+                    this.apiFindCarwashTypesBydtId(this.itemID) 
                 }else{
                     this.$message(res.msg)
                 }
@@ -405,6 +498,23 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.popStatus{
+  color: #f00;
+  margin-left: 14px;
+}
+.value_dialog_for{
+  margin-bottom: 9px;
+  display: flex;
+  .value_dialog{
+    display: flex;
+    align-items: center;
+    margin-left: 14px;
+    .val_dia{
+      color: #409eff;
+      margin-left: 8px;
+    }
+  }
+}
 .el-table .warning-row {
     background: oldlace;
   }

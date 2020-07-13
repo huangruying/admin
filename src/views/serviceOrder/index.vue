@@ -97,7 +97,7 @@
       </el-table-column>
       <el-table-column label="状态" prop="statusCopy" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.statusCopy == 1 ? "1次卡" : "2年卡"}}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="dateline" fixed align="center">

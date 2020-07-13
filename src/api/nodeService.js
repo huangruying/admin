@@ -31,3 +31,27 @@ export function findCarwashTypes(data) {
       data
     })
   }
+
+  export function goOnlineBydtId(data) {
+    return request({
+      url: '/wash/serviceType/goOnlineBydtId',
+      method: 'post',
+      data
+    })
+  }
+
+  export function goOnline(data) {
+    return request({
+      url: '/wash/serviceType/goOnline',
+      method: 'post',
+      data
+    })
+  }
+
+  export function findCarwashTypesBydtId(data) {
+    return request({
+      url: '/wash/serviceType/findCarwashTypesBydtId',
+      method: 'post',
+      data
+    })
+  }

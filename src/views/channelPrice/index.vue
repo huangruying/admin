@@ -241,11 +241,28 @@
                     <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
                 </el-select>
               </el-form-item>
-              <!-- <el-form-item label="原价：" prop="originalPrice" style="width: 100%">
-                  <el-input v-model="itemObj.originalPrice" style="width:50%" placeholder="请输入原价"></el-input>
-              </el-form-item> -->
+              <el-form-item label="服务类型：" prop="carwashId" style="width: 100%">
+                  <el-select v-model="itemObj.carwashId" @change="menuTwoList2" placeholder="请选择服务类型">
+                    <el-option
+                      v-for="item in menuList"
+                      :label="item.dotType"
+                      :value="item.id"
+                      :key="item.id"
+                    ></el-option>
+                  </el-select>
+              </el-form-item>
+              <el-form-item label="服务名称：" prop="carwashsId" style="width: 100%">
+                  <el-select v-model="itemObj.carwashsId" placeholder="请选择服务名称">
+                    <el-option
+                      v-for="item in menu2List"
+                      :label="item.dotsType"
+                      :value="item.ids"
+                      :key="item.ids"
+                    ></el-option>
+                  </el-select>
+              </el-form-item>
               <el-form-item label="优惠价：" prop="price" style="width: 100%">
-                  <el-input v-model="itemObj.price" style="width:50%" placeholder="请输入金额"></el-input>
+                  <el-input v-model="itemObj.price" style="width: 200px;" placeholder="请输入金额"></el-input>
               </el-form-item>
               <el-form-item label="有效时间" prop="fromTime" style="width: 100%">
                   <el-date-picker
@@ -280,6 +297,7 @@
 <script>
 import { findVehicleChannelPrice , delVehicleChannelPriceById , modifyVehicleChannelPrice , saveVehicleChannelPrice } from '@/api/channelPrice'
 import { findYuyueCityByProvinceid , findYuyueAreasByCityid , findYuyueProvinces } from '@/api/nodeList'  // 省市区接口
+import  { findCarwashType, findCarwashsTypeById } from '@/api/volumeList' // 服务项接口
 import { findChannelName } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
@@ -306,6 +324,8 @@ export default {
       cityList: [],
       countyList: [],
       itemArr: [],
+      menuList: [],
+      menu2List: [],
       itemObj: {
         wholeCity: false
       },
@@ -335,6 +355,12 @@ export default {
           ],
           areaid: [
               { required: true, message: '请选择区/县', trigger: 'blur' }
+          ],
+          carwashId: [
+            { required: true, message: '请选择服务类型', trigger: 'blur' }
+          ],
+          carwashsId: [
+            { required: true, message: '请选择服务名称', trigger: 'blur' }
           ]
       },
       data: {
@@ -361,6 +387,32 @@ export default {
     this.selectInfo()
   },
   methods: {
+    apiFindCarwashType(){
+      findCarwashType().then(res=>{
+        if(res.code == 200){
+          this.menuList = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
+    menuTwoList2(num,bl){
+      findCarwashsTypeById({carwashId: this.itemObj.carwashId}).then(res=>{
+        if(res.code == 200){
+          this.menu2List = res.data
+          if(num){
+            if(bl){
+              // 编辑初始化数据
+              this.itemObj.carwashsId = this.itemObj.carwashsId
+            }else{
+              this.itemObj.carwashsId = this.menu2List[0].ids
+            }
+          }
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
     async selectInfo(){
       var res = await findChannelName()
       this.statusInfoList = res.data
@@ -568,7 +620,11 @@ export default {
         this.itemObj.channelId = Number(item.channelId)
         this.changeCity(item.provinceid,1)
         this.itemObj.wholeCity = false
+        this.itemObj.carwashsId = Number(item.carwashsId)
+        this.itemObj.carwashId = Number(item.carwashId)
+        this.menuTwoList2(this.itemObj.carwashId,true)
         this.disabledCity = true
+        this.apiFindCarwashType()
         this.$forceUpdate()
     },
     changeBox(){
@@ -577,6 +633,7 @@ export default {
     newly(){
         this.dialogTitle = "新增"
         this.editTheNewDialog = true
+        this.apiFindCarwashType()
     },
     close(){
       this.itemObj = {

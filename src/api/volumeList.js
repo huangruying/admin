@@ -103,3 +103,11 @@ export function findChannelName(data) {
     data
   })
 }
+
+export function findGeneralLogBygeneralId(data) {
+  return request({
+    url: '/wash/generalLog/findGeneralLogBygeneralId',
+    method: 'post',
+    data
+  })
+}

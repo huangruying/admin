@@ -57,12 +57,33 @@
       border
       stripe
       fit
+      @expand-change="expandChange"
       style="width: 100%;">
       <!-- fit highlight-current-row -->
       <el-table-column type="expand" fixed label="点击展开" width="100px;">
         <template slot-scope="props">
-          <span>{{ props.row.couponName }}</span>
-          <el-button type="primary">导入导出信息</el-button>
+            <el-table :data="props.row.data" border stripe style="width: 100%" v-if="props.row.data.length > 0">
+              <el-table-column prop="channelName" label="渠道名称">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.channelName }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="num" label="数量">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.num }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="type" label="数据方式">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.type">{{ scope.row.type == 0? "生成": "导入" }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="createTime" label="生成时间">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.createTime }}</span>
+                </template>
+              </el-table-column>
+            </el-table>
         </template>
       </el-table-column>
       <el-table-column label="券码名称" prop="couponName" align="center">
@@ -428,7 +449,7 @@
 </template>
 
 <script>
-import { findGeneralCoupon , batchCouponcodeImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashsTypeById, findCarwashType , generateGeneralCouponcode, finGeneralCouponcode , delGeneralCouponcodeById , findChannelName } from '@/api/volumeList'
+import { findGeneralCoupon , batchCouponcodeImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashsTypeById, findCarwashType , generateGeneralCouponcode, finGeneralCouponcode , delGeneralCouponcodeById , findChannelName , findGeneralLogBygeneralId } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -472,6 +493,7 @@ export default {
       itemId: null,
       item: {},
       dynamicValidateForm: {},
+      expandLoading: false,
       lookEditDialog: false,
       centerDialogVisible: false,
       disabledPrice: true,
@@ -511,6 +533,14 @@ export default {
         link: ""
       },
       dialog: {
+        current_page: 1,
+        data: [],
+        last_page: 1,
+        per_page: 15,
+        total: 0,
+        link: ""
+      },
+      expandData: {
         current_page: 1,
         data: [],
         last_page: 1,
@@ -570,6 +600,57 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    resetData(){
+      this.data.data.forEach(v=>{
+        v.data = []
+      })
+    },
+    expandChange(row,expandedRows){
+       // 该处是用于判断是展开还是收起行，只有展开的时候做请求，避免多次请求！
+      // 展开的时候expandedRows有值，收起的时候为空.
+      if (expandedRows.length > 0) {
+        this.expandLoading = true
+        var data = {}
+        // data.pageNum = this.expandData.current_page
+        // data.pageSize = this.expandData.per_page
+        data.generalId = row.cid
+        findGeneralLogBygeneralId(data).then(res=>{
+           this.expandLoading = false
+          //  res.data = [
+          //    {
+          //      num: "77",
+          //      channelName: "测试",
+          //      type: 0
+          //    }
+          //  ]
+           if (!res.data || res.data.length <= 0) {
+              this.$message("暂无数据~")
+              // this.expandData = {
+              //   current_page: 1,
+              //   data: [],
+              //   last_page: 1,
+              //   per_page: 10,
+              //   total: 0,
+              //   link: ""
+              // }
+           }
+           if( res.data && res.data.length > 0){
+            //  this.expandData.data = res.data;
+            //  this.expandData.current_page = res.pageNum
+            //  this.expandData.per_page = res.pageSize
+            //  this.expandData.total = res.total
+            // this.resetData()
+             // 遍历当前页面表
+             this.data.data.forEach((temp, index) => {
+                // 找到当前点击的行，把动态获取到的数据赋值进去
+                if (temp.cid === row.cid) {
+                  this.data.data[index].data = res.data
+                }
+             });
+           }
+        })
+      }
+    },
     look(item,filter){
       this.loading2 = true
       this.lookEditDialog = true
@@ -980,7 +1061,7 @@ export default {
       const secDiff = (now - d) / 1000
       return secDiff > 3 * 60 * 60
     },
-    getData(filter){
+    async getData(filter){
       this.loading = true
       let data = {}
       var queryList = this.queryList
@@ -1013,7 +1094,6 @@ export default {
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
       findGeneralCoupon(data).then(res=>{
-        this.data = res;
         this.loading = false;
         if (res.msg == "暂无数据") {
           this.$message("暂无数据~")
@@ -1030,14 +1110,16 @@ export default {
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
-          this.data.data.forEach(v=>{
+          res.data.map(v=>{
             var blDate = this.isThreeHourAgo(v.failureTime)
             if(!blDate){
               v.type = true
             }else{
               v.type = false
             }
+            v.data = []
           })
+          this.data.data = res.data
         }
       })
     },

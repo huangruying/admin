@@ -64,6 +64,11 @@
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="合作类型" prop="types" fixed align="center">
+        <template slot-scope="scope">
+          <div v-for="(value,index) in scope.row.typesCope" :key="index">{{ value }}</div>
+        </template>
+      </el-table-column>
       <!-- <el-table-column label="对账金额" prop="reconAmount" fixed align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.reconAmount }}</span>
@@ -115,6 +120,17 @@
               <el-form-item label="渠道编码：" prop="code" style="width: 100%">
                   <el-input v-model="itemObj.code" style="width:50%" placeholder="请输入渠道编码"></el-input>
               </el-form-item>
+              <el-form-item label="合作类型：" prop="type" style="width: 100%">
+                  <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+                  <el-checkbox-group v-model="itemObj.types" @change="handleCheckedCitiesChange">
+                    <el-checkbox label="1" name="1">贵宾厅</el-checkbox>
+                    <el-checkbox label="10" name="2">车后</el-checkbox>
+                    <el-checkbox label="100" name="3">酒店</el-checkbox>
+                    <el-checkbox label="1000" name="4">门票</el-checkbox>
+                    <el-checkbox label="10000" name="5">火车票</el-checkbox>
+                    <el-checkbox label="0" name="0">其他</el-checkbox>
+                  </el-checkbox-group>
+              </el-form-item>
               <!-- <el-form-item label="对账金额：" prop="reconAmount" style="width: 100%">
                   <el-input v-model="itemObj.reconAmount" style="width:50%" placeholder="请输入对账金额"></el-input>
               </el-form-item> -->
@@ -139,14 +155,27 @@ export default {
   data() {
     return {
       dialogTitle: "",
+      checkAll: false,
+      isIndeterminate: true,
       loadingBootm: false,
       editDialog: false,
       loading: false,
       itemArr: [],
-      itemObj: {},
+      itemObj: {
+        types: []
+      },
       rules: {
-          username: [
-            { required: true, message: '不能为空', trigger: 'blur' }
+          name: [
+            { required: true, message: '渠道名称不能为空', trigger: 'blur' }
+          ],
+          alias: [
+            { required: true, message: '别名不能为空', trigger: 'blur' }
+          ],
+          code: [
+            { required: true, message: '渠道编码不能为空', trigger: 'blur' }
+          ],
+          types: [
+            { type: 'array', required: true, message: '请至少选择一个合作类型', trigger: 'change' }
           ]
       },
       data: {
@@ -176,6 +205,15 @@ export default {
     this.getData()
   },
   methods: {
+    handleCheckAllChange(val) {  // 全选全不选
+      this.itemObj.types = val ? ['1','10','100','1000','10000','0'] : [];
+      this.isIndeterminate = false;
+    },
+    handleCheckedCitiesChange(value) {  // 全选全不选
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === 6   // 总数据length,没有循环，写死的哦，改数据的时候记得改这里
+      this.isIndeterminate = checkedCount > 0 && checkedCount < 6
+    },
     audit(item){
       this.open2('确定审核通过？' , item.id)
     },
@@ -214,48 +252,51 @@ export default {
       this.editDialog = true
     },
     itemEditDialog(){
-        var data = {}
-      if(this.itemObj.id){
-        data.id = this.itemObj.id
-        data.name = this.itemObj.name
-        data.alias = this.itemObj.alias
-        // data.reconAmount = this.itemObj.reconAmount
-        data.code = this.itemObj.code
-        updateWashChannel(data).then(res=>{
-          if(res.code == 200){
-            this.$message({
-                type: 'success',
-                message: '操作成功!'
-            })
-            this.editDialog = false
-          }else{
-            this.$message({
-                type: 'info',
-                message: res.msg
-            })
+      this.$refs['ruleForm'].validate((valid) => {
+          if (valid){
+              var data = {}
+              if(this.itemObj.id){
+                data.id = this.itemObj.id
+                data.name = this.itemObj.name
+                data.alias = this.itemObj.alias
+                data.types = this.itemObj.types
+                data.code = this.itemObj.code
+                updateWashChannel(data).then(res=>{
+                  if(res.code == 200){
+                    this.$message({
+                        type: 'success',
+                        message: '操作成功!'
+                    })
+                    this.editDialog = false
+                  }else{
+                    this.$message({
+                        type: 'info',
+                        message: res.msg
+                    })
+                  }
+                })
+              }else{
+                data.name = this.itemObj.name
+                data.alias = this.itemObj.alias
+                data.types = this.itemObj.types
+                data.code = this.itemObj.code
+                saveWashChannel(data).then(res=>{
+                  if(res.code == 200){
+                    this.$message({
+                        type: 'success',
+                        message: '操作成功!'
+                    })
+                    this.editDialog = false
+                  }else{
+                    this.$message({
+                        type: 'info',
+                        message: res.msg
+                    })
+                  }
+                })
+              }
           }
-        })
-      }else{
-        data.name = this.itemObj.name
-        data.alias = this.itemObj.alias
-        // data.reconAmount = this.itemObj.reconAmount
-        data.code = this.itemObj.code
-        saveWashChannel(data).then(res=>{
-          if(res.code == 200){
-            this.$message({
-                type: 'success',
-                message: '操作成功!'
-            })
-            this.editDialog = false
-          }else{
-            this.$message({
-                type: 'info',
-                message: res.msg
-            })
-          }
-        })
-      }
-      
+      })
     },
     handleSelectionChange(val) {
         this.itemArr = val
@@ -326,15 +367,34 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
+            var typesCope = []
             if( v.dateline){
               v.dateline = formatTime(v.dateline*1000,'yyyy-mm-dd hh:mm:ss')
             }
+            v.types.forEach(i=>{
+              if(i == 0){
+                typesCope.push("其他")
+              }else if(i == 1){
+                typesCope.push("贵宾厅")
+              }else if(i == 10){
+                typesCope.push("车后")
+              }else if(i == 100){
+                typesCope.push("酒店")
+              }else if(i == 1000){
+                typesCope.push("门票")
+              }else if(i == 10000){
+                typesCope.push("火车票")
+              }
+            })
+            v.typesCope = typesCope
           })
         }
       })
     },
     close(){
-      this.itemObj = {}
+      this.itemObj = {
+        types: []
+      }
       this.getData()
     },
     handleFilter(){

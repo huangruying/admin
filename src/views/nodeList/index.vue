@@ -65,6 +65,22 @@
           placeholder="网点名称"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择服务类型">
+            <el-option
+              v-for="item in menuList"
+              :label="item.dotType"
+              :value="item.id"
+              :key="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.carwashsId" @change="handleFilter" class="input fl" placeholder="请选择服务名称">
+            <el-option
+              v-for="item in menu2List"
+              :label="item.dotsType"
+              :value="item.ids"
+              :key="item.ids"
+            ></el-option>
+          </el-select>
           <el-date-picker
             class="picker fl"
             v-model="queryList.time"
@@ -536,6 +552,7 @@
 
 <script>
 import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid , findMechanismName , findCarwashTypesInfos } from '@/api/nodeList'
+import { findCarwashsTypeById, findCarwashType } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 // import areaJson from '@/utils/city_data'
 import axios from 'axios'
@@ -608,6 +625,8 @@ export default {
       fileList_6:[],
       cityList: [],
       countyList: [],
+      menuList: [],
+      menu2List: [],
       rules: {
           dotCode: [
             { required: true, message: '网点编号不能为空', trigger: 'blur' },
@@ -687,6 +706,8 @@ export default {
         phone: null,
         nodeTypes: null,
         recommender: null,
+        carwashId: null,
+        carwashsId: null,
         time: ["" , ""]
       },
       statusList: [
@@ -724,6 +745,8 @@ export default {
     this.ApiAreaJson()
     // 服务项
     this.serviceItem()
+    // 服务项数据
+    this.apiFindCarwashType()
   },
   watch: {
     search_key(newv, oldv) {
@@ -870,6 +893,26 @@ export default {
       this.queryList.region = null
       this.getData()
     },
+    menuTwoList(){
+      findCarwashsTypeById({carwashId: this.queryList.carwashId}).then(res=>{
+        if(res.code == 200){
+          this.menu2List = res.data
+          this.queryList.carwashsId = null
+          this.getData()
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
+    apiFindCarwashType(){
+      findCarwashType().then(res=>{
+        if(res.code == 200){
+          this.menuList = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
     getDataCity(){
       findYuyueAreasByCityid({cityid: this.queryList.city}).then(res=>{
         this.regionListJson = res.data
@@ -972,6 +1015,12 @@ export default {
       }
       if (!(queryList.mechanismName == null)) {
         data.mechanismName = queryList.mechanismName   
+      }
+      if (!(queryList.carwashId == null)) {
+        data.carwashId = queryList.carwashId   
+      }
+      if (!(queryList.carwashsId == null)) {
+        data.carwashsId = queryList.carwashsId   
       }
       if (queryList.nodeTypes) {
         data.nodeTypes = queryList.nodeTypes
@@ -1377,6 +1426,8 @@ export default {
         region: null,
         phone: null,
         recommender: null,
+        carwashId: null,
+        carwashsId: null,
         time: ["", ""],
       }
     },

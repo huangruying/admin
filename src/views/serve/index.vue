@@ -8,30 +8,12 @@
           placeholder="车牌号码"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.phone"
-          placeholder="请输入手机号"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.garageName"
-          placeholder="请输入车行名称"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
           <el-select v-model="queryList.orderStatus" @change="getData" class="input fl" placeholder="订单状态">
             <el-option
               v-for="item in indentStateList"
               :label="item.name"
               :value="item.id"
               :key="item.id"
-            ></el-option>
-          </el-select>
-          <el-select v-model="queryList.orderSource" @change="getData" class="input fl" placeholder="订单来源">
-            <el-option
-              v-for="value in sourceList"
-              :label="value.name"
-              :value="value.id"
-              :key="value.id"
             ></el-option>
           </el-select>
           <el-date-picker
@@ -66,14 +48,24 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="订单编号" prop="orderNo" fixed align="center">
+      <el-table-column label="渠道名称" prop="channelName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderNo }}</span>
+          <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车行名称" prop="dotName" align="center">
+      <el-table-column label="项目名称" prop="dotsType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotName }}</span>
+          <span>{{ scope.row.dotsType }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="服务名称" prop="dotType" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotType }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单号" prop="orderNo" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
       <el-table-column label="车牌号" prop="licensePlate" align="center">
@@ -81,39 +73,14 @@
           <span>{{ scope.row.licensePlate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系人" prop="shopowner" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.shopowner }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="手机号" prop="phone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
+      <el-table-column label="劵码号" prop="couponCode" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderStatusCopy }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="订单来源" prop="orderSource" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.orderSource }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="项目名称" prop="projectName" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.projectName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="应收金额" prop="money" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.money }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="预约时间" prop="appointmentTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.appointmentTime }}</span>
+          <span>{{ scope.row.couponCode }}</span>
         </template>
       </el-table-column>
       <el-table-column label="下单时间" prop="placeTime" align="center">
@@ -121,9 +88,14 @@
           <span>{{ scope.row.placeTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="是否对账" prop="reconciliationCopy" align="center">
+      <el-table-column label="创建时间" prop="createTime" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.reconciliationCopy }}</span>
+          <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderStatusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" prop="remarks" align="center">
@@ -133,7 +105,7 @@
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button>
+          <!-- <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button> -->
           <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
         </template>
       </el-table-column>
@@ -155,50 +127,44 @@
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
            <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="订单编号:" prop="orderNo" style="width:50%">
+           <el-form-item label="服务订单ID:" prop="id" style="width:50%">
+              <el-input v-model="itemObj.id" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="订单号:" prop="orderNo" style="width:50%">
               <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行名称:" prop="dotName" style="width:50%">
-              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
+           <el-form-item label="渠道名称:" prop="channelName" style="width:50%">
+              <el-input v-model="itemObj.channelName" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行联系人:" prop="shopowner" style="width:50%">
-              <el-input v-model="itemObj.shopowner" style="width:80%" disabled></el-input>
+           <el-form-item label="项目名称:" prop="dotsType" style="width:50%">
+              <el-input v-model="itemObj.dotsType" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行联系人电话:" prop="phone" style="width:50%">
-              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
+           <el-form-item label="服务名称:" prop="dotType" style="width:50%">
+              <el-input v-model="itemObj.dotType" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行地址:" prop="address" style="width:50%">
-              <el-input v-model="itemObj.address" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <!-- <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
-              <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
-           </el-form-item> -->
            <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
               <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label=" 手机号:" prop="phone" style="width:50%">
+           <el-form-item label="手机号:" prop="phone" style="width:50%">
               <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label=" 订单状态:" prop="orderStatusCopy" style="width:50%">
-              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
+           <el-form-item label="劵码号:" prop="couponCode" style="width:50%">
+              <el-input v-model="itemObj.couponCode" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label=" 订单来源:" prop="orderSource" style="width:50%">
-              <el-input v-model="itemObj.orderSource" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 项目名称:" prop="projectName" style="width:50%">
-              <el-input v-model="itemObj.projectName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 应收金额:" prop="money" style="width:50%">
-              <el-input v-model="itemObj.money" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 预约时间:" prop="appointmentTime" style="width:50%">
+           <el-form-item label="预约时间:" prop="appointmentTime" style="width:50%">
               <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
+           <el-form-item label="下单时间:" prop="placeTime" style="width:50%">
               <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label=" 是否对账:" prop="reconciliationCopy" style="width:50%">
-              <el-input v-model="itemObj.reconciliationCopy" style="width:80%" disabled></el-input>
+           <el-form-item label="创建时间:" prop="createTime" style="width:50%">
+              <el-input v-model="itemObj.createTime" style="width:80%" disabled></el-input>
+           </el-form-item>
+          <el-form-item label="状态:" prop="orderStatusCopy" style="width:50%">
+              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="备注:" prop="remarks" style="width:50%">
+              <el-input v-model="itemObj.remarks" style="width:80%" disabled></el-input>
            </el-form-item>
        </el-form>
       <span slot="footer" class="dialog-footer">
@@ -412,11 +378,6 @@ export default {
               v.orderStatusCopy = '未支付'
             }else{
               v.orderStatusCopy = '已支付'
-            }
-            if(v.reconciliation == 0){
-              v.reconciliationCopy = '未对账'
-            }else if(v.reconciliation == 1){
-              v.reconciliationCopy = '已对账'
             }
           })
         }
