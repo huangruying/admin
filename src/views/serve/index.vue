@@ -3,17 +3,79 @@
     <el-divider content-position="left"><span class="title">查询</span></el-divider>
     <div class="query">
        <div class="input_box">
+          <!-- <el-input
+          v-model="queryList.name"
+          placeholder="请输入姓名"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/> -->
           <el-input
-          v-model="queryList.licensePlate"
-          placeholder="车牌号码"
+          v-model="queryList.phone "
+          placeholder="请输入手机号"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.orderStatus" @change="getData" class="input fl" placeholder="订单状态">
+          <el-input
+          v-model="queryList.licensePlate"
+          placeholder="请输入车牌号"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.code"
+          placeholder="请输入劵码号"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-input
+          v-model="queryList.dotAbbreviation"
+          placeholder="请输入网点简称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <!-- <el-input
+          v-model="queryList.dotName"
+          placeholder="请输入网点名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/> -->
+          <el-input
+          v-model="queryList.channelName"
+          placeholder="请输入渠道名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.province" @change="getDataProvince" class="input fl" placeholder="请选择省份">
             <el-option
-              v-for="item in indentStateList"
-              :label="item.name"
+              v-for="item in areaJson"
+              :label="item.province"
+              :value="item.provinceid"
+              :key="item.provinceid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.city" @change="getDataCity" class="input fl" placeholder="请选择城市">
+            <el-option
+              v-for="item in cityListJson"
+              :label="item.city"
+              :value="item.cityid"
+              :key="item.cityid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.region" @change="getData" class="input fl" placeholder="请选择区/县">
+            <el-option
+              v-for="item in regionListJson"
+              :label="item.area"
+              :value="item.areaid"
+              :key="item.areaid"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.carwashId" @change="menuTwoList" class="input fl" placeholder="请选择服务类型">
+            <el-option
+              v-for="item in menuList"
+              :label="item.dotType"
               :value="item.id"
               :key="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="queryList.carwashsId" @change="handleFilter" class="input fl" placeholder="请选择服务名称">
+            <el-option
+              v-for="item in menu2List"
+              :label="item.dotsType"
+              :value="item.ids"
+              :key="item.ids"
             ></el-option>
           </el-select>
           <el-date-picker
@@ -33,7 +95,7 @@
          <div>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
-           <el-button type="primary" @click="exportData">导出</el-button>
+           <!-- <el-button type="primary" @click="exportData">导出</el-button> -->
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
@@ -48,14 +110,14 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
+      <el-table-column label="订单号" prop="orderNo" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.orderNo }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="渠道名称" prop="channelName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.channelName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="项目名称" prop="dotsType" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dotsType }}</span>
         </template>
       </el-table-column>
       <el-table-column label="服务名称" prop="dotType" align="center">
@@ -63,19 +125,34 @@
           <span>{{ scope.row.dotType }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单号" prop="orderNo" align="center">
+      <el-table-column label="服务内容" prop="dotsType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderNo }}</span>
+          <span>{{ scope.row.dotsType }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车牌号" prop="licensePlate" align="center">
+      <el-table-column label="省" prop="province" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.licensePlate }}</span>
+          <span>{{ scope.row.province }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" prop="phone" align="center">
+      <el-table-column label="市" prop="city" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.city }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="区" prop="area" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.area }}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="网点名称" prop="dotName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotName }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="网点简称" prop="dotAbbreviation" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotAbbreviation }}</span>
         </template>
       </el-table-column>
       <el-table-column label="劵码号" prop="couponCode" align="center">
@@ -83,19 +160,24 @@
           <span>{{ scope.row.couponCode }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="姓名" prop="name" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="手机号" prop="phone" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.phone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="车牌号" prop="licensePlate" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.licensePlate }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="下单时间" prop="placeTime" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.placeTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.createTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.orderStatusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="备注" prop="remarks" align="center">
@@ -103,10 +185,10 @@
           <span>{{ scope.row.remarks }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="操作" width="150" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
           <!-- <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button> -->
-          <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
+          <el-button size="mini" type="primary" @click="compile(scope.row)">查 询</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,41 +209,47 @@
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
            <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="服务订单ID:" prop="id" style="width:50%">
-              <el-input v-model="itemObj.id" style="width:80%" disabled></el-input>
-           </el-form-item>
            <el-form-item label="订单号:" prop="orderNo" style="width:50%">
               <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="渠道名称:" prop="channelName" style="width:50%">
-              <el-input v-model="itemObj.channelName" style="width:80%" disabled></el-input>
+           <el-form-item label="网点名称:" prop="dotName" style="width:50%">
+              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="项目名称:" prop="dotsType" style="width:50%">
-              <el-input v-model="itemObj.dotsType" style="width:80%" disabled></el-input>
+           <el-form-item label="网点简称:" prop="dotAbbreviation" style="width:50%">
+              <el-input v-model="itemObj.dotAbbreviation" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="服务名称:" prop="dotType" style="width:50%">
-              <el-input v-model="itemObj.dotType" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
-              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
+           <el-form-item label="姓名:" prop="name" style="width:50%">
+              <el-input v-model="itemObj.name" style="width:80%" disabled></el-input>
            </el-form-item>
            <el-form-item label="手机号:" prop="phone" style="width:50%">
               <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
            </el-form-item>
+           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
+              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
+           </el-form-item>
            <el-form-item label="劵码号:" prop="couponCode" style="width:50%">
               <el-input v-model="itemObj.couponCode" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="预约时间:" prop="appointmentTime" style="width:50%">
-              <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
+           <el-form-item label="省:" prop="province" style="width:50%">
+              <el-input v-model="itemObj.province" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="市:" prop="city" style="width:50%">
+              <el-input v-model="itemObj.city" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="区:" prop="area" style="width:50%">
+              <el-input v-model="itemObj.area" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="渠道名称:" prop="channelName" style="width:50%">
+              <el-input v-model="itemObj.channelName" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="服务名称:" prop="dotType" style="width:50%">
+              <el-input v-model="itemObj.dotType" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="服务内容:" prop="dotsType" style="width:50%">
+              <el-input v-model="itemObj.dotsType" style="width:80%" disabled></el-input>
            </el-form-item>
            <el-form-item label="下单时间:" prop="placeTime" style="width:50%">
               <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="创建时间:" prop="createTime" style="width:50%">
-              <el-input v-model="itemObj.createTime" style="width:80%" disabled></el-input>
-           </el-form-item>
-          <el-form-item label="状态:" prop="orderStatusCopy" style="width:50%">
-              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
            </el-form-item>
            <el-form-item label="备注:" prop="remarks" style="width:50%">
               <el-input v-model="itemObj.remarks" style="width:80%" disabled></el-input>
@@ -177,6 +265,8 @@
 
 <script>
 import { findServiceOrderInfos , updateReconciliationByOrderNo } from '@/api/serve'
+import { findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid } from '@/api/nodeList' // 省市区接口
+import { findCarwashsTypeById, findCarwashType } from '@/api/volumeList' // 服务项接口
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -238,11 +328,18 @@ export default {
         link: ""
       },
       queryList: {
-        licensePlate: null,
+        name: null,
         phone: null,
-        garageName: null,
-        orderStatus: null,
-        orderSource: null,
+        licensePlate: null,
+        code: null,
+        dotAbbreviation: null,
+        dotName: null,
+        channelName: null,
+        province: null,
+        city: null,
+        region: null,
+        carwashId: null,
+        carwashsId: null,
         time: ["", ""],
       },
       indentStateList: [
@@ -271,13 +368,62 @@ export default {
           value: 0
         },
       ],
+      areaJson: [],
+      cityListJson: [],
+      regionListJson: [],
+      menu2List: [],
+      menuList: []
     }
   },
   created() {
     this.getData()
     this.thishostName = `${location.protocol}//${location.hostname}`
+    // 省市区
+    this.ApiAreaJson()
+    // 服务项数据
+    this.apiFindCarwashType()
   },
   methods: {
+    ApiAreaJson(){
+      findYuyueProvinces().then(res=>{
+        this.areaJson = res.data
+      })
+    },
+    getDataProvince(){
+      findYuyueCityByProvinceid({provinceid: this.queryList.province}).then(res=>{
+        this.cityListJson = res.data
+      })
+      this.queryList.city = null
+      this.queryList.region = null
+      this.getData()
+    },
+    getDataCity(){
+      findYuyueAreasByCityid({cityid: this.queryList.city}).then(res=>{
+        this.regionListJson = res.data
+      })
+      this.queryList.region = null
+      this.getData()
+    },
+    menuTwoList(){
+      findCarwashsTypeById({carwashId: this.queryList.carwashId}).then(res=>{
+        if(res.code == 200){
+          this.menu2List = res.data
+          this.queryList.carwashsId = null
+          this.getData()
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
+    apiFindCarwashType(){
+      findCarwashType().then(res=>{
+        if(res.code == 200){
+          this.menuList = res.data
+        }else{
+          this.$message("服务器数据格出了小问题哦！")
+        }
+      })
+    },
     reconciliation(item){
        this.open(item.orderNo)
     },
@@ -316,30 +462,51 @@ export default {
             type: 'warning'
           })
       }else{
-          var {licensePlate,phone,garageName,orderStatus,orderSource,time} = this.queryList
+          var {licensePlate,phone,garageName,orderSource,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&dotName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&dotName=${garageName}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     getData(filter){
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.licensePlate) {
-        data.licensePlate = queryList.licensePlate
+      if (queryList.name) {
+        data.name = queryList.name
       }
       if (queryList.phone) {
         data.phone = queryList.phone   
       }
-      if (queryList.garageName) {
-        data.garageName = queryList.garageName   
+      if (queryList.licensePlate) {
+        data.licensePlate = queryList.licensePlate   
       }
-      if (!(queryList.orderStatus == null)) {
-        data.orderStatus = queryList.orderStatus   
+      if (queryList.code) {
+        data.code = queryList.code   
       }
-      if (!(queryList.orderSource == null)) {
-        data.orderSource = queryList.orderSource   
+      if (queryList.dotAbbreviation) {
+        data.dotAbbreviation = queryList.dotAbbreviation   
+      }
+      if (queryList.dotName) {
+        data.dotName = queryList.dotName   
+      }
+      if (queryList.channelName) {
+        data.channelName = queryList.channelName   
+      }
+      if (!(queryList.province == null)) {
+        data.provinceId = queryList.province   
+      }
+      if (!(queryList.city == null)) {
+        data.cityId = queryList.city   
+      }
+      if (!(queryList.region == null)) {
+        data.regionId = queryList.region   
+      }
+      if (!(queryList.carwashId == null)) {
+        data.carwashId = queryList.carwashId   
+      }
+      if (!(queryList.carwashsId == null)) {
+        data.carwashsId = queryList.carwashsId   
       }
       if (queryList.time[0] && queryList.time[1]) {
         data.startTime = queryList.time[0]
@@ -374,11 +541,7 @@ export default {
           this.data.per_page = res.pageSize
           this.data.total = res.total
           this.data.data.forEach(v=>{
-            if(v.orderStatus == 0){
-              v.orderStatusCopy = '未支付'
-            }else{
-              v.orderStatusCopy = '已支付'
-            }
+            
           })
         }
       })
@@ -399,11 +562,18 @@ export default {
     },
     reset(){
       this.queryList = {
-        licensePlate: null,
+        name: null,
         phone: null,
-        garageName: null,
-        orderStatus: null,
-        orderSource: null,
+        licensePlate: null,
+        code: null,
+        dotAbbreviation: null,
+        dotName: null,
+        channelName: null,
+        province: null,
+        city: null,
+        region: null,
+        carwashId: null,
+        carwashsId: null,
         time: ["", ""],
       }
     },

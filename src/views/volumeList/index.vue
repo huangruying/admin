@@ -3,12 +3,12 @@
     <el-divider content-position="left"><span class="title">查询</span></el-divider>
     <div class="query">
        <div class="input_box">
-          <el-input
+          <!-- <el-input
           v-model="queryList.couponName"
           placeholder="请输入券码名称"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
+          @keyup.enter.native="handleFilter"/> -->
+          <!-- <el-input
           v-model="queryList.alias"
           placeholder="请输入别名"
           class="input fl"
@@ -17,7 +17,7 @@
           v-model="queryList.name"
           placeholder="请输入用户名"
           class="input fl"
-          @keyup.enter.native="handleFilter"/>
+          @keyup.enter.native="handleFilter"/> -->
           <!-- <el-select v-model="queryList.status" @change="getList" class="input fl" placeholder="状态">
             <el-option
               v-for="item in statusList"
@@ -62,25 +62,30 @@
       <!-- fit highlight-current-row -->
       <el-table-column type="expand" fixed label="点击展开" width="100px;">
         <template slot-scope="props">
-            <el-table :data="props.row.data" border stripe style="width: 100%" v-if="props.row.data.length > 0">
-              <el-table-column prop="channelName" label="渠道名称">
+            <el-table :data="props.row.data" border stripe style="width: 100%;" v-if="props.row.data.length > 0" v-loading="expandLoading">
+              <el-table-column prop="couponName" label="券码名称" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.channelName }}</span>
+                  <span>{{ scope.row.couponName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="num" label="数量">
+              <el-table-column prop="type" label="数据方式" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.type == 0? "生成": "导入" }}</span>
+                </template>
+              </el-table-column> 
+              <el-table-column prop="num" label="数量" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.num }}</span>
                 </template>
               </el-table-column>
-              <el-table-column prop="type" label="数据方式">
-                <template slot-scope="scope">
-                  <span v-if="scope.row.type">{{ scope.row.type == 0? "生成": "导入" }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="createTime" label="生成时间">
+              <el-table-column prop="createTime" label="生成时间" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.createTime }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="200" fixed="right" prop="" align="center">
+                <template slot-scope="scope">
+                  <el-button size="mini" type="primary" @click="lookInto(scope.row)">查 看</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -91,29 +96,19 @@
           <span>{{ scope.row.couponName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="别名" prop="alias" align="center">
+      <el-table-column label="渠道名称" prop="channelName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.alias }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column label="金额" prop="couponMoney" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.couponMoney }}</span>
+          <span>{{ scope.row.channelName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="服务商" prop="name" align="center">
+      <el-table-column label="服务名称" prop="dotType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.dotType }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="服务项" prop="name" align="center">
+      <el-table-column label="服务内容" prop="dotsType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" prop="type" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.type? "未过期": "已过期" }}</span>
+          <span>{{ scope.row.dotsType }}</span>
         </template>
       </el-table-column>
       <el-table-column label="使用说明" prop="content" align="center">
@@ -126,9 +121,9 @@
           <span>{{ scope.row.effectTime }}</span> &nbsp;&nbsp; ~ &nbsp;&nbsp; <span>{{ scope.row.failureTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center" width="170px">
+      <el-table-column label="状态" prop="type" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime }}</span>
+          <span>{{ scope.row.type? "未过期": "已过期" }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
@@ -136,7 +131,7 @@
           <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="primary" @click="compile(scope.row)" v-if="scope.row.type">编辑</el-button></div>
           <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="danger" @click="remove(scope.row)">删除</el-button></div>
           <div style="width: 50%;padding:0 0 7px 7px; float: left;"><el-button size="mini" type="success" @click="audit(scope.row)" v-if="scope.row.type">生成券码</el-button></div>
-          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="info" @click="look(scope.row)">查看券码</el-button></div>
+          <div style="width: 50%;padding:0 0 7px 0; float: left;"><el-button size="mini" type="info" @click="lookData(scope.row)">查看券码</el-button></div>
         </template>
       </el-table-column>
     </el-table>
@@ -159,13 +154,43 @@
         <el-divider content-position="left"><span class="title">基本信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
           <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-              <el-form-item label="优惠劵名称：" prop="couponName" style="width: 100%">
+              <el-form-item label="券码名称：" prop="couponName" style="width: 100%" :rules="[{ required: true, message: '请输入券码名称', trigger: 'blur' }]" >
                   <el-input v-model="itemObj.couponName" style="width:50%" placeholder="请输入优惠劵名称"></el-input>
               </el-form-item>
-              <el-form-item label="优惠劵金额：" prop="couponMoney" style="width: 100%">
-                  <el-input v-model="itemObj.couponMoney" style="width:50%" placeholder="请输入优惠劵金额" :disabled="disabledPrice" ></el-input>
+              <el-form-item prop="channelId" label="渠道名称" :rules="[{ required: true, message: '请选择渠道名称', trigger: 'blur' }]" style="width: 100%">
+                <el-select v-model="itemObj.channelId" placeholder="请选择渠道名称" style="width:50%">
+                  <el-option
+                    v-for="item in statusInfoList"
+                    :label="item.name"
+                    :value="item.id"
+                    :key="item.id"
+                  ></el-option>
+                </el-select>
               </el-form-item>
-              <el-form-item :label="itemPicker" prop="failureTime" style="width: 100%" v-show="!period">
+              <el-form-item prop="carwashId" label="服务名称" :rules="[{ required: true, message: '请选择服务名称', trigger: 'blur' }]" style="width: 100%">
+                <el-select v-model="itemObj.carwashId" @change="menuTwoList" placeholder="请选择服务名称" style="width:50%">
+                  <el-option
+                    v-for="item in menuList"
+                    :label="item.dotType"
+                    :value="item.id"
+                    :key="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item prop="carwashsId" label="服务内容" :rules="[{ required: true, message: '请选择服务内容', trigger: 'blur' }]" style="width: 100%">
+                <el-select v-model="itemObj.carwashsId" placeholder="请选择服务内容" style="width:50%">
+                  <el-option
+                    v-for="item in menu2List"
+                    :label="item.dotsType"
+                    :value="item.ids"
+                    :key="item.ids"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <!-- <el-form-item label="优惠劵金额：" prop="couponMoney" style="width: 100%">
+                  <el-input v-model="itemObj.couponMoney" style="width:50%" placeholder="请输入优惠劵金额" :disabled="disabledPrice" ></el-input>
+              </el-form-item> -->
+              <el-form-item :label="itemPicker" prop="time" style="width: 100%" v-show="!period" :rules="[{ type: 'array', required: true, message: '请选择时间', trigger: 'change' }]">
                  <el-date-picker
                     style="width:50%"
                     v-model="itemObj.time"
@@ -180,7 +205,7 @@
                     @blur="changePicker"
                   ></el-date-picker>
               </el-form-item>
-              <el-form-item :label="itemPicker" prop="failureTime" style="width: 100%" v-show="period">
+              <el-form-item :label="itemPicker" prop="failureTime" style="width: 100%" v-show="period" :rules="[{ required: true, message: '请选择时间', trigger: 'change' }]">
                   <el-date-picker
                     v-model="itemObj.failureTime"
                     type="datetime"
@@ -189,7 +214,6 @@
                     :picker-options="pickerOptions2"
                     placeholder="有效期结束">
                   </el-date-picker>
-                  <!-- <div class="color_period">可以延长有效期，严禁缩短有效期!</div> -->
               </el-form-item>
               <el-form-item label="使用说明：" prop="content" style="width: 100%">
                   <el-input type="textarea" v-model="itemObj.content" autosize maxlength="300" show-word-limit style="width:50%" placeholder="请输入使用说明"></el-input>
@@ -210,7 +234,7 @@
       center>
       <div class="clearFix">
         <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
-          <el-form-item prop="source" label="服务类型" :rules="[{ required: true, message: '请选择服务商', trigger: 'blur' }]">
+          <!-- <el-form-item prop="source" label="服务类型" :rules="[{ required: true, message: '请选择服务商', trigger: 'blur' }]">
             <el-select v-model="dynamicValidateForm.source" class="input fl" placeholder="请选择服务商">
               <el-option
                 v-for="item in statusInfoList"
@@ -239,7 +263,7 @@
                 :key="item.ids"
               ></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item prop="num" label="券码数量" :rules="[{ required: true, message: '请输入生成券码数量', trigger: 'blur' },{ pattern: /^[1-9]\d*|0$/, trigger: 'blur' , message: '请输入正整数'}]">
             <el-input
               type="number"
@@ -339,7 +363,7 @@
               <span>{{ scope.row.code }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="服务类型" prop="carwashId" align="center">
+          <!-- <el-table-column label="服务类型" prop="carwashId" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.carwashId }}</span>
             </template>
@@ -353,15 +377,15 @@
             <template slot-scope="scope">
               <span>{{ scope.row.sourceCopy }}</span>
             </template>
-          </el-table-column>
-          <el-table-column label="领劵人" prop="username" align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.username }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="领劵人手机号" prop="name" align="center">
+          </el-table-column> -->
+          <el-table-column label="领劵人" prop="name" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领劵人手机号" prop="phone" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.phone }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" prop="status" align="center">
@@ -369,11 +393,11 @@
               <span>{{ scope.row.status }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="领取时间" prop="collectionTime" align="center">
+          <!-- <el-table-column label="领取时间" prop="collectionTime" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.collectionTimeCopy }}</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="使用时间" prop="useTime" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.useTimeCopy }}</span>
@@ -408,7 +432,7 @@
     </el-dialog>
     <!--上传文件的弹窗-->
     <el-dialog :visible.sync="uploaddialogVisible" :close-on-click-modal="false" title="导入数据" center>
-      <div style="margin-bottom: 30px;">
+      <!-- <div style="margin-bottom: 30px;">
         <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
         <el-option
           v-for="item in statusInfoList"
@@ -433,7 +457,7 @@
             :key="item.ids"
           ></el-option>
         </el-select>
-      </div>
+      </div> -->
       <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
         :limit="1" action="" drag class="upload-demo">
         <i class="el-icon-upload"></i>
@@ -445,11 +469,90 @@
         <el-button type="primary" @click="submitImportExcel">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 详情导入查看 -->
+    <el-dialog
+      :title="dialogTitle"
+      :close-on-click-modal="false"
+      :visible.sync="lookIntoEditDialog"
+      width="83%"
+      @close="close3"
+      center>
+      <el-divider content-position="left"><span class="title">查询</span></el-divider>
+      <div class="query">
+       <div class="input_box">
+       </div>
+       <div class="btn_box">
+         <div>
+         </div>
+         <div>
+           <el-button type="primary" icon="el-icon-refresh" @click="resetGetData3(itemInto)"></el-button>
+         </div>
+       </div>
+      </div>
+        <el-table
+          v-loading="loading3"
+          :data="expandData.data"
+          border
+          stripe
+          fit
+          style="width: 100%;">
+          <el-table-column label="劵码ID" prop="id" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="劵码号" prop="code" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.code }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领劵人" prop="name" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="领劵人手机号" prop="phone" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.phone }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" prop="status" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.status }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="使用时间" prop="useTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.useTimeCopy }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" prop="createTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.createTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="修改时间" prop="updateTime" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.updateTime }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="expandData.total>0"
+          :total="expandData.total"
+          :page.sync="expandData.current_page"
+          :limit.sync="expandData.per_page"
+          @pagination="getPageData3"
+        />
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="lookIntoEditDialog = false">返回列表</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { findGeneralCoupon , batchCouponcodeImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashsTypeById, findCarwashType , generateGeneralCouponcode, finGeneralCouponcode , delGeneralCouponcodeById , findChannelName , findGeneralLogBygeneralId } from '@/api/volumeList'
+import { findGeneralCoupon , batchCouponcodeImport , findCompanyInfos , delGeneralCouponById , saveGeneralCoupon , modifyGeneralCouponById , findCarwashsTypeById, findCarwashType , generateGeneralCouponcode, finGeneralCouponcode , delGeneralCouponcodeById , findChannelName , findGeneralLogBygeneralId , findCodeDetailByLogId } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -493,6 +596,8 @@ export default {
       itemId: null,
       item: {},
       dynamicValidateForm: {},
+      loading3: false,
+      lookIntoEditDialog: false,
       expandLoading: false,
       lookEditDialog: false,
       centerDialogVisible: false,
@@ -512,7 +617,6 @@ export default {
       dialogList: {
         code: null,
         status: null,
-        source: null,
         time: ["", ""]
       },
       itemObj: {
@@ -548,6 +652,7 @@ export default {
         total: 0,
         link: ""
       },
+      itemInto: {},
       queryList: {
         couponName: null,
         couponCode: null,
@@ -600,50 +705,86 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
-    resetData(){
-      this.data.data.forEach(v=>{
-        v.data = []
+    lookInto(item){
+      this.lookIntoEditDialog = true
+      this.itemInto = item
+      this.getIntoData(item)
+    },
+    getIntoData(item , filter ){
+      this.loading3 = true
+      var data = {}
+      data.logId = item.id
+      // if (filter && this.expandData.current_page > 1) {
+      //   data.page = this.expandData.current_page;
+      // } else {
+      //   this.expandData.current_page = 1;
+      // }
+      data.pageNum = this.expandData.current_page
+      data.pageSize = this.expandData.per_page
+      findCodeDetailByLogId(data).then(res=>{
+         this.loading3 = false;
+        if (!res.data || res.data.length <= 0) {
+          this.$message("暂无数据~")
+          this.expandData = {
+              current_page: 1,
+              data: [],
+              last_page: 1,
+              per_page: 10,
+              total: 0,
+              link: ""
+         }
+        }
+        if( res.data && res.data.length > 0){
+          this.expandData = res;
+          this.expandData.current_page = res.pageNum
+          this.expandData.per_page = res.pageSize
+          this.expandData.total = res.total
+          this.expandData.data.forEach(v=>{
+              if(v.status == 0){
+                v.status = "未领取"
+              }else if(v.status == 1){
+                v.status = "已领取"
+              }else if(v.status == 2){
+                v.status = "已使用"
+              }else if(v.status == 3){
+                v.status = "已注销"
+              }
+              if(v.collectionTime && v.collectionTime != 0){
+                v.collectionTimeCopy = v.collectionTime
+              }
+              if(v.useTime && v.useTime != 0){
+                v.useTimeCopy = v.useTime
+              }
+              if(v.source == 0){
+                v.sourceCopy = "生成"
+              }else{
+                this.statusInfoList.forEach(i=>{
+                  if(v.source == i.id){
+                    v.sourceCopy = i.name
+                  }
+                })
+              }
+          })
+        }
       })
     },
     expandChange(row,expandedRows){
-       // 该处是用于判断是展开还是收起行，只有展开的时候做请求，避免多次请求！
+      // 该处是用于判断是展开还是收起行，只有展开的时候做请求，避免多次请求！
       // 展开的时候expandedRows有值，收起的时候为空.
       if (expandedRows.length > 0) {
         this.expandLoading = true
         var data = {}
-        // data.pageNum = this.expandData.current_page
-        // data.pageSize = this.expandData.per_page
-        data.generalId = row.cid
+        data.generalId = row.id
         findGeneralLogBygeneralId(data).then(res=>{
            this.expandLoading = false
-          //  res.data = [
-          //    {
-          //      num: "77",
-          //      channelName: "测试",
-          //      type: 0
-          //    }
-          //  ]
            if (!res.data || res.data.length <= 0) {
               this.$message("暂无数据~")
-              // this.expandData = {
-              //   current_page: 1,
-              //   data: [],
-              //   last_page: 1,
-              //   per_page: 10,
-              //   total: 0,
-              //   link: ""
-              // }
            }
            if( res.data && res.data.length > 0){
-            //  this.expandData.data = res.data;
-            //  this.expandData.current_page = res.pageNum
-            //  this.expandData.per_page = res.pageSize
-            //  this.expandData.total = res.total
-            // this.resetData()
              // 遍历当前页面表
              this.data.data.forEach((temp, index) => {
                 // 找到当前点击的行，把动态获取到的数据赋值进去
-                if (temp.cid === row.cid) {
+                if (temp.id === row.id) {
                   this.data.data[index].data = res.data
                 }
              });
@@ -651,12 +792,20 @@ export default {
         })
       }
     },
+    lookData(data){
+      this.dialogList = {
+        code: null,
+        status: null,
+        time: ["", ""]
+      }
+      this.look(data)
+    },
     look(item,filter){
       this.loading2 = true
       this.lookEditDialog = true
       this.item = item
       var data = {}
-      data.generalId = item.cid
+      data.generalId = item.id
       if (filter && this.dialog.current_page > 1) {
         data.page = this.dialog.current_page;
       } else {
@@ -732,25 +881,27 @@ export default {
             type: 'warning'
           })
       }else{
-          var { code , status , source , time } = this.dialogList
+          var { code , status , time } = this.dialogList
           var endTime = ""
           var startTime = ""
           if(time && time[0] && time[1]){
             endTime = time[1]
             startTime = time[0]
           }
-          window.location.href = `http://mp.yuyuetrip.com.cn/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
-          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/couponcodeExport?generalId=${item.cid}&code=${code}&source=${source}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/couponcodeExport?generalId=${item.cid}&code=${code}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/couponcodeExport?generalId=${item.id}&code=${code}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     resetGetData2(item){
       this.dialogList = {
         code: null,
         status: null,
-        source: null,
         time: ["", ""]
       }
       this.look(item)
+    },
+    resetGetData3(item){
+      this.getIntoData(item)
     },
     handleSelectionChange2(val){
        this.itemArr2 = val
@@ -804,11 +955,14 @@ export default {
     getPageData2(e) {
       this.look( this.item , "page" )
     },
+    getPageData3(e) {
+      this.getIntoData( this.itemInto , "page" )
+    },
     getCouponCode(){
       this.$refs['dynamicValidateForm'].validate((valid) => {
           if (valid){
             var data = this.dynamicValidateForm
-            data.generalId = this.itemId
+            data.projectId = this.itemId
             generateGeneralCouponcode(data).then(res=>{;
               if(res.code == 200){
                 this.$message({
@@ -826,8 +980,8 @@ export default {
           }
       })
     },
-    menuTwoList(){
-      findCarwashsTypeById({carwashId: this.dynamicValidateForm.carwashId}).then(res=>{
+    menuTwoList(id,bl){
+      findCarwashsTypeById({carwashId: this.itemObj.carwashId}).then(res=>{
         if(res.code == 200){
           this.menu2List = res.data
         }else{
@@ -835,8 +989,8 @@ export default {
         }
       })
     },
-    menuTwoList2(){
-      findCarwashsTypeById({carwashId: this.uploadCarwashId}).then(res=>{
+    menuTwoList2(id){
+      findCarwashsTypeById({carwashId: id}).then(res=>{
         if(res.code == 200){
           this.menu2List = res.data
         }else{
@@ -845,9 +999,8 @@ export default {
       })
     },
     audit(item){
-      this.itemId = item.cid
+      this.itemId = item.id
       this.centerDialogVisible = true
-      this.apiFindCarwashType()
     },
     apiFindCarwashType(){
       findCarwashType().then(res=>{
@@ -859,6 +1012,7 @@ export default {
       })
     },
     newlyIncreased(){
+      this.apiFindCarwashType()
       this.itemPicker = "有效期："
       this.editDialog = true
       this.period = false
@@ -899,58 +1053,69 @@ export default {
         });
     },
     compile(item){
+      this.apiFindCarwashType()
       this.itemPicker = "有效期结束："
       this.editDialog = true
       this.disabledPrice = true
       this.period = true
       this.itemObj = item
       this.itemObj.time = [item.effectTime , item.failureTime]
+      this.itemObj.carwashId = Number(item.carwashId)
+      this.itemObj.carwashsId = Number(item.carwashsId)
+      this.itemObj.channelId = Number(item.channelId)
+      this.menuTwoList(item.carwashId)
       this.failureTime = item.failureTime
     },
     itemEditDialog(){
-       var data = {}
-        data.couponName = this.itemObj.couponName
-        data.couponMoney = this.itemObj.couponMoney
-        data.content = this.itemObj.content
-      if(this.itemObj.id){
-        data.effectTime = this.itemObj.effectTime
-        data.failureTime = this.itemObj.failureTime
-        data.id = this.itemObj.id
-        // console.log(data);
-        modifyGeneralCouponById(data).then(res=>{
-          if(res.code == 200){
-            this.$message({
-                type: 'success',
-                message: '操作成功!'
-            })
-            this.editDialog = false
-          }else{
-            this.$message({
-                type: 'info',
-                message: res.msg
-            })
+      this.$refs['ruleForm'].validate((valid) => {
+          if (valid) {
+             var data = {}
+                data.couponName = this.itemObj.couponName
+                data.channelId = this.itemObj.channelId
+                data.carwashId = this.itemObj.carwashId
+                data.carwashsId = this.itemObj.carwashsId
+                data.content = this.itemObj.content
+              if(this.itemObj.id){
+                data.effectTime = this.effectTime
+                data.failureTime = this.itemObj.failureTime
+                data.id = this.itemObj.id
+                // console.log(data);
+                modifyGeneralCouponById(data).then(res=>{
+                  if(res.code == 200){
+                    this.$message({
+                        type: 'success',
+                        message: '操作成功!'
+                    })
+                    this.editDialog = false
+                  }else{
+                    this.$message({
+                        type: 'info',
+                        message: res.msg
+                    })
+                  }
+                })
+              }else{
+                if(this.itemObj.time[0] && this.itemObj.time[1]) {
+                  data.effectTime = this.itemObj.time[0]
+                  data.failureTime = this.itemObj.time[1]
+                }
+                saveGeneralCoupon(data).then(res=>{
+                  if(res.code == 200){
+                    this.$message({
+                        type: 'success',
+                        message: '操作成功!'
+                    })
+                    this.editDialog = false
+                  }else{
+                    this.$message({
+                        type: 'info',
+                        message: res.msg
+                    })
+                  }
+                })
+              }
           }
-        })
-      }else{
-        if(this.itemObj.time[0] && this.itemObj.time[1]) {
-          data.effectTime = this.itemObj.time[0]
-          data.failureTime = this.itemObj.time[1]
-        }
-        saveGeneralCoupon(data).then(res=>{
-          if(res.code == 200){
-            this.$message({
-                type: 'success',
-                message: '操作成功!'
-            })
-            this.editDialog = false
-          }else{
-            this.$message({
-                type: 'info',
-                message: res.msg
-            })
-          }
-        })
-      }
+      })
     },
     close(){
       this.itemObj = {}
@@ -958,7 +1123,8 @@ export default {
       this.failureTime = ""
     },
     close2(){
-      
+    },
+    close3(){
     },
     closeVis(){
       this.dynamicValidateForm = {}
@@ -968,11 +1134,11 @@ export default {
       var res = await findChannelName()
       this.statusInfoList = res.data
       this.statusList3 = this.statusInfoList
-      var obj = {
-        id: 0,
-        name: "生成"
-      }
-      this.statusList3.push(obj)
+      // var obj = {
+      //   id: 0,
+      //   name: "生成"
+      // }
+      // this.statusList3.push(obj)
     },
     exportData(){
       if(this.data.data.length <= 0){
@@ -989,29 +1155,29 @@ export default {
       }
     },
     submitImportExcel() {
-      if(this.facilitatorId == null){
-        this.$message({
-          type: "warning",
-          message: "请选择服务商"
-        })
-      }else if(this.uploadCarwashId == null){
-        this.$message({
-          type: "warning",
-          message: "请选择服务类型"
-        })
-      }else if(this.uploadCarwashsId == null){
-        this.$message({
-          type: "warning",
-          message: "请选择服务名称"
-        })
-      }else{
+      // if(this.facilitatorId == null){
+      //   this.$message({
+      //     type: "warning",
+      //     message: "请选择服务商"
+      //   })
+      // }else if(this.uploadCarwashId == null){
+      //   this.$message({
+      //     type: "warning",
+      //     message: "请选择服务类型"
+      //   })
+      // }else if(this.uploadCarwashsId == null){
+      //   this.$message({
+      //     type: "warning",
+      //     message: "请选择服务名称"
+      //   })
+      // }else{}
         if (this.fileList) {
           var formData = new FormData()
           formData.append('file', this.fileList[0].raw)
-          formData.append('generalId', this.item.cid)
-          formData.append('source', this.facilitatorId)
-          formData.append('carwashId', this.uploadCarwashId)
-          formData.append('carwashsId', this.uploadCarwashsId)
+          formData.append('generalId', this.item.id)
+          // formData.append('source', this.facilitatorId)
+          // formData.append('carwashId', this.uploadCarwashId)
+          // formData.append('carwashsId', this.uploadCarwashsId)
           batchCouponcodeImport(formData).then(res => {
             if(res.code == 200){
               this.uploaddialogVisible = false
@@ -1032,7 +1198,6 @@ export default {
             message: '请选择Excle文件!'
           })
         }
-      }
     },
     importExcel() {
         this.fileList = null
@@ -1151,6 +1316,9 @@ export default {
 /* element样式重置 start */
  // 处理input type = number的上下箭头
  @import "../../styles/cascader.css";
+ /deep/.el-table__expanded-cell{
+   background: #f0f9eb !important;
+ }
  /deep/.el-table__expand-icon {
    height: 60px;
    >i{

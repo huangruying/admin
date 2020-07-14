@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findVehicleServicePrice(data) {
     return request({
-      url: '/vsp/findVehicleServicePrice',
+      url: '/wash/vsp/findVehicleServicePrice',
       method: 'post',
       data
     })
@@ -10,7 +10,7 @@ export function findVehicleServicePrice(data) {
 
   export function delVehicleServicePriceById(data) {
     return request({
-      url: '/vsp/delVehicleServicePriceById',
+      url: '/wash/vsp/delVehicleServicePriceById',
       method: 'post',
       data
     })
@@ -18,7 +18,7 @@ export function findVehicleServicePrice(data) {
 
   export function modifyVehicleServicePrice(data) {
     return request({
-      url: '/vsp/modifyVehicleServicePrice',
+      url: '/wash/vsp/modifyVehicleServicePrice',
       method: 'post',
       data
     })
@@ -26,7 +26,7 @@ export function findVehicleServicePrice(data) {
 
   export function saveVehicleServicePrice(data) {
     return request({
-      url: '/vsp/saveVehicleServicePrice',
+      url: '/wash/vsp/saveVehicleServicePrice',
       method: 'post',
       data
     })

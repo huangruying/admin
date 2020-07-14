@@ -111,3 +111,11 @@ export function findGeneralLogBygeneralId(data) {
     data
   })
 }
+
+export function findCodeDetailByLogId(data) {
+  return request({
+    url: '/wash/generalLog/findCodeDetailByLogId',
+    method: 'post',
+    data
+  })
+}

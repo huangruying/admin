@@ -378,8 +378,8 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
+          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExports?monthIds=${id}`
           this.getData()
           // serviceOrderMonthExports({monthIds: id}).then(res=>{
           //   // this.down(`${this.thishostName}${res.url}`)
@@ -399,9 +399,9 @@ export default {
           })
       }else{
           var {orderNo,licensePlate,couponCode} = this.queryList2
-          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}
-          // &orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}`
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}&orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}&channelId=${this.id}&month=${this.month}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}
+          &orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}`
+          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/channelMonth/channelOrderMonthExport?pageNum=${this.lobbyData.current_page}&pageSize=${this.lobbyData.per_page}&orderNo=${orderNo}&couponCode=${couponCode}&licensePlate=${licensePlate}&channelId=${this.id}&month=${this.month}`
       }
     },
     open(id,remark) {

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function findVehicleChannelPrice(data) {
   return request({
-    url: '/vcp/findVehicleChannelPrice',
+    url: '/wash/vcp/findVehicleChannelPrice',
     method: 'post',
     data
   })
@@ -10,7 +10,7 @@ export function findVehicleChannelPrice(data) {
 
 export function modifyVehicleChannelPrice(data) {
     return request({
-      url: '/vcp/modifyVehicleChannelPrice',
+      url: '/wash/vcp/modifyVehicleChannelPrice',
       method: 'post',
       data
     })
@@ -18,7 +18,7 @@ export function modifyVehicleChannelPrice(data) {
 
   export function saveVehicleChannelPrice(data) {
     return request({
-      url: '/vcp/saveVehicleChannelPrice',
+      url: '/wash/vcp/saveVehicleChannelPrice',
       method: 'post',
       data
     })
@@ -26,7 +26,7 @@ export function modifyVehicleChannelPrice(data) {
 
   export function delVehicleChannelPriceById(data) {
     return request({
-      url: '/vcp/delVehicleChannelPriceById',
+      url: '/wash/vcp/delVehicleChannelPriceById',
       method: 'post',
       data
     })

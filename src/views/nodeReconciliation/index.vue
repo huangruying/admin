@@ -408,8 +408,8 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // window.location.href = `http://mp.yuyuetrip.com.cn/wash/servicerMonth/serviceOrderMonthExports?monthIds=${id}`
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/servicerMonth/serviceOrderMonthExports?monthIds=${id}`
+          window.location.href = `http://mp.yuyuetrip.com.cn/wash/servicerMonth/serviceOrderMonthExports?monthIds=${id}`
+          // window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/servicerMonth/serviceOrderMonthExports?monthIds=${id}`
           this.getData()
           // serviceOrderMonthExports({monthIds: id}).then(res=>{
           //   // this.down(`${this.thishostName}${res.url}`)

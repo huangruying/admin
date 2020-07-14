@@ -174,9 +174,9 @@
       </el-table-column>
       <el-table-column label="操作" width="230" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="pass(scope.row)" v-if="scope.row.status != 1">审批</el-button>
-          <el-button size="mini" type="primary" @click="edit(scope.row)">查看</el-button>
-          <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
+          <el-button size="mini" type="primary" @click="edit(scope.row)">查 看</el-button>
+          <el-button size="mini" type="primary" @click="pass(scope.row)" v-if="scope.row.status != 1">审 批</el-button>
+          <el-button size="mini" type="primary" @click="compile(scope.row)">编 辑</el-button>
         </template>
       </el-table-column>
     </el-table>
